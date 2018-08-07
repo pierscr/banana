@@ -161,7 +161,7 @@ function (angular, app, _, $, d3) {
           // Clear the panel
           element.html('');
 
-
+          var animationStep = 400;
 
           var parent_width = element.parent().width(),
               parentheight = parseInt(scope.row.height),
@@ -181,44 +181,6 @@ function (angular, app, _, $, d3) {
           //var margin = {top: 20, right: 20, bottom: 30, left: 40};
 
 
-//ordial1 (yaer)
-          var x0 = d3.scale.ordinal()
-            .domain(scope.data.range1)
-            .rangeRoundBands([0, width],0.1);
-
-
-//ordila2 (cluster)
-          var x1 = d3.scale.ordinal()
-              .domain(scope.data.range2)
-              .rangeRoundBands([0, x0.rangeBand()],0.05);
-
-//conteggio
-          var y = d3.scale.linear()
-              .domain([0,d3.max(
-                scope.data.values,
-                function(d) {
-                  /*
-                  console.log("array to max evaluate");
-                  console.log(d);
-                  */
-                  return d3.max(d.pivot, function(obj) {
-                    /*
-                    console.log("object to count");
-                    console.log(obj.count);
-                    */
-                    return obj.count;
-                  });
-                  }
-                )]).nice()
-              .rangeRound([ height,0]);
-
-
-
-//anni
-
-          var z = d3.scale.ordinal()
-              .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
-
           //var g = chart.append("g").attr("transform", "translate(30,30)");
 
           var force = d3.layout
@@ -229,11 +191,11 @@ function (angular, app, _, $, d3) {
             .size([width, height]);
 
            force
-              .nodes(nodes)
-              .links(links);
+              .nodes(scope.data.nodes)
+              .links(scope.data.links);
 
             var link = chart.selectAll('.link')
-              .data(links)
+              .data(scope.data.links)
               .enter().append('line')
               .attr('class', 'link')
               .attr('x1', function(d) { return d.source.x; })
@@ -244,10 +206,10 @@ function (angular, app, _, $, d3) {
           // Now it's the nodes turn. Each node is drawn as a circle.
 
           var node = chart.selectAll('.node')
-              .data(nodes)
+              .data(scope.data.nodes)
               .enter().append('g')
               .attr('class', 'node')
-              .attr("transform", function(d){return "translate("+d.x+","+d.y+")"})
+              .attr("transform", function(d){return "translate("+d.x+","+d.y+")";});
 
 
               node
@@ -263,7 +225,7 @@ function (angular, app, _, $, d3) {
 
 
                 node.transition().ease('linear').duration(animationStep)
-                    .attr("transform", function(d){return "translate("+d.x+","+d.y+")"})
+                    .attr("transform", function(d){return "translate("+d.x+","+d.y+")";});
 
 
 
