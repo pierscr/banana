@@ -121,6 +121,7 @@ function (Settings) {
       'tagcloud',
       'multibar',
       'multiseries',
+      'networkgraph',
       'sunburst',
       'docviewer'
     ]
