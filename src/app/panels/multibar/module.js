@@ -13,6 +13,13 @@ define([
 function (angular, app, _, $, d3, d3tip) {
   'use strict';
 
+  var debug = function(message){
+    var ACTIVE=true;
+    if(ACTIVE){
+      console.log(message);
+    }
+  };
+
   var module = angular.module('kibana.panels.multibar', []);
   app.useModule(module);
 
@@ -119,23 +126,19 @@ function (angular, app, _, $, d3, d3tip) {
       // Execute the search and get results
       var results = request.doSearch();
 
-      console.log(results);
-
       // Populate scope when we have results
       results.then(function(results) {
           $scope.data = {};
           // var range1set=new Set();
           // var range2set=new Set();
         // var parsedResults = d3.json.parse(results, function(d) {
-          console.log("data:"+results);
-          console.log("panale field1:"+$scope.panel.field1);
-          console.log("panale field2:"+$scope.panel.field2);
+
           $scope.data = {range1:[],range2:[],values:[]};
 
           // $scope.data.range2 = results.facet_counts.facet_fields[$scope.panel.field2].filter(function(val,index){ if((index+1) % 2){ return val;}});
-          // console.log("range2:"+  $scope.data.range2);
+          // debug("range2:"+  $scope.data.range2);
           $scope.data.values = d3.values(results.facet_counts.facet_pivot[$scope.panel.field1+","+$scope.panel.field2]);
-          console.log("values:"+  $scope.data.values);
+
 
           $scope.addToSet=function(set,val){
               return set.add(val.value);
@@ -152,7 +155,7 @@ function (angular, app, _, $, d3, d3tip) {
             $scope.data.values.reduce($scope.addToSet,new Set())
               );
 
-          console.log("range1:"+  $scope.data.range1);
+
 
           $scope.data.range2 =  Array.from(
               $scope.data.values
@@ -160,29 +163,19 @@ function (angular, app, _, $, d3, d3tip) {
                 .reduce($scope.addToSet,new Set())
           );
 
-          console.log("range2:"+  $scope.data.range2);
+
+            debug("data:"+results);
+            debug("panale field1:"+$scope.panel.field1);
+            debug("panale field2:"+$scope.panel.field2);
+            debug("values:"+  $scope.data.values);
+            debug("range1:"+  $scope.data.range1);
+            debug("range2:"+  $scope.data.range2);
 
           $scope.render();
       });
 
       // Hide the spinning wheel icon
       $scope.panelMeta.loading = false;
-
-      //-----> data retrieve
-
-      // d3.json("/solr/example_data/cluster.json", function(data) {
-      //     console.log("data:"+data);
-      //     console.log("panale field1:"+$scope.panel.field1);
-      //     console.log("panale field2:"+$scope.panel.field2);
-      //     $scope.data = {range1:[],range2:[],values:[]};
-      //     $scope.data.range1 = data.facet_counts.facet_fields[$scope.panel.field1].filter(function(val,index){ if((index+1) % 2){return val;}});
-      //     console.log("range1:"+  $scope.data.range1);
-      //     $scope.data.range2 = data.facet_counts.facet_fields[$scope.panel.field2].filter(function(val,index){ if((index+1) % 2){ return val;}});
-      //     console.log("range2:"+  $scope.data.range2);
-      //     $scope.data.values = d3.values(data.facet_counts.facet_pivot).pop();
-      //     console.log("values:"+  $scope.data.values);
-      //     $scope.render();
-      // });
 
       $scope.panelMeta.loading = false;
     };
@@ -213,8 +206,9 @@ function (angular, app, _, $, d3, d3tip) {
               width = parent_width - 20,
               height = parentheight -50;
 //              barHeight = height / scope.data.length;
-              console.log("height:"+height);
-              console.log("width"+ width );
+                debug("height:"+height);
+                debug("width"+ width )
+;
           // var x = d3.scale.linear()
           //           .domain([0, d3.max(scope.data)])
           //           .range([0, width]);
@@ -243,13 +237,13 @@ function (angular, app, _, $, d3, d3tip) {
                 scope.data.values,
                 function(d) {
                   /*
-                  console.log("array to max evaluate");
-                  console.log(d);
+                  debug("array to max evaluate");
+                  debug(d);
                   */
                   return d3.max(d.pivot, function(obj) {
                     /*
-                    console.log("object to count");
-                    console.log(obj.count);
+                    debug("object to count");
+                    debug(obj.count);
                     */
                     return obj.count;
                   });
@@ -281,13 +275,13 @@ function (angular, app, _, $, d3, d3tip) {
             .data(scope.data.values)
             .enter().append("g")
               .attr("transform", function(d) {
-                console.log(d.value);
+                debug(d.value);
                 return "translate(" + x0(d.value) + ",0)";
               })
             .selectAll("rect")
             .data(function(d) {
-              console.log("cluster data selected:");
-              console.log(d);
+              debug("cluster data selected:");
+              debug(d);
               var range =  Array.from(d.pivot.reduce(scope.addToSet,new Set()));
 
               d.newScale = d3.scale.ordinal()
@@ -298,9 +292,8 @@ function (angular, app, _, $, d3, d3tip) {
             })
             .enter().append("rect")
               .attr("x", function(d) {
-
-                console.log("x rect:"+d.value);
-                console.log("x rect coded:"+this.parentNode.__data__.newScale(d.value));
+                debug("x rect:"+d.value);
+                debug("x rect coded:"+this.parentNode.__data__.newScale(d.value));
                 return this.parentNode.__data__.newScale(d.value);
               })
               .attr("y", function(d) {
@@ -308,19 +301,21 @@ function (angular, app, _, $, d3, d3tip) {
               })
               .attr("width", function(){return this.parentNode.__data__.newScale.rangeBand();})
               .attr("height", function(d) {
-                console.log("object to draw");
-                console.log(d);
-                console.log("height calculation");
-                console.log("height:"+height);
-                console.log("d.value:"+d.count);
-                console.log(" y(d.value):"+ y(d.count));
-                console.log("eventualy y value:"+ height - y(d.count));
+                debug("object to draw");
+                debug(d);
+                debug("height calculation");
+                debug("height:"+height);
+                debug("d.value:"+d.count);
+                debug(" y(d.value):"+ y(d.count));
+                debug("eventualy y value:"+ height - y(d.count));
+
                 return height - y(d.count);
               })
               .attr("fill", function(d) {
-                console.log("color number:"+d.value);
-                console.log("color code"+z(d.value));
-                return z(d.value); })
+                debug("color number:"+d.value);
+                debug("color code"+z(d.value));
+                return z(d.value);
+              })
               .on('mouseover', tip.show)
               .on('mouseout', tip.hide)
               .on('click', function(d){ tip.hide(); scope.build_search(d.value);});
