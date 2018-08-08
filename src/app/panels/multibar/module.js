@@ -78,6 +78,15 @@ function (angular, app, _, $, d3, d3tip) {
       $scope.$emit('render');
     };
 
+    $scope.build_search = function(word) {
+      if(word) {
+        filterSrv.set({type:'terms',field:$scope.panel.field2,value:word,mandate:'must'});
+      } else {
+        return;
+      }
+      dashboard.refresh();
+    };
+
     $scope.get_data = function() {
       // Show the spinning wheel icon
       $scope.panelMeta.loading = true;
@@ -261,7 +270,11 @@ function (angular, app, _, $, d3, d3tip) {
               .attr('class', 'd3-tip')
               .offset([-10, 0])
               .html(function(d) {
-                  return "<strong>Frequency:</strong> <span style='color:red'>" + d.value + "</span>";
+                  var p=this.parentNode.__data__;
+                  return "<div><strong>"+d.field+":</strong> <span style='color:red'>" + d.value + "</span></div>"+
+                  "<div><strong>Value</strong> <span style='color:red'>" + d.count + "</span></div>"+
+                  "<div><strong>"+p.field+":</strong> <span style='color:red'>" + p.value + "</span></div>"+
+                  "<div><strong>Value</strong> <span style='color:red'>" + p.count + "</span></div>";
               });
 
           g.selectAll("g")
@@ -309,7 +322,8 @@ function (angular, app, _, $, d3, d3tip) {
                 console.log("color code"+z(d.value));
                 return z(d.value); })
               .on('mouseover', tip.show)
-              .on('mouseout', tip.hide);
+              .on('mouseout', tip.hide)
+              .on('click', function(d){ tip.hide(); scope.build_search(d.value);});
 
               chart.call(tip);
 
