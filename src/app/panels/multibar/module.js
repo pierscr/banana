@@ -7,9 +7,10 @@ define([
   'app',
   'underscore',
   'jquery',
-  'd3'
+  'd3',
+  'd3tip'
 ],
-function (angular, app, _, $, d3) {
+function (angular, app, _, $, d3, d3tip) {
   'use strict';
 
   var module = angular.module('kibana.panels.multibar', []);
@@ -256,7 +257,12 @@ function (angular, app, _, $, d3) {
 
           var g = chart.append("g").attr("transform", "translate(30,30)");
 
-          var newScale;
+          var tip = d3tip()
+              .attr('class', 'd3-tip')
+              .offset([-10, 0])
+              .html(function(d) {
+                  return "<strong>Frequency:</strong> <span style='color:red'>" + d.value + "</span>";
+              });
 
           g.selectAll("g")
             .data(scope.data.values)
@@ -287,7 +293,7 @@ function (angular, app, _, $, d3) {
               .attr("y", function(d) {
                 return y(d.count);
               })
-              .attr("width", function(){return this.parentNode.__data__.newScale.rangeBand()})
+              .attr("width", function(){return this.parentNode.__data__.newScale.rangeBand();})
               .attr("height", function(d) {
                 console.log("object to draw");
                 console.log(d);
@@ -301,7 +307,12 @@ function (angular, app, _, $, d3) {
               .attr("fill", function(d) {
                 console.log("color number:"+d.value);
                 console.log("color code"+z(d.value));
-                return z(d.value); });
+                return z(d.value); })
+              .on('mouseover', tip.show)
+              .on('mouseout', tip.hide);
+
+              chart.call(tip);
+
 
           g.append("g")
               .attr("class", "axis")
