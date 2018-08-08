@@ -185,9 +185,9 @@ function (angular, app, _, $, d3) {
 
           var force = d3.layout
             .force()
-            .linkDistance(100)
-            .charge(-150)
-            .gravity(0)
+            .linkDistance(30)
+            .charge(-50)
+            .gravity(0.1)
             .size([width, height]);
 
            force
