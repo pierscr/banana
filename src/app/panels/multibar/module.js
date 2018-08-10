@@ -366,19 +366,25 @@ function (angular, app, _, $, d3, d3tip) {
           g.append("g")
               .attr("class", "axis")
               .attr("transform", "translate(0," + height + ")")
-              .call(d3.svg.axis().scale(x0).orient("bottom").tickFormat(function(d) { return d.field1Index;}));
+              .call(d3.svg.axis().scale(x0)
+              .orient("bottom")
+              .tickFormat(function(d,i) {
+                console.log(i);
+                console.log(d.field1Index);
+                return i;
+              }));
 
           g.append("g")
               .attr("class", "axis")
               .call(d3.svg.axis().scale(y).orient("left").ticks(null, "s"))
             .append("text")
-              .attr("x", 2)
-              .attr("y", y(y.ticks().pop()) + 0.5)
+              .attr("x", -30)
+              .attr("y", y(y.ticks().pop()) + -20)
               .attr("dy", "0.32em")
               .attr("fill", "#000")
               .attr("font-weight", "bold")
               .attr("text-anchor", "start")
-              .text("Cluster count");
+              .text("Documents");
 
           var legend = g.append("g")
               .attr("font-family", "sans-serif")
