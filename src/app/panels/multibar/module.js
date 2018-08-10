@@ -14,7 +14,7 @@ function (angular, app, _, $, d3, d3tip) {
   'use strict';
 
   var debug = function(message){
-    var ACTIVE=true;
+    var ACTIVE=false;
     if(ACTIVE){
       console.log(message);
     }
@@ -138,7 +138,7 @@ function (angular, app, _, $, d3, d3tip) {
           // $scope.data.range2 = results.facet_counts.facet_fields[$scope.panel.field2].filter(function(val,index){ if((index+1) % 2){ return val;}});
           // debug("range2:"+  $scope.data.range2);
           $scope.data.values = d3.values(results.facet_counts.facet_pivot[$scope.panel.field1+","+$scope.panel.field2]);
-
+          //$scope.total.facet1
 
           $scope.addToSet=function(set,val){
               return set.add(val.value);
@@ -252,6 +252,16 @@ function (angular, app, _, $, d3, d3tip) {
               .rangeRound([ height,0]);
 
 
+/* total value of field1*/
+
+          var totalY =  d3.scale.linear()
+                              .domain([0,d3.max(scope.data.values,
+                                  function(d){
+                                          return d.count;
+                                      })
+                                    ])
+                        .rangeRound([ height,0]);
+
 
 //anni
 
@@ -260,33 +270,41 @@ function (angular, app, _, $, d3, d3tip) {
 
           var g = chart.append("g").attr("transform", "translate(30,30)");
 
-          var tip = d3tip()
+          var tipField1 = d3tip()
               .attr('class', 'd3-tip')
               .offset([-10, 0])
-              .html(function(d) {
-                  var p=this.parentNode.__data__;
-                  return "<div><strong>"+d.field+":</strong> <span style='color:red'>" + d.value + "</span></div>"+
-                  "<div><strong>Value</strong> <span style='color:red'>" + d.count + "</span></div>"+
-                  "<div><strong>"+p.field+":</strong> <span style='color:red'>" + p.value + "</span></div>"+
+              .html(function(p) {
+                  return "<div><strong>"+p.field+":</strong> <span style='color:red'>cluster_" + p.field1Index+ "</span></div>"+
                   "<div><strong>Value</strong> <span style='color:red'>" + p.count + "</span></div>";
               });
 
-          g.selectAll("g")
+          var tipField2 = d3tip()
+              .attr('class', 'd3-tip')
+              .offset([-10, 0])
+              .html(function(d) {
+                  return "<div><strong>"+d.field+":</strong> <span style='color:red'>" + d.value + "</span></div>"+
+                  "<div><strong>Value</strong> <span style='color:red'>" + d.count + "</span></div>";
+              });
+
+          var field1Block=g.selectAll("g")
             .data(scope.data.values)
             .enter().append("g")
               .attr("transform", function(d) {
                 debug(d.value);
                 return "translate(" + x0(d.value) + ",0)";
-              })
-            .selectAll("rect")
-            .data(function(d) {
+              });
+
+          field1Block.selectAll("rect")
+            .data(function(d,i) {
               debug("cluster data selected:");
               debug(d);
+              console.log("indice?:",i);
               var range =  Array.from(d.pivot.reduce(scope.addToSet,new Set()));
 
               d.newScale = d3.scale.ordinal()
                   .domain(range)
                   .rangeRoundBands([0, x0.rangeBand()],0.05);
+              d.field1Index=i;
 
               return d.pivot;
             })
@@ -316,17 +334,39 @@ function (angular, app, _, $, d3, d3tip) {
                 debug("color code"+z(d.value));
                 return z(d.value);
               })
-              .on('mouseover', tip.show)
-              .on('mouseout', tip.hide)
-              .on('click', function(d){ tip.hide(); scope.build_search(d.value);});
+              .on('mouseover', tipField2.show)
+              .on('mouseout', tipField2.hide)
+              .on('click', function(d){ tipField2.hide(); scope.build_search(d.value);});
 
-              chart.call(tip);
 
+
+          field1Block.selectAll("circle")
+            .data(function(d){
+              return new Array(d);
+            })
+            .enter()
+            .append("circle")
+            .attr("class","field1total")
+            .attr("cx",function(){
+              debug("x value"+x0.rangeBand()/2);
+              return (x0.rangeBand()/2);
+              })
+              .attr("cy",function(d){
+                console.log("d.value",d.count);
+                console.log("scale d.value",totalY(d.count));
+                return totalY(d.count);
+              })
+            .on('mouseover', tipField1.show)
+            .on('mouseout', tipField1.hide);
+
+
+          chart.call(tipField1);
+          chart.call(tipField2);
 
           g.append("g")
               .attr("class", "axis")
               .attr("transform", "translate(0," + height + ")")
-              .call(d3.svg.axis().scale(x0).orient("bottom").tickFormat(function(d) { return d.slice(1,3); }));
+              .call(d3.svg.axis().scale(x0).orient("bottom").tickFormat(function(d) { return d.field1Index;}));
 
           g.append("g")
               .attr("class", "axis")
