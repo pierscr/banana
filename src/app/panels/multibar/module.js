@@ -14,7 +14,7 @@ function (angular, app, _, $, d3, d3tip) {
   'use strict';
 
   var debug = function(message){
-    var ACTIVE=false;
+    var ACTIVE=true;
     if(ACTIVE){
       console.log(message);
     }
@@ -109,12 +109,42 @@ function (angular, app, _, $, d3, d3tip) {
       }
       var wt = '&wt=json';
       //var fl = '&fl=' + $scope.panel.field;
-      var rows_limit = '&rows=' + $scope.panel.max_rows;
-      var pivot_field = '&facet=true&facet.pivot=' + $scope.panel.field1 +","+$scope.panel.field2;
+      var rows_limit = '&rows=' +$scope.panel.max_number_r;
+      //var pivot_field = '&facet=true&facet.pivot=' + $scope.panel.field1 +","+$scope.panel.field2;
       var facet_fields = '&facet.field=' + $scope.panel.field1 +"&facet.field=" +$scope.panel.field2;
       var facet_limit="&facet.limit="+$scope.panel.max_number_r;
+      var pivot_field="&facet=true&json.facet={top_field1:{type: terms,field: cluster_h,allBuckets:true,numBuckets:true,limit:"+$scope.panel.max_number_r+",facet:{top_field2:{type : terms,field: escluster_str_patent_codes,limit:"+$scope.panel.max_number_r+",allBuckets:true,numBuckets:true}}}}";
+
 
       $scope.panel.queries.query = querySrv.getQuery(0) + fq + pivot_field +facet_fields+facet_limit+ wt + rows_limit;
+
+      //facet=true&stats=true&facet.field=cluster_h&stats.field=escluster_str_patent_codes&stats.field=cluster_h&facet.field=escluster_str_patent_codes&stats.calcdistinct=true
+
+      //facet=true&json.facet={categories:{type:terms,field:cluster_h,limit:3,numBuckets:true}}
+
+      //facet=true&json.facet={top_field1:{type: terms,field: cluster_h,allBuckets:true,numBuckets:true,facet:{top_field2:{type : terms,field: escluster_str_patent_codes,limit:5,allBuckets:true,numBuckets:true}}}}
+
+      //facet=true&json.facet={top_escluster_str_patent_codes:{type: terms,field: escluster_str_patent_codes,allBuckets:true,numBuckets:true,facet:{top_cluster_h:{type : terms,field: cluster_h,limit:5,allBuckets:true,numBuckets:true}}}}
+
+      /*
+      "facets": {
+         "count": 497,
+         "top_cluster_h": {
+           "numBuckets": 19,
+           "allBuckets": {
+             "count": 497
+           },
+           "buckets": [
+             {
+               "val": "b60c1_00,b65d51_24,b24b9_10,a24f47_00,c03b37_018,b65g49_06,b65d49_00,c04b18_02,b08b3_08,b60j7_043",
+               "count": 123,
+               "top_escluster_str_patent_codes": {
+                 "numBuckets": 233,
+                 "allBuckets": {
+                   "count": 249
+                 },
+    */
+
 
       // Set the additional custom query
       if ($scope.panel.queries.custom != null) {
@@ -122,6 +152,8 @@ function (angular, app, _, $, d3, d3tip) {
       } else {
           request = request.setQuery($scope.panel.queries.query);
       }
+
+
 
       // Execute the search and get results
       var results = request.doSearch();
@@ -133,30 +165,33 @@ function (angular, app, _, $, d3, d3tip) {
           // var range2set=new Set();
         // var parsedResults = d3.json.parse(results, function(d) {
 
-          $scope.data = {range1:[],range2:[],values:[]};
+          $scope.data = {range1:[],range2:[],values:[],field1stat:{tot_docs:0,field_count:0}};
 
           // $scope.data.range2 = results.facet_counts.facet_fields[$scope.panel.field2].filter(function(val,index){ if((index+1) % 2){ return val;}});
           // debug("range2:"+  $scope.data.range2);
-          $scope.data.values = d3.values(results.facet_counts.facet_pivot[$scope.panel.field1+","+$scope.panel.field2]);
-          //$scope.total.facet1
+          //-->
+          //$scope.data.values = d3.values(results.facet_counts.facet_pivot[$scope.panel.field1+","+$scope.panel.field2]);
+          //-->
+          //list di tutti i cluster
+          $scope.data.values = d3.values(results.facets['top_field1'].buckets);
+          $scope.data.field1stat.tot_docs=results.facets['top_field1'].allBuckets.count;
+          $scope.data.field1stat.field_count=results.facets['top_field1'].numBuckets;
 
           $scope.addToSet=function(set,val){
-              return set.add(val.value);
+              return set.add(val.val);
           };
 
           $scope.flatNestedArray=function(array,curr){
-              return array.concat(curr.pivot);
+              return array.concat(curr['top_field2'].buckets);
           };
 
-
-
-
+          //range first field (cluster)
           $scope.data.range1 =  Array.from(
             $scope.data.values.reduce($scope.addToSet,new Set())
               );
 
 
-
+          //range second field (patent)
           $scope.data.range2 =  Array.from(
               $scope.data.values
                 .reduce($scope.flatNestedArray,[])
@@ -240,7 +275,7 @@ function (angular, app, _, $, d3, d3tip) {
                   debug("array to max evaluate");
                   debug(d);
                   */
-                  return d3.max(d.pivot, function(obj) {
+                  return d3.max(d.top_field2.buckets, function(obj) {
                     /*
                     debug("object to count");
                     debug(obj.count);
@@ -274,45 +309,48 @@ function (angular, app, _, $, d3, d3tip) {
               .attr('class', 'd3-tip')
               .offset([-10, 0])
               .html(function(p) {
-                  return "<div><strong>"+p.field+":</strong> <span style='color:red'>cluster_" + p.field1Index+ "</span></div>"+
-                  "<div><strong>Value</strong> <span style='color:red'>" + p.count + "</span></div>";
+                  return "<div><strong>"+scope.panel.field1+":</strong> <span style='color:red'>" + p.val.substr(0,4)+ "</span></div>"+
+                  "<div><strong>"+scope.panel.field1+" documents</strong> <span style='color:red'>" + p.count + "</span></div>"+
+                  "<div><strong>total "+scope.panel.field1+" counts</strong> <span style='color:red'>" + scope.data.field1stat.field_count + "</span></div>"+
+                  "<div><strong>total docs</strong> <span style='color:red'>" + scope.data.field1stat.tot_docs + "</span></div>";
               });
 
           var tipField2 = d3tip()
               .attr('class', 'd3-tip')
               .offset([-10, 0])
               .html(function(d) {
-                  return "<div><strong>"+d.field+":</strong> <span style='color:red'>" + d.value + "</span></div>"+
-                  "<div><strong>Value</strong> <span style='color:red'>" + d.count + "</span></div>";
+                  return "<div><strong>"+scope.panel.field2+":</strong> <span style='color:red'>" + d.val + "</span></div>"+
+                  "<div><strong>number of different "+scope.panel.field2+"</strong> <span style='color:red'>" + this.parentNode.__data__.top_field2.numBuckets + "</span></div>"+
+                  "<div><strong>total "+scope.panel.field2+" for this "+scope.panel.field1+"</strong> <span style='color:red'>" + this.parentNode.__data__.top_field2.allBuckets.count + "</span></div>"+
+                  "<div><strong>documents</strong> <span style='color:red'>" + d.count + "</span></div>";
               });
 
           var field1Block=g.selectAll("g")
             .data(scope.data.values)
             .enter().append("g")
               .attr("transform", function(d) {
-                debug(d.value);
-                return "translate(" + x0(d.value) + ",0)";
+                debug(d.val);
+                return "translate(" + x0(d.val) + ",0)";
               });
 
           field1Block.selectAll("rect")
             .data(function(d,i) {
               debug("cluster data selected:");
               debug(d);
-              console.log("indice?:",i);
-              var range =  Array.from(d.pivot.reduce(scope.addToSet,new Set()));
+              var range =  Array.from(d.top_field2.buckets.reduce(scope.addToSet,new Set()));
 
               d.newScale = d3.scale.ordinal()
                   .domain(range)
                   .rangeRoundBands([0, x0.rangeBand()],0.05);
               d.field1Index=i;
 
-              return d.pivot;
+              return d['top_field2'].buckets;
             })
             .enter().append("rect")
               .attr("x", function(d) {
-                debug("x rect:"+d.value);
-                debug("x rect coded:"+this.parentNode.__data__.newScale(d.value));
-                return this.parentNode.__data__.newScale(d.value);
+                debug("x rect:"+d.val);
+                debug("x rect coded:"+this.parentNode.__data__.newScale(d.val));
+                return this.parentNode.__data__.newScale(d.val);
               })
               .attr("y", function(d) {
                 return y(d.count);
@@ -330,13 +368,13 @@ function (angular, app, _, $, d3, d3tip) {
                 return height - y(d.count);
               })
               .attr("fill", function(d) {
-                debug("color number:"+d.value);
-                debug("color code"+z(d.value));
-                return z(d.value);
+                debug("color number:"+d.val);
+                debug("color code"+z(d.val));
+                return z(d.val);
               })
               .on('mouseover', tipField2.show)
               .on('mouseout', tipField2.hide)
-              .on('click', function(d){ tipField2.hide(); scope.build_search(d.value);});
+              .on('click', function(d){ tipField2.hide(); scope.build_search(d.val);});
 
 
 
@@ -369,9 +407,8 @@ function (angular, app, _, $, d3, d3tip) {
               .call(d3.svg.axis().scale(x0)
               .orient("bottom")
               .tickFormat(function(d,i) {
-                console.log(i);
-                console.log(d.field1Index);
-                return i;
+                i;
+                return d.substr(0,4);
               }));
 
           g.append("g")
