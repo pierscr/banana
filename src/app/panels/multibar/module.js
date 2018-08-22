@@ -8,13 +8,14 @@ define([
   'underscore',
   'jquery',
   'd3',
-  'd3tip'
+  'd3tip',
+  'palettejs'
 ],
-function (angular, app, _, $, d3, d3tip) {
+function (angular, app, _, $, d3, d3tip,palettejs) {
   'use strict';
 
   var debug = function(message){
-    var ACTIVE=true;
+    var ACTIVE=false;
     if(ACTIVE){
       console.log(message);
     }
@@ -205,6 +206,7 @@ function (angular, app, _, $, d3, d3tip) {
             debug("values:"+  $scope.data.values);
             debug("range1:"+  $scope.data.range1);
             debug("range2:"+  $scope.data.range2);
+            console.log($scope.data.range2);
 
           $scope.render();
       });
@@ -299,9 +301,10 @@ function (angular, app, _, $, d3, d3tip) {
 
 
 //anni
+          //console.log(palette('tol-rainbow', 10).map(function(a){return "#"+a}));
 
           var z = d3.scale.ordinal()
-              .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+              .range(palette('tol-rainbow', scope.data.range2.length).map(function(a){return "#"+a}));
 
           var g = chart.append("g").attr("transform", "translate(30,30)");
 
@@ -423,14 +426,14 @@ function (angular, app, _, $, d3, d3tip) {
               .attr("text-anchor", "start")
               .text("Documents");
 
-          var legend = g.append("g")
-              .attr("font-family", "sans-serif")
-              .attr("font-size", 10)
-              .attr("text-anchor", "end")
-            .selectAll("g")
-            .data(scope.data.range2.reverse())
-            .enter().append("g")
-              .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+          // var legend = g.append("g")
+          //     .attr("font-family", "sans-serif")
+          //     .attr("font-size", 10)
+          //     .attr("text-anchor", "end")
+          //   .selectAll("g")
+          //   .data(scope.data.range2)
+          //   .enter().append("g")
+          //     .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
           legend.append("rect")
               .attr("x", width - 19)
