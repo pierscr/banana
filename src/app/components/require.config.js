@@ -44,7 +44,8 @@ require.config({
     elasticjs:                '../vendor/elasticjs/elastic-angular-client',
     solrjs:                   '../vendor/solrjs/solr-angular-client',
     d3:                       '../vendor/d3',
-    d3tip:                   '../vendor/d3.tip'
+    d3tip:                   '../vendor/d3.tip',
+    palettejs:                 '../vendor/palette'
   },
   shim: {
     underscore: {
