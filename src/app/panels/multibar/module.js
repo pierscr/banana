@@ -312,20 +312,22 @@ function (angular, app, _, $, d3, d3tip,palettejs) {
               .attr('class', 'd3-tip')
               .offset([-10, 0])
               .html(function(p) {
-                  return "<div><strong>"+scope.panel.field1+":</strong> <span style='color:red'>" + p.val.substr(0,4)+ "</span></div>"+
-                  "<div><strong>"+scope.panel.field1+" documents</strong> <span style='color:red'>" + p.count + "</span></div>"+
-                  "<div><strong>total "+scope.panel.field1+" counts</strong> <span style='color:red'>" + scope.data.field1stat.field_count + "</span></div>"+
-                  "<div><strong>total docs</strong> <span style='color:red'>" + scope.data.field1stat.tot_docs + "</span></div>";
+                  return "<div><strong>Cluster name</strong> <span style='color:red'>" + p.val.substr(0,4)+ "</span></div>"+
+                  "<div><strong>Patents </strong> <span style='color:red'>" + p.count + "</span></div>"+
+                  "<div><strong>Unique patent category</strong> <span style='color:red'>" + this.__data__.top_field2.numBuckets + "</span></div>"+
+                  "<div><strong>Patent category</strong> <span style='color:red'>" + this.__data__.top_field2.allBuckets.count + "</span></div>"+
+                  "<hr>"+
+                  "<h4>Total</h4>"+
+                  "<div><strong>Cluster</strong> <span style='color:red'>" + scope.data.field1stat.field_count + "</span></div>"+
+                  "<div><strong>Patents</strong> <span style='color:red'>" + scope.data.field1stat.tot_docs + "</span></div>";
               });
 
           var tipField2 = d3tip()
               .attr('class', 'd3-tip')
               .offset([-10, 0])
               .html(function(d) {
-                  return "<div><strong>"+scope.panel.field2+":</strong> <span style='color:red'>" + d.val + "</span></div>"+
-                  "<div><strong>number of different "+scope.panel.field2+"</strong> <span style='color:red'>" + this.parentNode.__data__.top_field2.numBuckets + "</span></div>"+
-                  "<div><strong>total "+scope.panel.field2+" for this "+scope.panel.field1+"</strong> <span style='color:red'>" + this.parentNode.__data__.top_field2.allBuckets.count + "</span></div>"+
-                  "<div><strong>documents</strong> <span style='color:red'>" + d.count + "</span></div>";
+                  return "<div><strong>Patent category name:</strong> <span style='color:red'>" + d.val + "</span></div>"+
+                  "<div><strong>Patents count</strong> <span style='color:red'>" + d.count + "</span></div>";
               });
 
           var field1Block=g.selectAll("g")
@@ -435,17 +437,17 @@ function (angular, app, _, $, d3, d3tip,palettejs) {
           //   .enter().append("g")
           //     .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
-          legend.append("rect")
-              .attr("x", width - 19)
-              .attr("width", 19)
-              .attr("height", 19)
-              .attr("fill", z);
-
-          legend.append("text")
-              .attr("x", width - 24)
-              .attr("y", 9.5)
-              .attr("dy", "0.32em")
-              .text(function(d) { return d; });
+          // legend.append("rect")
+          //     .attr("x", width - 19)
+          //     .attr("width", 19)
+          //     .attr("height", 19)
+          //     .attr("fill", z);
+          //
+          // legend.append("text")
+          //     .attr("x", width - 24)
+          //     .attr("y", 9.5)
+          //     .attr("dy", "0.32em")
+          //     .text(function(d) { return d; });
     }
   }};
 });
