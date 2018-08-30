@@ -96,6 +96,7 @@ module.exports = function (grunt) {
           'app/directives/**/*.js',
           'app/services/**/*.js',
           'app/filters/**/*.js',
+          'app/extensions/*.js',
           'app/panels/**/*.js',
           'app/app.js',
           'vendor/angular/**/*.js',
@@ -244,7 +245,14 @@ module.exports = function (grunt) {
       });
     });
 
-  // exclude the literal config definition from all modules
+    // create a module for each directory in src/app/panels/
+
+    requireModules.push({
+      name: "d3ZoomExt"
+    });
+
+
+  //exclude the literal config definition from all modules
   requireModules
     .forEach(function (module) {
       module.excludeShallow = module.excludeShallow || [];

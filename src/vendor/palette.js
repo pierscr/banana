@@ -1498,4 +1498,8 @@ palette.SchemeType;
 
 if(typeof module === "object" && module.exports) {
   module.exports = palette
+} else if ((typeof define !== "undefined" && define !== null) && (define.amd != null)) {
+  define([], function() {
+    return palette;
+  });
 }

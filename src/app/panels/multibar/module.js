@@ -11,7 +11,7 @@ define([
   'd3tip',
   'palettejs'
 ],
-function (angular, app, _, $, d3, d3tip,palettejs) {
+function (angular, app, _, $, d3, d3tip,palette) {
   'use strict';
 
   var debug = function(message){
@@ -206,7 +206,6 @@ function (angular, app, _, $, d3, d3tip,palettejs) {
             debug("values:"+  $scope.data.values);
             debug("range1:"+  $scope.data.range1);
             debug("range2:"+  $scope.data.range2);
-            console.log($scope.data.range2);
 
           $scope.render();
       });
@@ -250,15 +249,12 @@ function (angular, app, _, $, d3, d3tip,palettejs) {
           //           .domain([0, d3.max(scope.data)])
           //           .range([0, width]);
 
-          var chart = d3.select(element[0]).append('svg')
-                        .attr('width', parent_width)
-                        .attr('height', parentheight);
 
           //var margin = {top: 20, right: 20, bottom: 30, left: 40};
 
 
 //ordial1 (yaer)
-          var x0 = d3.scale.ordinal()
+          var x = d3.scale.ordinal()
             .domain(scope.data.range1)
             .rangeRoundBands([0, width],0.1);
 
@@ -266,7 +262,7 @@ function (angular, app, _, $, d3, d3tip,palettejs) {
 //ordila2 (cluster)
           // var x1 = d3.scale.ordinal()
           //     .domain(scope.data.range2)
-          //     .rangeRoundBands([0, x0.rangeBand()],0.05);
+          //     .rangeRoundBands([0, x.rangeBand()],0.05);
 
 //conteggio
           var y = d3.scale.linear()
@@ -292,21 +288,45 @@ function (angular, app, _, $, d3, d3tip,palettejs) {
 /* total value of field1*/
 
           var totalY =  d3.scale.linear()
-                              .domain([0,d3.max(scope.data.values,
-                                  function(d){
+                              .domain([0,d3.max(scope.data.values,function(d){
                                           return d.count;
-                                      })
-                                    ])
-                        .rangeRound([ height,0]);
+                                      })])
+                              .rangeRound([ height,0]);
 
 
 //anni
           //console.log(palette('tol-rainbow', 10).map(function(a){return "#"+a}));
 
-          var z = d3.scale.ordinal()
-              .range(palette('tol-rainbow', scope.data.range2.length).map(function(a){return "#"+a}));
+        var z = d3.scale.ordinal()
+            .range(palette('tol-rainbow', scope.data.range2.length).map(function(a){return "#"+a;}));
 
-          var g = chart.append("g").attr("transform", "translate(30,30)");
+          var xAxis=d3.svg.axis().scale(x)
+          .orient("bottom")
+          .tickFormat(function(d,i) {
+            i;
+            return d.substr(0,4);
+          });
+
+
+
+
+          var chart = d3.select(element[0]).append('svg')
+                        .attr('width', parent_width)
+                        .attr('height', parentheight);
+
+          var g= chart.append("g").attr("transform", "translate(30,30)");
+
+          var zoom=d3.extensions.zoomBounded()
+                              .scaleExtent([1, width])
+                              .setXaxis(x)
+                              .onZoom(function(translate){
+                                draw(d3.event.scale,translate);
+                                tipField1.hide();
+                                tipField2.hide();
+                              });
+                              //.on("zoom", zoomed);
+
+          chart.call(zoom);
 
           var tipField1 = d3tip()
               .attr('class', 'd3-tip')
@@ -330,24 +350,36 @@ function (angular, app, _, $, d3, d3tip,palettejs) {
                   "<div><strong>Patents count</strong> <span style='color:red'>" + d.count + "</span></div>";
               });
 
+          var draw = function(scale,translateX,translateY){
+            scale=scale || 1;
+            translateX= translateX || 0;
+            translateY= translateY || 0;
+            var offsetX=30;
+            var offsetY=30;
+
+          g.remove();
+          g=chart.append("g").attr("transform", "translate("+ (translateX+offsetX)+","+(translateY+offsetY)+")");
+
           var field1Block=g.selectAll("g")
             .data(scope.data.values)
             .enter().append("g")
               .attr("transform", function(d) {
                 debug(d.val);
-                return "translate(" + x0(d.val) + ",0)";
+                return "translate(" + x(d.val) + ",0)";
               });
 
           field1Block.selectAll("rect")
-            .data(function(d,i) {
+            .data(function(d) {
               debug("cluster data selected:");
               debug(d);
               var range =  Array.from(d.top_field2.buckets.reduce(scope.addToSet,new Set()));
 
               d.newScale = d3.scale.ordinal()
                   .domain(range)
-                  .rangeRoundBands([0, x0.rangeBand()],0.05);
-              d.field1Index=i;
+                  .rangeRoundBands([0, x.rangeBand()],0.1);
+
+
+
 
               return d['top_field2'].buckets;
             })
@@ -391,30 +423,23 @@ function (angular, app, _, $, d3, d3tip,palettejs) {
             .append("circle")
             .attr("class","field1total")
             .attr("cx",function(){
-              debug("x value"+x0.rangeBand()/2);
-              return (x0.rangeBand()/2);
+              debug("x value"+x.rangeBand()/2);
+              return (x.rangeBand()/2);
               })
               .attr("cy",function(d){
-                console.log("d.value",d.count);
-                console.log("scale d.value",totalY(d.count));
                 return totalY(d.count);
               })
             .on('mouseover', tipField1.show)
             .on('mouseout', tipField1.hide);
 
 
-          chart.call(tipField1);
-          chart.call(tipField2);
+          g.call(tipField1);
+          g.call(tipField2);
 
           g.append("g")
-              .attr("class", "axis")
+              .attr("class", "axis x")
               .attr("transform", "translate(0," + height + ")")
-              .call(d3.svg.axis().scale(x0)
-              .orient("bottom")
-              .tickFormat(function(d,i) {
-                i;
-                return d.substr(0,4);
-              }));
+              .call(xAxis);
 
           g.append("g")
               .attr("class", "axis")
@@ -427,6 +452,9 @@ function (angular, app, _, $, d3, d3tip,palettejs) {
               .attr("font-weight", "bold")
               .attr("text-anchor", "start")
               .text("Documents");
+          };
+
+          draw();
 
           // var legend = g.append("g")
           //     .attr("font-family", "sans-serif")
@@ -436,7 +464,7 @@ function (angular, app, _, $, d3, d3tip,palettejs) {
           //   .data(scope.data.range2)
           //   .enter().append("g")
           //     .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
-
+          //
           // legend.append("rect")
           //     .attr("x", width - 19)
           //     .attr("width", 19)

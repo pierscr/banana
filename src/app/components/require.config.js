@@ -45,7 +45,8 @@ require.config({
     solrjs:                   '../vendor/solrjs/solr-angular-client',
     d3:                       '../vendor/d3',
     d3tip:                   '../vendor/d3.tip',
-    palettejs:                 '../vendor/palette'
+    palettejs:                 '../vendor/palette',
+    d3ZoomExt:                    'extensions/d3ZoomExt'
   },
   shim: {
     underscore: {
@@ -94,6 +95,7 @@ require.config({
     datepicker:             ['jquery', 'bootstrap'],
 
     elasticjs:              ['angular', '../vendor/elasticjs/elastic'],
-    solrjs:                 ['angular', '../vendor/solrjs/solr']
+    solrjs:                 ['angular', '../vendor/solrjs/solr'],
+    app:                     ['d3ZoomExt']
   }
 });
