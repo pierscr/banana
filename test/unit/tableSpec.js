@@ -6,13 +6,11 @@ define([
 	'underscore',
 	'kbn',
 	'moment',
-	'angular-mocks',
 	'solrjs',
-	'elasticjs',
-	'tablePanel'
+	'elasticjs'
 ],
 function(angular, app, _, kbn, moment) {
-	// This is just an example test.	
+	// This is just an example test.
 	describe('just checking', function() {
 		it('works for app', function() {
 			var el = $('<div>require.js up and running</div>');
@@ -27,7 +25,6 @@ function(angular, app, _, kbn, moment) {
 	describe('table controller', function() {
 		// Need to load these modules before start testing
 		beforeEach(function() {
-			module('kibana');
 			module('kibana.services');
 			module('kibana.controllers');
 			module('kibana.directives');

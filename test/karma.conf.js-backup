@@ -6,18 +6,21 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['jasmine', 'requirejs'],
-    //frameworks: ['jasmine'],
+    // frameworks: ['jasmine', 'requirejs'],
+    frameworks: ['jasmine'],
 
     // list of files / patterns to load in the browser
     files: [
-      'test/test-main.js',
-      {pattern: 'src/**/*.js', included: false},
+
+      // {pattern: 'src/**/*.js', included: false},
       // {pattern: 'bower_components/**/*.js', included: false},
 
-      {pattern: 'test/platanotest/*Spec.js', included: false}
+       {pattern: 'test/**/*Spec.js', included: false},
       // {pattern: 'test/unit/tableSpec.js', included: false}
-      //'test/unit/dummySpec.js'
+      'src/vendor/require/require.js',
+      'src/app/components/require.config.js',
+      'test/unit/dummySpec.js',
+      'test/test-main.js'
     ],
 
     // list of files to exclude

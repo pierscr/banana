@@ -1,28 +1,32 @@
+// Karma configuration
+// Generated on Tue Aug 21 2018 15:39:33 GMT+0200 (CEST)
+
 module.exports = function(config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '../',
 
+
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['jasmine', 'requirejs'],
-    //frameworks: ['jasmine'],
+    frameworks: ['jasmine'],
+
 
     // list of files / patterns to load in the browser
     files: [
-      'test/test-main.js',
-      {pattern: 'src/**/*.js', included: false},
-      // {pattern: 'bower_components/**/*.js', included: false},
 
-      {pattern: 'test/platanotest/*Spec.js', included: false}
-      // {pattern: 'test/unit/tableSpec.js', included: false}
-      //'test/unit/dummySpec.js'
+      //{pattern: 'bower_components/**/*.js', included: true},
+      'src/vendor/require/require.js',
+      'bower_components/angular/angular.js',
+      'bower_components/angular-mocks/angular-mocks.js',
+      {pattern: 'src/**/*.js', included: true},
+      'test/unit/servicesSpec.js'
     ],
+
 
     // list of files to exclude
     exclude: [
-      // 'src/app/components/require.config.js'
     ],
 
 
@@ -62,6 +66,10 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false
-  });
-};
+    singleRun: false,
+
+    // Concurrency level
+    // how many browser should be started simultaneous
+    concurrency: Infinity
+  })
+}
