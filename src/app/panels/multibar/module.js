@@ -57,7 +57,8 @@ function (angular, app, _, $, d3, d3tip,palette) {
       max_number_r: 10,
       max_rows: 10,
       spyable: true,
-      show_queries: true
+      show_queries: true,
+      number_mode: "F"
     };
 
     // Set panel's default values
@@ -332,8 +333,15 @@ function (angular, app, _, $, d3, d3tip,palette) {
               .attr('class', 'd3-tip')
               .offset([-10, 0])
               .html(function(p) {
+                  var patent_number;
+                  if(scope.panel.number_mode==="F"){
+                    patent_number="<div><strong>Patents </strong> <span style='color:red'>" + p.count + "</span></div>";
+                  }else{
+                    patent_number="<div><strong>Patents percentage</strong> <span style='color:red'>" + ((p.count/scope.data.field1stat.tot_docs)*100).toFixed(2)  + "%</span></div>";
+                  }
+
                   return "<div><strong>Cluster name</strong> <span style='color:red'>" + p.val.substr(0,4)+ "</span></div>"+
-                  "<div><strong>Patents </strong> <span style='color:red'>" + p.count + "</span></div>"+
+                  patent_number+
                   "<div><strong>Unique patent category</strong> <span style='color:red'>" + this.__data__.top_field2.numBuckets + "</span></div>"+
                   "<div><strong>Patent category</strong> <span style='color:red'>" + this.__data__.top_field2.allBuckets.count + "</span></div>"+
                   "<hr>"+
@@ -346,8 +354,14 @@ function (angular, app, _, $, d3, d3tip,palette) {
               .attr('class', 'd3-tip')
               .offset([-10, 0])
               .html(function(d) {
+                  var tipField2;
+                  if(scope.panel.number_mode==="F"){
+                    tipField2="<div><strong>Patents</strong> <span style='color:red'>" + d.count + "</span></div>";
+                  }else{
+                    tipField2="<div><strong>Patents percentage</strong> <span style='color:red'>" + ((d.count/this.parentNode.__data__.top_field2.allBuckets.count)*100).toFixed(2) + "%</span></div>";
+                  }
                   return "<div><strong>Patent category name:</strong> <span style='color:red'>" + d.val + "</span></div>"+
-                  "<div><strong>Patents count</strong> <span style='color:red'>" + d.count + "</span></div>";
+                  tipField2;
               });
 
           var draw = function(scale,translateX,translateY){
