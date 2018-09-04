@@ -21,8 +21,12 @@ function (angular, app, _, $, d3, d3tip,palette) {
     }
   };
 
+
+
   var module = angular.module('kibana.panels.multibar', []);
   app.useModule(module);
+
+
 
   module.controller('multibar', function($scope, dashboard, querySrv, filterSrv) {
 //  module.controller('multibar', function($scope) {
@@ -115,7 +119,7 @@ function (angular, app, _, $, d3, d3tip,palette) {
       //var pivot_field = '&facet=true&facet.pivot=' + $scope.panel.field1 +","+$scope.panel.field2;
       var facet_fields = '&facet.field=' + $scope.panel.field1 +"&facet.field=" +$scope.panel.field2;
       var facet_limit="&facet.limit="+$scope.panel.max_number_r;
-      var pivot_field="&facet=true&json.facet={top_field1:{type: terms,field: cluster_h,allBuckets:true,numBuckets:true,limit:"+$scope.panel.max_number_r+",facet:{top_field2:{type : terms,field: escluster_str_patent_codes,limit:"+$scope.panel.max_number_r+",allBuckets:true,numBuckets:true}}}}";
+      var pivot_field="&facet=true&json.facet={top_field1:{type: terms,field: "+$scope.panel.field1+",allBuckets:true,numBuckets:true,limit:"+$scope.panel.max_number_r+",facet:{top_field2:{type : terms,field: "+$scope.panel.field2+",limit:"+$scope.panel.max_number_r+",allBuckets:true,numBuckets:true}}}}";
 
 
       $scope.panel.queries.query = querySrv.getQuery(0) + fq + pivot_field +facet_fields+facet_limit+ wt + rows_limit;
@@ -218,6 +222,8 @@ function (angular, app, _, $, d3, d3tip,palette) {
     };
   });
 
+
+
   module.directive('multibarChart', function() {
     return {
       restrict: 'E',
@@ -236,22 +242,19 @@ function (angular, app, _, $, d3, d3tip,palette) {
           // Clear the panel
           element.html('');
 
+          var margin = {top: 30, right: 30, bottom: 50, left: 30};
 
-
-          var parent_width = element.parent().width(),
-              parentheight = parseInt(scope.row.height),
-              width = parent_width - 20,
-              height = parentheight -50;
+          var panel_width = element.parent().width(),
+              panel_height = parseInt(scope.row.height),
+              width = panel_width - (margin.right + margin.left),
+              height = panel_height - (margin.top + margin.bottom);
 //              barHeight = height / scope.data.length;
-                debug("height:"+height);
-                debug("width"+ width )
-;
+              debug("height:"+height);
+              debug("width"+ width );
+
           // var x = d3.scale.linear()
           //           .domain([0, d3.max(scope.data)])
           //           .range([0, width]);
-
-
-          //var margin = {top: 20, right: 20, bottom: 30, left: 40};
 
 
 //ordial1 (yaer)
@@ -308,14 +311,25 @@ function (angular, app, _, $, d3, d3tip,palette) {
             return d.substr(0,4);
           });
 
+          var yAxis=d3.svg.axis().scale(y)
+          .orient("left")
+          .ticks(null, "s");
 
 
 
-          var chart = d3.select(element[0]).append('svg')
-                        .attr('width', parent_width)
-                        .attr('height', parentheight);
 
-          var g= chart.append("g").attr("transform", "translate(30,30)");
+          var svg = d3.select(element[0]).append('svg')
+                        .attr('width', panel_width)
+                        .attr('height', panel_height);
+
+          var chart= svg.append("g").attr("transform", "translate("+margin.left+","+margin.top+")");
+          svg.append("text")
+               .attr("transform","translate(" + (width/2) + " ," + (height + margin.top + 30) + ")")
+               .attr("dy", "0.32em")
+               .attr("fill", "#000")
+               .attr("font-weight", "bold")
+               .attr("text-anchor", "start")
+               .text("Clusters");
 
           var zoom=d3.extensions.zoomBounded()
                               .scaleExtent([1, width])
@@ -327,7 +341,7 @@ function (angular, app, _, $, d3, d3tip,palette) {
                               });
                               //.on("zoom", zoomed);
 
-          chart.call(zoom);
+          svg.call(zoom);
 
           var tipField1 = d3tip()
               .attr('class', 'd3-tip')
@@ -340,7 +354,7 @@ function (angular, app, _, $, d3, d3tip,palette) {
                     patent_number="<div><strong>Patents percentage</strong> <span style='color:red'>" + ((p.count/scope.data.field1stat.tot_docs)*100).toFixed(2)  + "%</span></div>";
                   }
 
-                  return "<div><strong>Cluster name</strong> <span style='color:red'>" + p.val.substr(0,4)+ "</span></div>"+
+                  return "<div><strong>Cluster name</strong> <span style='color:red'>" + p.val.substr(0,12)+ "</span></div>"+
                   patent_number+
                   "<div><strong>Unique patent category</strong> <span style='color:red'>" + this.__data__.top_field2.numBuckets + "</span></div>"+
                   "<div><strong>Patent category</strong> <span style='color:red'>" + this.__data__.top_field2.allBuckets.count + "</span></div>"+
@@ -365,16 +379,15 @@ function (angular, app, _, $, d3, d3tip,palette) {
               });
 
           var draw = function(scale,translateX,translateY){
+
             scale=scale || 1;
             translateX= translateX || 0;
             translateY= translateY || 0;
-            var offsetX=30;
-            var offsetY=30;
 
-          g.remove();
-          g=chart.append("g").attr("transform", "translate("+ (translateX+offsetX)+","+(translateY+offsetY)+")");
+          chart.remove();
+          chart=svg.append("g").attr("transform", "translate("+ (translateX+margin.left)+","+(translateY+margin.top)+")");
 
-          var field1Block=g.selectAll("g")
+          var field1Block=chart.selectAll("g")
             .data(scope.data.values)
             .enter().append("g")
               .attr("transform", function(d) {
@@ -447,17 +460,19 @@ function (angular, app, _, $, d3, d3tip,palette) {
             .on('mouseout', tipField1.hide);
 
 
-          g.call(tipField1);
-          g.call(tipField2);
+          chart.call(tipField1);
+          chart.call(tipField2);
 
-          g.append("g")
+          chart.append("g")
               .attr("class", "axis x")
               .attr("transform", "translate(0," + height + ")")
               .call(xAxis);
 
-          g.append("g")
-              .attr("class", "axis")
-              .call(d3.svg.axis().scale(y).orient("left").ticks(null, "s"))
+
+
+          chart.append("g")
+              .attr("class", "axis y")
+              .call(yAxis)
             .append("text")
               .attr("x", -30)
               .attr("y", y(y.ticks().pop()) + -20)
@@ -465,12 +480,13 @@ function (angular, app, _, $, d3, d3tip,palette) {
               .attr("fill", "#000")
               .attr("font-weight", "bold")
               .attr("text-anchor", "start")
-              .text("Documents");
+              .text("Patents");
           };
 
           draw();
 
-          // var legend = g.append("g")
+
+          // var legend = chart.append("g")
           //     .attr("font-family", "sans-serif")
           //     .attr("font-size", 10)
           //     .attr("text-anchor", "end")
