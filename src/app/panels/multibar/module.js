@@ -58,6 +58,8 @@ function (angular, app, _, $, d3, d3tip,palette) {
       },
       field1: '',
       field2: '',
+      labelXaxis: '',
+      labelYaxis: '',
       max_number_r: 10,
       max_rows: 10,
       spyable: true,
@@ -329,7 +331,7 @@ function (angular, app, _, $, d3, d3tip,palette) {
                .attr("fill", "#000")
                .attr("font-weight", "bold")
                .attr("text-anchor", "start")
-               .text("Clusters");
+               .text(scope.panel.labelYaxis);
 
           var zoom=d3.extensions.zoomBounded()
                               .scaleExtent([1, width])
@@ -349,19 +351,19 @@ function (angular, app, _, $, d3, d3tip,palette) {
               .html(function(p) {
                   var patent_number;
                   if(scope.panel.number_mode==="F"){
-                    patent_number="<div><strong>Patents </strong> <span style='color:red'>" + p.count + "</span></div>";
+                    patent_number="<div><strong>"+scope.panel.labelYaxis+"</strong> <span style='color:red'>" + p.count + "</span></div>";
                   }else{
-                    patent_number="<div><strong>Patents percentage</strong> <span style='color:red'>" + ((p.count/scope.data.field1stat.tot_docs)*100).toFixed(2)  + "%</span></div>";
+                    patent_number="<div><strong>"+scope.panel.labelYaxis+"percentage</strong> <span style='color:red'>" + ((p.count/scope.data.field1stat.tot_docs)*100).toFixed(2)  + "%</span></div>";
                   }
 
                   return "<div><strong>Cluster name</strong> <span style='color:red'>" + p.val.substr(0,12)+ "</span></div>"+
                   patent_number+
                   "<div><strong>Unique patent category</strong> <span style='color:red'>" + this.__data__.top_field2.numBuckets + "</span></div>"+
-                  "<div><strong>Patent category</strong> <span style='color:red'>" + this.__data__.top_field2.allBuckets.count + "</span></div>"+
+                  "<div><strong>"+scope.panel.labelYaxis+" category</strong> <span style='color:red'>" + this.__data__.top_field2.allBuckets.count + "</span></div>"+
                   "<hr>"+
                   "<h4>Total</h4>"+
-                  "<div><strong>Cluster</strong> <span style='color:red'>" + scope.data.field1stat.field_count + "</span></div>"+
-                  "<div><strong>Patents</strong> <span style='color:red'>" + scope.data.field1stat.tot_docs + "</span></div>";
+                  "<div><strong>"+scope.panel.labelXaxis+"</strong> <span style='color:red'>" + scope.data.field1stat.field_count + "</span></div>"+
+                  "<div><strong>"+scope.panel.labelYaxis+"</strong> <span style='color:red'>" + scope.data.field1stat.tot_docs + "</span></div>";
               });
 
           var tipField2 = d3tip()
@@ -370,11 +372,11 @@ function (angular, app, _, $, d3, d3tip,palette) {
               .html(function(d) {
                   var tipField2;
                   if(scope.panel.number_mode==="F"){
-                    tipField2="<div><strong>Patents</strong> <span style='color:red'>" + d.count + "</span></div>";
+                    tipField2="<div><strong>"+scope.panel.labelYaxis+"</strong> <span style='color:red'>" + d.count + "</span></div>";
                   }else{
-                    tipField2="<div><strong>Patents percentage</strong> <span style='color:red'>" + ((d.count/this.parentNode.__data__.top_field2.allBuckets.count)*100).toFixed(2) + "%</span></div>";
+                    tipField2="<div><strong>"+scope.panel.labelYaxis+" percentage</strong> <span style='color:red'>" + ((d.count/this.parentNode.__data__.top_field2.allBuckets.count)*100).toFixed(2) + "%</span></div>";
                   }
-                  return "<div><strong>Patent category name:</strong> <span style='color:red'>" + d.val + "</span></div>"+
+                  return "<div><strong>"+scope.panel.labelYaxis+" category name:</strong> <span style='color:red'>" + d.val + "</span></div>"+
                   tipField2;
               });
 
@@ -480,7 +482,7 @@ function (angular, app, _, $, d3, d3tip,palette) {
               .attr("fill", "#000")
               .attr("font-weight", "bold")
               .attr("text-anchor", "start")
-              .text("Patents");
+              .text(scope.panel.labelYaxis);
           };
 
           draw();

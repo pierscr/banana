@@ -19,6 +19,18 @@
     </div>
     <div class="span2">
         <label class="small">
+            Label x<tip>label of the x axis</tip>
+        </label>
+        <input class="input-small" ng-model="panel.labelXaxis" ng-change="set_refresh(true)">
+    </div>
+    <div class="span2">
+        <label class="small">
+          Label y<tip>label of the x axis</tip>
+        </label>
+        <input class="input-small" ng-model="panel.labelYaxis" ng-change="set_refresh(true)">
+    </div>
+    <div class="span2">
+        <label class="small">
             Mode <tip>Specify if show frequency or percentage.</tip>
         </label>
         <select class="input-small" ng-model="panel.number_mode" ng-change="set_refresh(true)">
@@ -26,4 +38,5 @@
             <option value="P">percentage</option>
         </select>
     </div>
+
 </div>
