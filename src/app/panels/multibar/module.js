@@ -93,9 +93,9 @@ function (angular, app, _, $, d3, d3tip,palette) {
       $scope.$emit('render');
     };
 
-    $scope.build_search = function(word) {
+    $scope.build_search = function(field1,word) {
       if(word) {
-        filterSrv.set({type:'terms',field:$scope.panel.field2,value:word,mandate:'must'});
+        filterSrv.set({type:'terms',field:field1,value:word,mandate:'must'});
       } else {
         return;
       }
@@ -440,7 +440,7 @@ function (angular, app, _, $, d3, d3tip,palette) {
               })
               .on('mouseover', tipField2.show)
               .on('mouseout', tipField2.hide)
-              .on('click', function(d){ tipField2.hide(); scope.build_search(d.val);});
+              .on('click', function(d){ tipField2.hide(); scope.build_search(scope.panel.field2,d.val);});
 
 
 
@@ -459,17 +459,32 @@ function (angular, app, _, $, d3, d3tip,palette) {
                 return totalY(d.count);
               })
             .on('mouseover', tipField1.show)
-            .on('mouseout', tipField1.hide);
+            .on('mouseout', tipField1.hide)
+            .on('click', function(d){ tipField1.hide(); scope.build_search(scope.panel.field1,d.val);});
 
 
           chart.call(tipField1);
           chart.call(tipField2);
 
+          // var xAxisTipFn=d3tip()
+          //     .attr('class', 'd3-tip')
+          //     .offset([-10, 0])
+          //     .html(function(p) {
+          //         return p;
+          //     });
+
+
           chart.append("g")
               .attr("class", "axis x")
               .attr("transform", "translate(0," + height + ")")
-              .call(xAxis);
-
+              .call(xAxis)
+              .selectAll("text")
+                .attr("transform", "rotate(-60)" )
+                .style("text-anchor", "end")
+                .attr("dx", "-.8em")
+                .attr("dy", "-.55em")
+                .attr("title",function(p){return p;});
+                //.on('mouseover', xAxisTipFn.show);
 
 
           chart.append("g")
