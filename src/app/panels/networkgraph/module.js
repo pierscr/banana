@@ -185,8 +185,8 @@ function (angular, app, _, $, d3) {
 
           var force = d3.layout
             .force()
-            .linkDistance(30)
-            .charge(-50)
+            .linkDistance(50)
+            .charge(-300)
             .gravity(0.1)
             .size([width, height]);
 
@@ -212,16 +212,19 @@ function (angular, app, _, $, d3) {
               .attr("transform", function(d){return "translate("+d.x+","+d.y+")";});
 
 
-              node
-                .append('text')
-                .text(function(d){return d.name;})
-                .attr('x',20);
+
 
 
               node.append('circle')
-                  .attr('r', width/250);
+                  .attr('r', width/150)
+                  .call(force.drag);
 
-          force.on("tick", function() {
+              node
+                  .append('text')
+                  .text(function(d){return d.name;})
+                  .attr('x',20);                  
+
+              force.on("tick", function() {
 
 
                 node.transition().ease('linear').duration(animationStep)
@@ -256,8 +259,6 @@ function (angular, app, _, $, d3) {
           });
 
           force.start();
-
-          console.log(node);
     }
   }};
 });
