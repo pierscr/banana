@@ -125,7 +125,7 @@ function (angular, app, _, $, d3) {
       // // Hide the spinning wheel icon
       // $scope.panelMeta.loading = false;
 
-      d3.json("/solr/example_data/networkgraph.json", function(data) {
+      d3.json("example_data/networkgraph.json", function(data) {
           console.log("data:"+data);
           console.log("panale field1:"+$scope.panel.field1);
           console.log("panale field2:"+$scope.panel.field2);
@@ -167,21 +167,17 @@ function (angular, app, _, $, d3) {
               parentheight = parseInt(scope.row.height),
               width = parent_width - 20,
               height = parentheight -50;
-//              barHeight = height / scope.data.length;
-              console.log("height:"+height);
-              console.log("width"+ width );
-          // var x = d3.scale.linear()
-          //           .domain([0, d3.max(scope.data)])
-          //           .range([0, width]);
+
+
+
+          var zoom = d3.behavior.zoom();
 
           var chart = d3.select(element[0]).append('svg')
                         .attr('width', parent_width)
-                        .attr('height', parentheight);
+                        .attr('height', parentheight)
+                        .call(zoom);
 
-          //var margin = {top: 20, right: 20, bottom: 30, left: 40};
 
-
-          //var g = chart.append("g").attr("transform", "translate(30,30)");
 
           var force = d3.layout
             .force()
@@ -201,7 +197,8 @@ function (angular, app, _, $, d3) {
               .attr('x1', function(d) { return d.source.x; })
               .attr('y1', function(d) { return d.source.y; })
               .attr('x2', function(d) { return d.target.x; })
-              .attr('y2', function(d) { return d.target.y; });
+              .attr('y2', function(d) { return d.target.y; })
+              .attr('transform','translate('+zoom.translate()+')'+'scale('+zoom.scale()+')');
 
           // Now it's the nodes turn. Each node is drawn as a circle.
 
@@ -209,27 +206,42 @@ function (angular, app, _, $, d3) {
               .data(scope.data.nodes)
               .enter().append('g')
               .attr('class', 'node')
-              .attr("transform", function(d){return "translate("+d.x+","+d.y+")";});
+              .attr("transform", function(d){
+                return "translate("+d.x+","+d.y+")";
+              });
 
 
 
 
 
-              node.append('circle')
-                  .attr('r', width/150)
-                  .call(force.drag);
+            node.append('circle')
+                .attr('r', width/150)
+                .attr("cx",zoom.translate()[0])
+                .attr("cy",zoom.translate()[1])
+                .call(force.drag);
 
               node
                   .append('text')
                   .text(function(d){return d.name;})
-                  .attr('x',20);                  
+                  .attr('x',20);
 
               force.on("tick", function() {
 
 
                 node.transition().ease('linear').duration(animationStep)
-                    .attr("transform", function(d){return "translate("+d.x+","+d.y+")";});
+                    .attr("transform",function(d){
+                                        //return "translate("+(d.x+zoom.translate()[0])*zoom.scale()+","+(d.y+zoom.translate()[1])*zoom.scale()+")";
+                                        return "translate("+d.x*zoom.scale()+","+d.y*zoom.scale()+")translate("+zoom.translate()[0]+","+zoom.translate()[1]+")";
+                                      });
 
+                node.selectAll('circle')
+                    .transition().ease('linear').duration(animationStep)
+                    .attr('transform','scale('+zoom.scale()+')');
+                    // .attr("cx",zoom.translate()[0])
+                    // .attr("cy",zoom.translate()[1]);
+
+                node.selectAll('text')
+                    .transition().ease('linear').duration(animationStep);
 
 
               // We also need to update positions of the links.
@@ -247,7 +259,8 @@ function (angular, app, _, $, d3) {
                   .attr('x1', function(d) { return d.source.x; })
                   .attr('y1', function(d) { return d.source.y; })
                   .attr('x2', function(d) { return d.target.x; })
-                  .attr('y2', function(d) { return d.target.y; });
+                  .attr('y2', function(d) { return d.target.y; })
+                  .attr('transform','translate('+zoom.translate()+')scale('+zoom.scale()+')');
 
 
 
