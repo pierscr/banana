@@ -47,7 +47,10 @@ function (angular, app, _, $, d3) {
       field2: '',
       max_rows: 10,
       spyable: true,
-      show_queries: true
+      show_queries: true,
+      linkDistance:50,
+      charge:-300,
+      gravity:0.1
     };
 
     // Set panel's default values
@@ -181,9 +184,9 @@ function (angular, app, _, $, d3) {
 
           var force = d3.layout
             .force()
-            .linkDistance(50)
-            .charge(-300)
-            .gravity(0.1)
+            .linkDistance(scope.panel.linkDistance)
+            .charge(scope.panel.charge)
+            .gravity(scope.panel.gravity)
             .size([width, height]);
 
            force
@@ -197,8 +200,7 @@ function (angular, app, _, $, d3) {
               .attr('x1', function(d) { return d.source.x; })
               .attr('y1', function(d) { return d.source.y; })
               .attr('x2', function(d) { return d.target.x; })
-              .attr('y2', function(d) { return d.target.y; })
-              .attr('transform','translate('+zoom.translate()+')'+'scale('+zoom.scale()+')');
+              .attr('y2', function(d) { return d.target.y; });
 
           // Now it's the nodes turn. Each node is drawn as a circle.
 
@@ -216,21 +218,19 @@ function (angular, app, _, $, d3) {
 
             node.append('circle')
                 .attr('r', width/150)
-                .attr("cx",zoom.translate()[0])
-                .attr("cy",zoom.translate()[1])
                 .call(force.drag);
 
               node
                   .append('text')
                   .text(function(d){return d.name;})
-                  .attr('x',20);
+                  .attr('x',20)
+                  .attr('y',-10);
 
               force.on("tick", function() {
 
 
                 node.transition().ease('linear').duration(animationStep)
                     .attr("transform",function(d){
-                                        //return "translate("+(d.x+zoom.translate()[0])*zoom.scale()+","+(d.y+zoom.translate()[1])*zoom.scale()+")";
                                         return "translate("+d.x*zoom.scale()+","+d.y*zoom.scale()+")translate("+zoom.translate()[0]+","+zoom.translate()[1]+")";
                                       });
 
