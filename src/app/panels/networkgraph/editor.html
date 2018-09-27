@@ -1,16 +1,24 @@
 <div class="row-fluid">
     <div class="span3">
         <label class="small">
-            Field 1 for displaying values <tip>Specify a field to show values on the bar chart</tip>
+            nodes core name<tip>Specify a the core name containing the nodes for the graph</tip>
         </label>
-        <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.field1" ng-change="set_refresh(true)">
+        <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.nodesCore" ng-change="set_refresh(true)">
     </div>
     <div class="span3">
         <label class="small">
-            Field 2 for displaying values <tip>Specify a field to show values on the bar chart</tip>
+            Node field <tip>Specify a field which contains the nodes name</tip>
         </label>
-        <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.field2" ng-change="set_refresh(true)">
+        <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.nodesField" ng-change="set_refresh(true)">
     </div>
+  </br>
+    <div class="span3">
+        <label class="small">
+            links core name<tip>Specify a the core name containing the nodes for the graph</tip>
+        </label>
+        <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.linksCore" ng-change="set_refresh(true)">
+    </div>
+  </br>
     <div class="span3">
         <label class="small">
           Link distance <tip>The link distance</tip>

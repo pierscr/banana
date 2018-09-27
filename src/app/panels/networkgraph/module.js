@@ -7,16 +7,17 @@ define([
   'app',
   'underscore',
   'jquery',
-  'd3'
+  'd3',
+  'dataGraphMapping'
 ],
-function (angular, app, _, $, d3) {
+function (angular, app, _, $, d3,dataGraphMapping) {
   'use strict';
 
   var module = angular.module('kibana.panels.networkgraph', []);
   app.useModule(module);
 
 //  module.controller('multibar', function($scope, dashboard, querySrv, filterSrv) {
-  module.controller('networkgraph', function($scope) {
+  module.controller('networkgraph', function($scope, dashboard, querySrv) {
     $scope.panelMeta = {
       modals: [
         {
@@ -43,8 +44,9 @@ function (angular, app, _, $, d3) {
         query: '*:*',
         custom: ''
       },
-      field1: '',
-      field2: '',
+      nodesCore: '',
+      nodesField: '',
+      linksCore:'',
       max_rows: 10,
       spyable: true,
       show_queries: true,
@@ -79,68 +81,85 @@ function (angular, app, _, $, d3) {
       $scope.$emit('render');
     };
 
-    $scope.get_data = function() {
-      // // Show the spinning wheel icon
-      // $scope.panelMeta.loading = true;
-      //
-      // // Set Solr server
-      // $scope.sjs.client.server(dashboard.current.solr.server + dashboard.current.solr.core_name);
-      // var request = $scope.sjs.Request();
-      //
-      // // Construct Solr query
+    $scope.constructSolrQuery=function(facetField){
+      // Construct Solr query
       // var fq = '';
       // if (filterSrv.getSolrFq()) {
       //     fq = '&' + filterSrv.getSolrFq();
       // }
-      // var wt = '&wt=json';
-      // //var fl = '&fl=' + $scope.panel.field;
-      // var rows_limit = '&rows=' + $scope.panel.max_rows;
-      // var pivot_field = '&facet.pivot=' + $scope.panel.field;
-      //
-      // $scope.panel.queries.query = querySrv.getQuery(0) + fq + pivot_field + wt + rows_limit;
-      //
-      // // Set the additional custom query
-      // if ($scope.panel.queries.custom != null) {
-      //     request = request.setQuery($scope.panel.queries.query + $scope.panel.queries.custom);
-      // } else {
-      //     request = request.setQuery($scope.panel.queries.query);
-      // }
-      //
-      // // Execute the search and get results
-      // var results = request.doSearch();
-      //
-      // console.log(results);
-      //
-      // // Populate scope when we have results
-      // results.then(function(results) {
-      //   $scope.data = {};
-      //
-      //   var parsedResults = d3.json.parse(results, function(d) {
-      //     return d.facet_counts.facet_pivot[$scope.panel.field];
-      //     // d[$scope.panel.field] = +d[$scope.panel.field]; // coerce to number
-      //     // return d;
-      //   });
-      //
-      //   $scope.data = _.pluck(parsedResults,$scope.panel.field);
-      //   $scope.render();
-      // });
-      //
-      // // Hide the spinning wheel icon
-      // $scope.panelMeta.loading = false;
+      var wt = '&wt=json';
+      //var facet_limit="&facet.limit="+$scope.panel.max_number_r;
+      var pivot_field="&facet=true&facet.pivot="+facetField;
+      var result=wt;
+      if(facetField){
+        result+=pivot_field;
+      }
+      return $scope.panel.queries.query = querySrv.getQuery(0)+result;
+    };
 
-      d3.json("example_data/networkgraph.json", function(data) {
-          console.log("data:"+data);
-          console.log("panale field1:"+$scope.panel.field1);
-          console.log("panale field2:"+$scope.panel.field2);
-          $scope.data = data;
-          // $scope.data.range1 = data.facet_counts.facet_fields[$scope.panel.field1].filter(function(val,index){ if((index+1) % 2){return val;}});
-          // console.log("range1:"+  $scope.data.range1);
-          // $scope.data.range2 = data.facet_counts.facet_fields[$scope.panel.field2].filter(function(val,index){ if((index+1) % 2){ return val;}});
-          // console.log("range2:"+  $scope.data.range2);
-          // $scope.data.values = d3.values(data.facet_counts.facet_pivot).pop();
-          // console.log("values:"+  $scope.data.values);
-          $scope.render();
+    $scope.get_data = function() {
+
+      $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.nodesCore);
+      var nodeRequest = $scope.sjs.Request();
+      nodeRequest.setQuery(
+        $scope.constructSolrQuery($scope.panel.nodesField)
+      );
+
+      var results = nodeRequest.doSearch();
+      results
+        .then(function(results) {
+          $scope.data=
+            {
+              nodes:results.facet_counts.facet_pivot[$scope.panel.nodesField],
+              links:[]
+            };
+      }).then(function(){
+        $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.linksCore);
+        var linksRequest = $scope.sjs.Request();
+            linksRequest.setQuery(
+              $scope.constructSolrQuery()
+            );
+        linksRequest
+          .doSearch()
+          .then(function(linkResults){
+             $scope.data.links=linkResults.response.docs;
+
+             var initModule=dataGraphMapping();
+             initModule
+                .nodes($scope.data.nodes)
+                .links($scope.data.links);
+
+              d3.keys(dashboard.current.services.filter.list)
+                .forEach(function(filterKeys){
+                    console.log("filterKey: "+filterKeys);
+                  if(dashboard.current.services.filter.list[filterKeys].field===$scope.panel.nodesField){
+                    console.log("found: "+dashboard.current.services.filter.list[filterKeys].value);
+                    var newFilter=decodeURIComponent(dashboard.current.services.filter.list[filterKeys].value);
+                    initModule.filter(newFilter);
+                  }
+                });
+
+            initModule.build();
+
+            $scope.data.nodes=initModule.filteredNodes();
+            $scope.data.links=initModule.indexedLinks();
+            $scope.render();
+          });
       });
+
+      // d3.json("example_data/networkgraph.json", function(data) {
+      //     console.log("data:"+data);
+      //     console.log("panale field1:"+$scope.panel.field1);
+      //     console.log("panale field2:"+$scope.panel.field2);
+      //     $scope.data = data;
+      //     // $scope.data.range1 = data.facet_counts.facet_fields[$scope.panel.field1].filter(function(val,index){ if((index+1) % 2){return val;}});
+      //     // console.log("range1:"+  $scope.data.range1);
+      //     // $scope.data.range2 = data.facet_counts.facet_fields[$scope.panel.field2].filter(function(val,index){ if((index+1) % 2){ return val;}});
+      //     // console.log("range2:"+  $scope.data.range2);
+      //     // $scope.data.values = d3.values(data.facet_counts.facet_pivot).pop();
+      //     // console.log("values:"+  $scope.data.values);
+      //     $scope.render();
+      // });
 
       $scope.panelMeta.loading = false;
     };
@@ -149,7 +168,7 @@ function (angular, app, _, $, d3) {
   module.directive('networkgraphChart', function() {
     return {
       restrict: 'E',
-      link: function(scope, element) {
+      link: function(scope, element)  {
         scope.$on('render',function(){
           render_panel();
         });

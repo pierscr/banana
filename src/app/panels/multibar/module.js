@@ -357,14 +357,14 @@ function (angular, app, _, $, d3, d3tip,palette) {
                     patent_number="<div><strong>"+scope.panel.docname+"percentage</strong> <span style='color:red'>" + ((p.count/scope.data.field1stat.tot_docs)*100).toFixed(2)  + "%</span></div>";
                   }
 
-                  return "<div><strong>"+scope.panel.labelXaxis+"</strong> <span style='color:red'>" + p.val.substr(0,12)+ "</span></div>"+
+                  return "<div class='category1-tip'><div><strong>"+scope.panel.labelXaxis+"</strong> <span style='color:red'>" + p.val+ "</span></div>"+
                   patent_number+
                   "<div><strong>Unique "+scope.panel.labelYaxis +"</strong> <span style='color:red'>" + this.__data__.top_field2.numBuckets + "</span></div>"+
                   "<div><strong>"+scope.panel.labelYaxis+"</strong> <span style='color:red'>" + this.__data__.top_field2.allBuckets.count + "</span></div>"+
                   "<hr>"+
                   "<h4>Total</h4>"+
                   "<div><strong>"+scope.panel.labelXaxis+"</strong> <span style='color:red'>" + scope.data.field1stat.field_count + "</span></div>"+
-                  "<div><strong>"+scope.panel.docname+"</strong> <span style='color:red'>" + scope.data.field1stat.tot_docs + "</span></div>";
+                  "<div><strong>"+scope.panel.docname+"</strong> <span style='color:red'>" + scope.data.field1stat.tot_docs + "</span></div></div>";
               });
 
           var tipField2 = d3tip()

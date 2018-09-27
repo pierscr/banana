@@ -46,7 +46,8 @@ require.config({
     d3:                       '../vendor/d3',
     d3tip:                   '../vendor/d3.tip',
     palettejs:                 '../vendor/palette',
-    d3ZoomExt:                    'extensions/d3ZoomExt'
+    d3ZoomExt:                    'extensions/d3ZoomExt',
+    dataGraphMapping:         'utils/dataGraphMapping'
   },
   shim: {
     underscore: {
@@ -96,6 +97,6 @@ require.config({
 
     elasticjs:              ['angular', '../vendor/elasticjs/elastic'],
     solrjs:                 ['angular', '../vendor/solrjs/solr'],
-    app:                     ['d3ZoomExt']
+    app:                     ['d3ZoomExt','dataGraphMapping']
   }
 });

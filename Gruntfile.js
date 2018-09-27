@@ -250,6 +250,9 @@ module.exports = function (grunt) {
     requireModules.push({
       name: "d3ZoomExt"
     });
+    requireModules.push({
+      name: "dataGraphMapping"
+    });
 
 
   //exclude the literal config definition from all modules
