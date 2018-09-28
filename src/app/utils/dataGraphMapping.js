@@ -20,7 +20,7 @@ define('dataGraphMapping',[],function () {
       function _nodeLinkCompare(nodeValue,linkValue){
         return nodeValue && linkValue && _clusterStringReplace(nodeValue) === _clusterStringReplace(linkValue);
       }
-
+      
       /* map the filteredNodes index into the link node reference parameter - add the matching node to filteredNodes Array*/
       function _linkNodeMap(link,clusterName,destinationParam,node,flag,filteredNodes,mapFunction){
         if(!flag  && _nodeLinkCompare(node.value,link[clusterName][0])){
@@ -28,7 +28,7 @@ define('dataGraphMapping',[],function () {
           mapFunction(filteredNodes,link,destinationParam,node);
           return true;
         }
-        return false;
+        return flag;
       }
 
       function _pushFilteredNode(filteredNodes,link,destinationParam,node){
@@ -50,18 +50,21 @@ define('dataGraphMapping',[],function () {
           found2=_linkNodeMap(link,'Cluster2','target',filteredNodes[i],found2,i,_getIndexFilteredNode);
           if(found1 && found2){break;}
         }
-        for(var k=0; k<nodes.length; k++){
-          if(!found1){
-            found1=_linkNodeMap(link,'Cluster1','source',nodes[k],found1,filteredNodes,_pushFilteredNode);
-            found1 && nodeToRemove.push(k);
+        if(!(found1 && found2)){
+          for(var k=0; k<nodes.length; k++){
+            if(!found1){
+              found1=_linkNodeMap(link,'Cluster1','source',nodes[k],found1,filteredNodes,_pushFilteredNode);
+              found1 && nodeToRemove.push(k);
+            }
+            if(!found2){
+              found2=_linkNodeMap(link,'Cluster2','target',nodes[k],found2,filteredNodes,_pushFilteredNode);
+              found2 && nodeToRemove.push(k);
+            }
+            if(found1 && found2) {break;}
           }
-          if(!found2){
-            found2=_linkNodeMap(link,'Cluster2','target',nodes[k],found2,filteredNodes,_pushFilteredNode);
-            found2 && nodeToRemove.push(k);
-          }
-          if(found1 && found2) {break;}
+          _removeNodesInLink(nodes,nodeToRemove);
         }
-        _removeNodesInLink(nodes,nodeToRemove);
+        return found1 && found2;
       }
 
       function _isFilterInCluster(filter,cluster1,cluster2){
@@ -72,8 +75,7 @@ define('dataGraphMapping',[],function () {
         /*use of 'for' because of performance*/
         for(var i=0; i<links.length; i++){
           if(!filter || _isFilterInCluster(filter,links[i].Cluster1[0],links[i].Cluster2[0])){
-            _linkIndexer(links[i],nodes,filteredNodes);
-            indexedLinks.push(links[i]);
+            _linkIndexer(links[i],nodes,filteredNodes) &&  indexedLinks.push(links[i]);
           }
         }
         return this;

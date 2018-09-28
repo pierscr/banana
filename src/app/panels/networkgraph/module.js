@@ -8,16 +8,17 @@ define([
   'underscore',
   'jquery',
   'd3',
+  'd3tip',
   'dataGraphMapping'
 ],
-function (angular, app, _, $, d3,dataGraphMapping) {
+function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
   'use strict';
 
   var module = angular.module('kibana.panels.networkgraph', []);
   app.useModule(module);
 
 //  module.controller('multibar', function($scope, dashboard, querySrv, filterSrv) {
-  module.controller('networkgraph', function($scope, dashboard, querySrv) {
+  module.controller('networkgraph', function($scope, dashboard, querySrv, filterSrv) {
     $scope.panelMeta = {
       modals: [
         {
@@ -52,7 +53,9 @@ function (angular, app, _, $, d3,dataGraphMapping) {
       show_queries: true,
       linkDistance:50,
       charge:-300,
-      gravity:0.1
+      gravity:0.1,
+      maxLinkDistance:100,
+      minLinkDistance:10
     };
 
     // Set panel's default values
@@ -81,6 +84,15 @@ function (angular, app, _, $, d3,dataGraphMapping) {
       $scope.$emit('render');
     };
 
+    $scope.build_search = function(field1,word) {
+      if(word) {
+        filterSrv.set({type:'terms',field:field1,value:word,mandate:'must'});
+      } else {
+        return;
+      }
+      dashboard.refresh();
+    };
+
     $scope.constructSolrQuery=function(facetField){
       // Construct Solr query
       // var fq = '';
@@ -97,14 +109,33 @@ function (angular, app, _, $, d3,dataGraphMapping) {
       return $scope.panel.queries.query = querySrv.getQuery(0)+result;
     };
 
+      $scope.forEachFilter=function(fn){
+        d3.keys(dashboard.current.services.filter.list)
+          .forEach(function(item){
+            fn(dashboard.current.services.filter.list[item].field,dashboard.current.services.filter.list[item].value);
+          });
+      };
+
+
+
     $scope.get_data = function() {
 
       $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.nodesCore);
       var nodeRequest = $scope.sjs.Request();
+      var filtersQr='';
+      var afd;
+      $scope.forEachFilter(function(key,value){
+          if(key!==$scope.panel.nodesField){
+            console.log("test");
+            afd=54;
+            filtersQr=filtersQr+'&fq=' +key+':'+value;
+          }
+        });
+        afd=4;
+        console.log(afd);
       nodeRequest.setQuery(
-        $scope.constructSolrQuery($scope.panel.nodesField)
+        $scope.constructSolrQuery($scope.panel.nodesField)+filtersQr
       );
-
       var results = nodeRequest.doSearch();
       results
         .then(function(results) {
@@ -129,13 +160,9 @@ function (angular, app, _, $, d3,dataGraphMapping) {
                 .nodes($scope.data.nodes)
                 .links($scope.data.links);
 
-              d3.keys(dashboard.current.services.filter.list)
-                .forEach(function(filterKeys){
-                    console.log("filterKey: "+filterKeys);
-                  if(dashboard.current.services.filter.list[filterKeys].field===$scope.panel.nodesField){
-                    console.log("found: "+dashboard.current.services.filter.list[filterKeys].value);
-                    var newFilter=decodeURIComponent(dashboard.current.services.filter.list[filterKeys].value);
-                    initModule.filter(newFilter);
+              $scope.forEachFilter(function(key,value){
+                  if(key===$scope.panel.nodesField){
+                    initModule.filter(decodeURIComponent(value));
                   }
                 });
 
@@ -146,20 +173,6 @@ function (angular, app, _, $, d3,dataGraphMapping) {
             $scope.render();
           });
       });
-
-      // d3.json("example_data/networkgraph.json", function(data) {
-      //     console.log("data:"+data);
-      //     console.log("panale field1:"+$scope.panel.field1);
-      //     console.log("panale field2:"+$scope.panel.field2);
-      //     $scope.data = data;
-      //     // $scope.data.range1 = data.facet_counts.facet_fields[$scope.panel.field1].filter(function(val,index){ if((index+1) % 2){return val;}});
-      //     // console.log("range1:"+  $scope.data.range1);
-      //     // $scope.data.range2 = data.facet_counts.facet_fields[$scope.panel.field2].filter(function(val,index){ if((index+1) % 2){ return val;}});
-      //     // console.log("range2:"+  $scope.data.range2);
-      //     // $scope.data.values = d3.values(data.facet_counts.facet_pivot).pop();
-      //     // console.log("values:"+  $scope.data.values);
-      //     $scope.render();
-      // });
 
       $scope.panelMeta.loading = false;
     };
@@ -199,11 +212,37 @@ function (angular, app, _, $, d3,dataGraphMapping) {
                         .attr('height', parentheight)
                         .call(zoom);
 
+          var tipLink = d3tip()
+              .attr('class', 'd3-tip')
+              .offset([-10, 0])
+              .html(function(d) {
+                  return "<div><strong>Similarity</strong> <span style='color:red'>" + d.Similarity + "</span></div>";
+              });
+
+          // node distance scale
+          var distanceScale =  d3.scale.linear()
+                            .domain([d3.min(scope.data.links,function(link){
+                                        return link.Similarity;
+                                    }),d3.max(scope.data.links,function(link){
+                                        return link.Similarity;
+                                    })])
+                            .rangeRound([scope.panel.maxLinkDistance,scope.panel.minLinkDistance]);
+
+          // node distance scale
+          var lineStroke =  d3.scale.linear()
+                            .domain([d3.min(scope.data.links,function(link){
+                                        return link.Similarity;
+                                    }),d3.max(scope.data.links,function(link){
+                                        return link.Similarity;
+                                    })])
+                            .rangeRound([1,3]);
 
 
           var force = d3.layout
             .force()
-            .linkDistance(scope.panel.linkDistance)
+            .linkDistance(function(link){
+              return distanceScale(link.Similarity);
+            })
             .charge(scope.panel.charge)
             .gravity(scope.panel.gravity)
             .size([width, height]);
@@ -219,7 +258,17 @@ function (angular, app, _, $, d3,dataGraphMapping) {
               .attr('x1', function(d) { return d.source.x; })
               .attr('y1', function(d) { return d.source.y; })
               .attr('x2', function(d) { return d.target.x; })
-              .attr('y2', function(d) { return d.target.y; });
+              .attr('y2', function(d) { return d.target.y; })
+              .attr("stroke-width", function(link){return lineStroke(link.Similarity);});
+
+            // link.insert('line')
+            //   .attr('x1', function() { return this.parentNode.__data__.source.x; })
+            //   .attr('y1', function() { return this.parentNode.__data__.source.y; })
+            //   .attr('x2', function() { return this.parentNode.__data__.target.x; })
+            //   .attr('y2', function() { return this.parentNode.__data__.target.y; })
+            //   .attr("stroke-width", 5)
+            //   .on('mouseover', tipLink.show)
+            //   .on('mouseout', tipLink.hide);
 
           // Now it's the nodes turn. Each node is drawn as a circle.
 
@@ -229,7 +278,8 @@ function (angular, app, _, $, d3,dataGraphMapping) {
               .attr('class', 'node')
               .attr("transform", function(d){
                 return "translate("+d.x+","+d.y+")";
-              });
+              })
+              .on('click', function(d){  tipLink.hide; scope.build_search(scope.panel.nodesField,d.name);});
 
 
 
@@ -245,6 +295,8 @@ function (angular, app, _, $, d3,dataGraphMapping) {
                   .attr('x',20)
                   .attr('y',-10);
 
+            chart.call(tipLink);
+
               force.on("tick", function() {
 
 
@@ -256,8 +308,7 @@ function (angular, app, _, $, d3,dataGraphMapping) {
                 node.selectAll('circle')
                     .transition().ease('linear').duration(animationStep)
                     .attr('transform','scale('+zoom.scale()+')');
-                    // .attr("cx",zoom.translate()[0])
-                    // .attr("cy",zoom.translate()[1]);
+
 
                 node.selectAll('text')
                     .transition().ease('linear').duration(animationStep);
