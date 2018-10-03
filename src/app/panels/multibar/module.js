@@ -60,7 +60,7 @@ function (angular, app, _, $, d3, d3tip,palette) {
       field2: '',
       labelXaxis: 'category1',
       labelYaxis: 'category2',
-      docname:'documents',
+      docname:'Occurrence',
       max_number_r: 10,
       max_rows: 10,
       spyable: true,
@@ -245,7 +245,7 @@ function (angular, app, _, $, d3, d3tip,palette) {
           // Clear the panel
           element.html('');
 
-          var margin = {top: 30, right: 30, bottom: 50, left: 30};
+          var margin = {top: 30, right: 30, bottom: 100, left: 70};
 
           var panel_width = element.parent().width(),
               panel_height = parseInt(scope.row.height),
@@ -311,7 +311,7 @@ function (angular, app, _, $, d3, d3tip,palette) {
           .orient("bottom")
           .tickFormat(function(d,i) {
             i;
-            return d.substr(0,4);
+            return d+''.substr(0,10);
           });
 
           var yAxis=d3.svg.axis().scale(y)
@@ -327,7 +327,7 @@ function (angular, app, _, $, d3, d3tip,palette) {
 
           var chart= svg.append("g").attr("transform", "translate("+margin.left+","+margin.top+")");
           svg.append("text")
-               .attr("transform","translate(" + (width/2) + " ," + (height + margin.top + 30) + ")")
+               .attr("transform","translate(" + (width/2) + " ," + (height + margin.top + 60) + ")")
                .attr("dy", "0.32em")
                .attr("fill", "#000")
                .attr("font-weight", "bold")
@@ -352,20 +352,27 @@ function (angular, app, _, $, d3, d3tip,palette) {
               .html(function(p) {
                   var patent_number;
                   if(scope.panel.number_mode==="F"){
-                    patent_number="<div><strong>"+scope.panel.docname+"</strong> <span style='color:red'>" + p.count + "</span></div>";
+                    patent_number="<div><strong>Frequency</strong> <span style='color:red'>" + p.count + "</span></div>";
                   }else{
-                    patent_number="<div><strong>"+scope.panel.docname+"percentage</strong> <span style='color:red'>" + ((p.count/scope.data.field1stat.tot_docs)*100).toFixed(2)  + "%</span></div>";
+                    patent_number="<div><strong>Percentage</strong> <span style='color:red'>" + ((p.count/scope.data.field1stat.tot_docs)*100).toFixed(2)  + "%</span></div>";
                   }
 
-                  return "<div class='category1-tip'><div><strong>"+scope.panel.labelXaxis+"</strong> <span style='color:red'>" + p.val+ "</span></div>"+
-                  patent_number+
-                  "<div><strong>Unique "+scope.panel.labelYaxis +"</strong> <span style='color:red'>" + this.__data__.top_field2.numBuckets + "</span></div>"+
-                  "<div><strong>"+scope.panel.labelYaxis+"</strong> <span style='color:red'>" + this.__data__.top_field2.allBuckets.count + "</span></div>"+
-                  "<hr>"+
-                  "<h4>Total</h4>"+
-                  "<div><strong>"+scope.panel.labelXaxis+"</strong> <span style='color:red'>" + scope.data.field1stat.field_count + "</span></div>"+
-                  "<div><strong>"+scope.panel.docname+"</strong> <span style='color:red'>" + scope.data.field1stat.tot_docs + "</span></div></div>";
-              });
+              //     return "<div class='category1-tip'><div><strong>"+scope.panel.labelXaxis+"</strong> <span style='color:red'>" + p.val+ "</span></div>"+
+              //     patent_number+
+              //     "<div><strong>Unique "+scope.panel.labelYaxis +"</strong> <span style='color:red'>" + this.__data__.top_field2.numBuckets + "</span></div>"+
+              //     "<div><strong>"+scope.panel.labelYaxis+"</strong> <span style='color:red'>" + this.__data__.top_field2.allBuckets.count + "</span></div>"+
+              //     "<hr>"+
+              //     "<h4>Total</h4>"+
+              //     "<div><strong>"+scope.panel.labelXaxis+"</strong> <span style='color:red'>" + scope.data.field1stat.field_count + "</span></div>"+
+              //     "<div><strong>"+scope.panel.docname+"</strong> <span style='color:red'>" + scope.data.field1stat.tot_docs + "</span></div></div>";
+              // });
+              return "<div class='category1-tip'><div><strong>"+scope.panel.labelXaxis+"</strong> <span style='color:red'>" + p.val+ "</span></div>"+
+              patent_number+
+              "<hr>"+
+              "<div>Total "+scope.panel.labelXaxis+"</strong> <span style='color:red'>" + scope.data.field1stat.field_count + "</span></div>";
+
+          });
+
 
           var tipField2 = d3tip()
               .attr('class', 'd3-tip')
@@ -373,9 +380,9 @@ function (angular, app, _, $, d3, d3tip,palette) {
               .html(function(d) {
                   var tipField2;
                   if(scope.panel.number_mode==="F"){
-                    tipField2="<div><strong>"+scope.panel.docname+"</strong> <span style='color:red'>" + d.count + "</span></div>";
+                    tipField2="<div><strong>Frequency</strong> <span style='color:red'>" + d.count + "</span></div>";
                   }else{
-                    tipField2="<div><strong>"+scope.panel.docname+" percentage</strong> <span style='color:red'>" + ((d.count/this.parentNode.__data__.top_field2.allBuckets.count)*100).toFixed(2) + "%</span></div>";
+                    tipField2="<div><strong>Percentage</strong> <span style='color:red'>" + ((d.count/this.parentNode.__data__.top_field2.allBuckets.count)*100).toFixed(2) + "%</span></div>";
                   }
                   return "<div><strong>"+scope.panel.labelYaxis+":</strong> <span style='color:red'>" + d.val + "</span></div>"+
                   tipField2;
@@ -480,10 +487,10 @@ function (angular, app, _, $, d3, d3tip,palette) {
               .attr("transform", "translate(0," + height + ")")
               .call(xAxis)
               .selectAll("text")
-                .attr("transform", "rotate(-60)" )
+                .attr("transform", "rotate(-45)" )
                 .style("text-anchor", "end")
-                .attr("dx", "-.8em")
-                .attr("dy", "-.55em")
+                .attr("dx", "-.28em")
+                .attr("dy", "-.05em")
                 .attr("title",function(p){return p;});
                 //.on('mouseover', xAxisTipFn.show);
 
@@ -492,7 +499,7 @@ function (angular, app, _, $, d3, d3tip,palette) {
               .attr("class", "axis y")
               .call(yAxis)
             .append("text")
-              .attr("x", -30)
+              .attr("x", -50)
               .attr("y", y(y.ticks().pop()) + -20)
               .attr("dy", "0.32em")
               .attr("fill", "#000")
