@@ -309,9 +309,8 @@ function (angular, app, _, $, d3, d3tip,palette) {
 
           var xAxis=d3.svg.axis().scale(x)
           .orient("bottom")
-          .tickFormat(function(d,i) {
-            i;
-            return d+''.substr(0,10);
+          .tickFormat(function(p) {
+            return typeof p==='string' && p.length>12?p.substr(0,13)+"...":p;
           });
 
           var yAxis=d3.svg.axis().scale(y)
@@ -327,7 +326,7 @@ function (angular, app, _, $, d3, d3tip,palette) {
 
           var chart= svg.append("g").attr("transform", "translate("+margin.left+","+margin.top+")");
           svg.append("text")
-               .attr("transform","translate(" + (width/2) + " ," + (height + margin.top + 60) + ")")
+               .attr("transform","translate(" + (width/2) + " ," + (height + margin.top + 15) + ")")
                .attr("dy", "0.32em")
                .attr("fill", "#000")
                .attr("font-weight", "bold")
@@ -387,6 +386,12 @@ function (angular, app, _, $, d3, d3tip,palette) {
                   return "<div><strong>"+scope.panel.labelYaxis+":</strong> <span style='color:red'>" + d.val + "</span></div>"+
                   tipField2;
               });
+
+            var axisTip = d3tip()
+                .attr('class', 'd3-tip')
+                .html(function(d) {
+                    return "<div>"+d+"</div>";
+                });
 
           var draw = function(scale,translateX,translateY){
 
@@ -473,6 +478,7 @@ function (angular, app, _, $, d3, d3tip,palette) {
 
           chart.call(tipField1);
           chart.call(tipField2);
+          chart.call(axisTip);
 
           // var xAxisTipFn=d3tip()
           //     .attr('class', 'd3-tip')
@@ -489,9 +495,11 @@ function (angular, app, _, $, d3, d3tip,palette) {
               .selectAll("text")
                 .attr("transform", "rotate(-45)" )
                 .style("text-anchor", "end")
-                .attr("dx", "-.28em")
-                .attr("dy", "-.05em")
-                .attr("title",function(p){return p;});
+                .attr("dx", "-1.1em")
+                .attr("dy", ".9em")
+                .attr("title",function(p){typeof p==='string' && p.length>12?p.substr(0,13)+"...":p;})
+                .on('mouseover', axisTip.show)
+                .on('mouseout', function(){setTimeout(axisTip.hide,100);});
                 //.on('mouseover', xAxisTipFn.show);
 
 
@@ -507,7 +515,6 @@ function (angular, app, _, $, d3, d3tip,palette) {
               .attr("text-anchor", "start")
               .text(scope.panel.docname);
           };
-
           draw();
 
 

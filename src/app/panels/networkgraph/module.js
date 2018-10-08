@@ -52,13 +52,13 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
       spyable: true,
       show_queries: true,
       linkDistance:50,
-      charge:-300,
-      gravity:0.1,
+      charge:-100,
+      gravity:0.05,
       maxLinkDistance:100,
-      minLinkDistance:10,
+      minLinkDistance:50,
       minNodeSize:80,
-      maxNodeSize:170,
-      fontSize:15
+      maxNodeSize:120,
+      fontSize:12
     };
 
     // Set panel's default values
