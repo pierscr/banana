@@ -15,7 +15,7 @@ define([
     var module = angular.module('kibana.panels.sunburst', []);
     app.useModule(module);
 
-    module.controller('sunburst', function ($scope, dashboard, querySrv, filterSrv) {
+    module.controller('sunburst', function ($scope, dashboard, querySrv, filterSrv,filterDialogSrv) {
         $scope.panelMeta = {
             modals: [{
                 description: "Inspect",
@@ -155,17 +155,17 @@ define([
             if (DEBUG) {
                 console.log("Setting Filters to " + d);
             }
-            for (var i = 0; i < d.length; i++) {
-                filterSrv.set({
-                    type: 'terms',
-                    field: $scope.panel.facet_pivot_strings[i].replace(/ /g, ''),
-                    mandate: 'must',
-                    value: d[i]
-                });
-                console.log($scope.panel.facet_pivot_strings[i].replace(/ /g, '') + ' - ' + d[i]);
-
-            }
-
+            // for (var i = 0; i < d.length; i++) {
+            //     filterSrv.set({
+            //         type: 'terms',
+            //         field: $scope.panel.facet_pivot_strings[i].replace(/ /g, ''),
+            //         mandate: 'must',
+            //         value: d[i]
+            //     });
+            //     console.log($scope.panel.facet_pivot_strings[i].replace(/ /g, '') + ' - ' + d[i]);
+            //
+            // }
+            filterDialogSrv.showDialog($scope.panel.facet_pivot_strings[d.length-1].replace(/ /g, ''),d[d.length-1]);
             dashboard.refresh();
         };
 

@@ -206,7 +206,7 @@ define([
         };
     });
 
-    module.directive('scatterplot', function (dashboard, filterSrv) {
+    module.directive('scatterplot', function (dashboard, filterSrv,filterDialogSrv) {
         return {
             restrict: 'E',
             link: function (scope, element) {
@@ -304,12 +304,7 @@ define([
                         })
                         .on("click", function (d) {
                             if (scope.panel.colorField) {
-                                filterSrv.set({
-                                    type: 'terms',
-                                    field: scope.panel.colorField,
-                                    value: d[scope.panel.colorField],
-                                    mandate: 'must'
-                                });
+                                filterDialogSrv.showDialog( scope.panel.colorField,d[scope.panel.colorField]);
                                 $tooltip.detach();
                                 dashboard.refresh();
                             }

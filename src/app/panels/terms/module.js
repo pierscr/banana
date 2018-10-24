@@ -23,7 +23,7 @@ function (angular, app, _, $, kbn) {
   var module = angular.module('kibana.panels.terms', []);
   app.useModule(module);
 
-  module.controller('terms', function($scope, $timeout, timer, querySrv, dashboard, filterSrv) {
+  module.controller('terms', function($scope, $timeout, timer, querySrv, dashboard, filterSrv,filterDialogSrv) {
     $scope.panelMeta = {
       modals : [
         {
@@ -92,7 +92,7 @@ function (angular, app, _, $, kbn) {
       $scope.$on('refresh',function(){
         $scope.get_data();
       });
-      
+
       $scope.get_data();
     };
 
@@ -317,16 +317,17 @@ function (angular, app, _, $, kbn) {
     };
 
     $scope.build_search = function(term,negate) {
-      if(_.isUndefined(term.meta)) {
-        filterSrv.set({type:'terms',field:$scope.panel.field,value:term.label,
-          mandate:(negate ? 'mustNot':'must')});
-      } else if(term.meta === 'missing') {
-        filterSrv.set({type:'exists',field:$scope.panel.field,
-          mandate:(negate ? 'must':'mustNot')});
-      } else {
-        return;
-      }
-      dashboard.refresh();
+      // if(_.isUndefined(term.meta)) {
+      //   filterSrv.set({type:'terms',field:$scope.panel.field,value:term.label,
+      //     mandate:(negate ? 'mustNot':'must')});
+      // } else if(term.meta === 'missing') {
+      //   filterSrv.set({type:'exists',field:$scope.panel.field,
+      //     mandate:(negate ? 'must':'mustNot')});
+      // } else {
+      //   return;
+      // }
+      // dashboard.refresh();
+      filterDialogSrv.showDialog($scope.panel.field,term.label,term.pageY,term.pageX);
     };
 
     $scope.set_refresh = function (state) {
@@ -520,7 +521,10 @@ function (angular, app, _, $, kbn) {
 
         elem.bind("plotclick", function (event, pos, object) {
           if(object) {
-            scope.build_search(scope.data[object.seriesIndex]);
+            var featuredObj=scope.data[object.seriesIndex];
+            featuredObj.pageX=pos.pageX;
+            featuredObj.pageY=pos.pageY;
+            scope.build_search(featuredObj);
             scope.panel.lastColor = object.series.color;
           }
         });

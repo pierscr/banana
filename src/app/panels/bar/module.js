@@ -129,7 +129,7 @@ define([
                 }
                 var slice = {
                   letter: term,
-                  frequency: count                
+                  frequency: count
               	};
                 if (count / $scope.hits > $scope.maxRatio) {
                   $scope.maxRatio = count / $scope.hits;
@@ -168,7 +168,7 @@ define([
       };
     });
 
-    module.directive('barChart', function() {
+    module.directive('barChart', function(filterDialogSrv) {
       return {
         restrict: 'A',
         link: function(scope, element) {
@@ -256,7 +256,7 @@ define([
                   .attr("height", function(d) { return height - y(d.frequency); })
                   .on('mouseover', tip.show)
                   .on('mouseout', tip.hide)
-                  .on('click', function(d){ tip.hide(); scope.build_search(d.letter);});
+                  .on('click', function(d){ tip.hide(); filterDialogSrv.showDialog(scope.panel.field,d.letter);});
           }
         }
       };

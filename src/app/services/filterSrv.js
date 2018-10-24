@@ -168,7 +168,7 @@ define([
     // Return fq string for constructing a query to send to Solr.
     // noTime param use only in ticker panel so the filter query will return without
     // time filter query
-    this.getSolrFq = function(noTime) {
+    this.getSolrFq = function(noTime,excludedField) {
       var start_time, end_time, time_field;
       var filter_fq = '';
       var filter_either = [];
@@ -180,7 +180,7 @@ define([
           console.debug('filterSrv: v=', v, ' k=', k);
         }
 
-        if (v.active) {
+        if (v.active && v.field!==excludedField) {
           if (v.type === 'time') {
             time_field = v.field;
             // Check for type of timestamps

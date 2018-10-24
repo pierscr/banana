@@ -87,14 +87,14 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
       $scope.$emit('render');
     };
 
-    $scope.build_search = function(field1,word) {
-      if(word) {
-        filterSrv.set({type:'terms',field:field1,value:word,mandate:'must'});
-      } else {
-        return;
-      }
-      dashboard.refresh();
-    };
+    // $scope.build_search = function(field1,word) {
+    //   if(word) {
+    //     filterSrv.set({type:'terms',field:field1,value:word,mandate:'either'});
+    //   } else {
+    //     return;
+    //   }
+    //   dashboard.refresh();
+    // };
 
     $scope.constructSolrQuery=function(facetField){
       // Construct Solr query
@@ -126,16 +126,12 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
       $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.nodesCore);
       var nodeRequest = $scope.sjs.Request();
       var filtersQr='';
-      var afd;
-      $scope.forEachFilter(function(key,value){
-          if(key!==$scope.panel.nodesField){
-            console.log("test");
-            afd=54;
-            filtersQr=filtersQr+'&fq=' +key+':'+value;
-          }
-        });
-        afd=4;
-        console.log(afd);
+      // $scope.forEachFilter(function(key,value){
+      //     if(key!==$scope.panel.nodesField){
+      //       filtersQr=filtersQr+'&fq=' +key+':'+value;
+      //     }
+      //   });
+      filtersQr = '&' + filterSrv.getSolrFq(false,$scope.panel.nodesField);
       nodeRequest.setQuery(
         $scope.constructSolrQuery($scope.panel.nodesField)+filtersQr
       );
@@ -181,7 +177,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
     };
   });
 
-  module.directive('networkgraphChart', function() {
+  module.directive('networkgraphChart', function(filterDialogSrv) {
     return {
       restrict: 'E',
       link: function(scope, element)  {
@@ -302,6 +298,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
 
           // Now it's the nodes turn. Each node is drawn as a circle.
 
+
           var node = chart.selectAll('.node')
               .data(scope.data.nodes)
               .enter().append('g')
@@ -309,7 +306,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
               .attr("transform", function(d){
                 return "translate("+d.x+","+d.y+")";
               })
-              .on('click', function(d){  tipLink.hide; scope.build_search(scope.panel.nodesField,d.name);})
+              .on('click', function(d){  tipLink.hide(); tipNode.hide(); filterDialogSrv.showDialog(scope.panel.nodesField,d.name);})
               .on('mousedown',function(){
                   zoomScale=zoom.scale();
                   zoomtX=zoom.translate();
@@ -321,7 +318,10 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
                   zoomEnable=true;
               })
               .on('mouseover', tipNode.show)
-              .on('mouseout', tipNode.hide);
+              .on('mouseout', function(){
+                tipNode.hide();
+                //filterDialogSrv.hideDialog();
+              });
 
 
 

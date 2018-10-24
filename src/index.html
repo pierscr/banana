@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="css/animate.min.css">
     <link rel="stylesheet" href="css/normalize.min.css">
     <link rel="stylesheet" href="css/rotate.css">
+    <link rel="stylesheet" href="css/main.css">    
     <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
     <!-- load the root require context -->
     <script src="vendor/require/require.js"></script>
@@ -33,6 +34,7 @@
       <button type="button" class="close" ng-click="dashAlerts.clear(alert)" style="padding-right:50px">&times;</button>
       <strong>{{alert.title}}</strong> <span ng-bind-html-unsafe='alert.text'></span> <div style="padding-right:10px" class='pull-right small'> {{$index + 1}} alert(s) </div>
     </div>
+    <filter-dialog></filter-dialog>
     <div class="navbar navbar-static-top">
       <div class="navbar-inner">
         <div class="container-fluid">

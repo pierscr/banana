@@ -5,7 +5,7 @@ define('dataGraphMapping',[],function () {
       var links=[];
       var filteredNodes=[];
       var indexedLinks=[];
-      var filter;
+      var filter=[];
 
       function _removeNodesInLink(nodes,nodesToRemove){
         nodesToRemove
@@ -20,7 +20,7 @@ define('dataGraphMapping',[],function () {
       function _nodeLinkCompare(nodeValue,linkValue){
         return nodeValue && linkValue && _clusterStringReplace(nodeValue) === _clusterStringReplace(linkValue);
       }
-      
+
       /* map the filteredNodes index into the link node reference parameter - add the matching node to filteredNodes Array*/
       function _linkNodeMap(link,clusterName,destinationParam,node,flag,filteredNodes,mapFunction){
         if(!flag  && _nodeLinkCompare(node.value,link[clusterName][0])){
@@ -74,8 +74,16 @@ define('dataGraphMapping',[],function () {
       function build(){
         /*use of 'for' because of performance*/
         for(var i=0; i<links.length; i++){
-          if(!filter || _isFilterInCluster(filter,links[i].Cluster1[0],links[i].Cluster2[0])){
-            _linkIndexer(links[i],nodes,filteredNodes) &&  indexedLinks.push(links[i]);
+          if(filter.length!==0){
+            for(var k=0 ; k<filter.length; k++){
+              if(_isFilterInCluster(filter[k],links[i].Cluster1[0],links[i].Cluster2[0])){
+                _linkIndexer(links[i],nodes,filteredNodes) &&  indexedLinks.push(links[i]);
+                break;
+              }
+
+            }
+          }else{
+              _linkIndexer(links[i],nodes,filteredNodes) &&  indexedLinks.push(links[i]);
           }
         }
         return this;
@@ -101,7 +109,7 @@ define('dataGraphMapping',[],function () {
 
       function filterFn(filterArg){
         if(filterArg){
-          filter=filterArg;
+          filter.push(filterArg);
           return this;
         }else{
           return filter;
