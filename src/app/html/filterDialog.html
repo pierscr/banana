@@ -1,7 +1,11 @@
-<div class="context" ng-show="dialog" ng-style="style">
-  <ul>
+<div class="context" ng-show="dialog=='add' || dialog=='remove'" ng-style="style">
+  <ul ng-show="dialog=='add'">
     <li ng-click="andSelection()">And filter</li>
     <li ng-click="orSelection()">Or filter</li>
-    <li ng-click="close()">Abort</li>
+    <li ng-click="abort()">Abort</li>
+  </ul>
+  <ul ng-show="dialog=='remove'">
+    <li ng-click="removeFilterSelection()">Remove filter</li>
+    <li ng-click="abort()">Abort</li>
   </ul>
 </div>

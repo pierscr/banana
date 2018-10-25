@@ -10,21 +10,42 @@ define(['angular'],function(angular){
           restrict: 'E',
           templateUrl:'app/html/filterDialog.html',
           controller:function($scope){
-            $scope.dialog=false;
+            $scope.dialog='';
             $scope.style={position:"absolute",top:"100px",left:"50px"};
             $scope.prova='vuoto';
-            var showDeferred;
-            var initPromise=function(){
-              showDeferred=$q.defer();
-              filterDialogSrv.subscribeShow(showCallback);
-            }
+            var showAddDeferred;
+            var showRemoveDeferred;
+            var initAddPromise=function(){
+              showAddDeferred=$q.defer();
+              filterDialogSrv.subscribeShow(showAddDialog);
 
-            var showCallback=function(posy,posx){
-              $scope.dialog=true;
+            };
+
+            var initRemovePromise=function(){
+              showRemoveDeferred=$q.defer();
+              filterDialogSrv.subscribeRemoveCallback(showRemoveDialog);
+            };
+
+            var showAddDialog=function(posy,posx){
+              $scope.dialog='add';
               $scope.style.top=posy;
               $scope.style.left=posx;
               $scope.$apply();
-              return showDeferred.promise;
+              return showAddDeferred.promise;
+            };
+
+            var showRemoveDialog=function(posy,posx){
+              $scope.dialog='remove';
+              $scope.style.top=posy;
+              $scope.style.left=posx;
+              $scope.$apply();
+              return showRemoveDeferred.promise;
+            };
+
+            $scope.removeFilterSelection=function(){
+              showRemoveDeferred.resolve();
+              $scope.close();
+              initRemovePromise();
             };
 
             // var hideCallback=function(){
@@ -39,23 +60,24 @@ define(['angular'],function(angular){
 
 
             $scope.andSelection=function(){
-              showDeferred.resolve('must');
+              showAddDeferred.resolve('must');
               $scope.close();
-              initPromise();
+              initAddPromise();
             };
 
             $scope.orSelection=function(){
-              showDeferred.resolve('either');
+              showAddDeferred.resolve('either');
               $scope.close();
-              initPromise();
+              initAddPromise();
             };
 
             $scope.abort=function(){
               $scope.close();
-              initPromise();
+              initAddPromise();
             };
 
-            initPromise();
+            initAddPromise();
+            initRemovePromise();
 
           }
         };

@@ -317,6 +317,7 @@ function (angular, app, _, $, kbn) {
     };
 
     $scope.build_search = function(term,negate) {
+      negate;
       // if(_.isUndefined(term.meta)) {
       //   filterSrv.set({type:'terms',field:$scope.panel.field,value:term.label,
       //     mandate:(negate ? 'mustNot':'must')});

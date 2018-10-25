@@ -11,6 +11,8 @@ define([
   module.service('filterDialogSrv',function($q,dashboard, filterSrv){
 
     var callback;
+    var showRemoveCallback;
+
 
     var hideDialogCallback;
 
@@ -27,6 +29,10 @@ define([
         hideDialogCallback=fn;
     };
 
+    var subscribeRemoveCallback=function(fn){
+      showRemoveCallback=fn;
+    };
+
     var build_search = function(field,value,mode) {
       DEBUG && console.log(d3.event);
       if(value) {
@@ -37,7 +43,26 @@ define([
       dashboard.refresh();
     };
 
+    var hasFilter=function(type,field,value){
+      var result=Object.keys(filterSrv.list).findIndex(function(d){
+          return equals(filterSrv.list[d],{type:type,field:field,value:value});
+        });
+      if(result!==-1){
+        return true;
+      }else{
+        return false;
+      }
+    };
+
     var showDialog=function(field,value,pageY,pageX) {
+      if(hasFilter('terms',field,value)){
+          callRemoveDialog(field,value,pageY,pageX);
+        }else{
+          callAddDialog(field,value,pageY,pageX);
+      }
+    };
+
+    var callAddDialog=function(field,value,pageY,pageX){
       var resolve=function(mode){
         build_search(field,value,mode);
       };
@@ -53,9 +78,46 @@ define([
         .then(resolve,reject);
     };
 
+    var callRemoveDialog=function(field,value,pageY,pageX){
+
+      var resolve=function(){
+          removeFilterByFieldAndValue(field,value);
+          dashboard.refresh();
+      };
+
+      var reject=function(){
+
+      };
+      if(!pageY){
+        pageY=d3.event.pageY;
+        pageX=d3.event.pageX;
+      }
+      showRemoveCallback(pageY+"px",pageX+"px")
+        .then(resolve,reject);
+    };
+
+    var equals=function(filter1,filter2){
+      switch (filter1.type) {
+        case 'terms':
+          return (filter1.field===filter2.field) && (decodeURIComponent(filter1.value)===decodeURIComponent(filter2.value));
+        default:
+          return false;
+
+      }
+    };
+
+    var removeFilterByFieldAndValue=function(field,value){
+      Object.keys(filterSrv.list).filter(function(d){
+          return equals(filterSrv.list[d],{type:'terms',field:field,value:value});
+        }).forEach(function(d){
+          filterSrv.remove(filterSrv.list[d].id);
+        });
+    };
+
     return {
       subscribeShow:subscribeShow,
       subscribeHide:subscribeHide,
+      subscribeRemoveCallback:subscribeRemoveCallback,
       showDialog:showDialog,
       hideDialog:hideDialog
     };

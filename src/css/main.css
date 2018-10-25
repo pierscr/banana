@@ -36,7 +36,7 @@
   margin-bottom: 15px;
 }
 
-.row-close {
+/* .row-close {
   color: #bbb;
   position: absolute;
   font-size: 9pt;
@@ -61,7 +61,7 @@
   -webkit-transform: rotate(-90deg);
   -moz-transform: rotate(-90deg);
   -ms-transform: rotate(-90deg);
-}
+} */
 
 .row-open i {
   font-size: 10pt;
