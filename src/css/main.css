@@ -239,3 +239,31 @@ body{
   background-color:#333;
   color: white;
 }
+
+body.frame-background{
+  background-color: #5bc0de;
+}
+
+.frame-background .panelCont{
+  background-color: white;
+  box-shadow: 10px 10px 30px grey;
+  border-radius: 5px;
+  outline: none;
+}
+
+.frame-background a{
+  color: #000000;
+}
+
+.frame-background .panel div.panel-extra div.panel-extra-container{
+  margin-right: -5px;
+}
+
+.frame-background .panel div.panel-extra {
+    margin-top: 10px;
+}
+
+.frame-background .panel-title{
+    font-size: 1em;
+    margin-left: 5px;
+}

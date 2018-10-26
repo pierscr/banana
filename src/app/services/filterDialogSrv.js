@@ -74,7 +74,7 @@ define([
         pageY=d3.event.pageY;
         pageX=d3.event.pageX;
       }
-      callback(pageY+"px",pageX+"px")
+      callback(pageY+"px",pageX+10+"px")
         .then(resolve,reject);
     };
 
@@ -92,7 +92,7 @@ define([
         pageY=d3.event.pageY;
         pageX=d3.event.pageX;
       }
-      showRemoveCallback(pageY+"px",pageX+"px")
+      showRemoveCallback(pageY+"px",pageX+10+"px")
         .then(resolve,reject);
     };
 
