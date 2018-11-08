@@ -123,7 +123,9 @@ function (Settings) {
       'multiseries',
       'networkgraph',
       'sunburst',
-      'docviewer'
+      'docviewer',
+      'sankey',
+      'gridgraph'
     ]
   });
 });

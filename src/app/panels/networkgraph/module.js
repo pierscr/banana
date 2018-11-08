@@ -198,9 +198,9 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
           var animationStep = 400;
 
           var parent_width = element.parent().width(),
-              parentheight = parseInt(scope.row.height),
-              width = parent_width - 20,
-              height = parentheight -50;
+          parentheight = parseInt(scope.row.height),
+          width = parent_width - 20,
+          height = parentheight -50;
 
 
 
@@ -210,29 +210,29 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
           var zoomtX;
 
           var chart = d3.select(element[0]).append('svg')
-                        .attr('width', parent_width)
-                        .attr('height', parentheight)
-                        .call(zoom);
+            .attr('width', parent_width)
+            .attr('height', parentheight)
+            .call(zoom);
 
           chart
             .on('mouseup',function(){
-                      !zoomEnable && zoom.scale(zoomScale);
-                      !zoomEnable && zoom.translate(zoomtX);
-                      zoomEnable=true;
-                  });
+              !zoomEnable && zoom.scale(zoomScale);
+              !zoomEnable && zoom.translate(zoomtX);
+              zoomEnable=true;
+            });
 
           var tipLink = d3tip()
               .attr('class', 'd3-tip')
               .offset([-10, 0])
               .html(function(d) {
-                  return "<div><strong>Similarity</strong> <span style='color:red'>" + d.Similarity + "</span></div>";
+                return "<div><strong>Similarity</strong> <span style='color:red'>" + d.Similarity + "</span></div>";
               });
 
           var tipNode = d3tip()
               .attr('class', 'd3-tip')
               .offset([-10, 0])
               .html(function(d) {
-                  return "<div><strong>Frequency</strong> <span style='color:red'>" + d.count + "</span></div>";
+                return "<div><strong>Frequency</strong> <span style='color:red'>" + d.count + "</span></div>";
               });
 
           // node distance scale
@@ -246,21 +246,21 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
 
           // node distance scale
           var lineStroke =  d3.scale.linear()
-                            .domain([d3.min(scope.data.links,function(link){
-                                        return link.Similarity;
-                                    }),d3.max(scope.data.links,function(link){
-                                        return link.Similarity;
-                                    })])
-                            .rangeRound([3,8]);
+            .domain([d3.min(scope.data.links,function(link){
+              return link.Similarity;
+            }),d3.max(scope.data.links,function(link){
+              return link.Similarity;
+            })])
+            .rangeRound([3,8]);
 
                             // node distance scale
           var nodeSize =  d3.scale.linear()
-                            .domain([d3.min(scope.data.nodes,function(node){
-                                        return node.count;
-                                    }),d3.max(scope.data.nodes,function(node){
-                                        return node.count;
-                                    })])
-                          .rangeRound([width/scope.panel.maxNodeSize,width/scope.panel.minNodeSize]);
+            .domain([d3.min(scope.data.nodes,function(node){
+              return node.count;
+            }),d3.max(scope.data.nodes,function(node){
+              return node.count;
+            })])
+            .rangeRound([width/scope.panel.maxNodeSize,width/scope.panel.minNodeSize]);
 
 
           var force = d3.layout

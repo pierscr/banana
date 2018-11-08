@@ -230,7 +230,8 @@ module.exports = function (grunt) {
         'jquery.flot.pie',
         'angular-sanitize',
         'angular-dragdrop',
-        'd3'
+        'd3',
+        'd3-sanky'
       ]
     }
   ];
@@ -245,7 +246,7 @@ module.exports = function (grunt) {
       });
     });
 
-    // create a module for each directory in src/app/panels/
+    // create a modules inside utils
 
     requireModules.push({
       name: "d3ZoomExt"
@@ -254,6 +255,9 @@ module.exports = function (grunt) {
       name: "dataGraphMapping"
     });
 
+    requireModules.push({
+      name: 'grid'
+    });
 
   //exclude the literal config definition from all modules
   requireModules
@@ -276,8 +280,7 @@ module.exports = function (grunt) {
     'ngmin:build',
     'requirejs:build',
     'clean:temp',
-    'build:write_revision',
-    'uglify:dest'
+    'build:write_revision'
   ]);
 
   // run a string replacement on the require config, using the latest revision number as the cache buster

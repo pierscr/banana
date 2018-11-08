@@ -1,0 +1,31 @@
+<div ng-controller="gridgraph" ng-init="init()">
+    <style>
+        bar-chart rect {
+            fill: steelblue;
+        }
+        bar-chart text {
+            fill: white;
+            font: 10px sans-serif;
+            text-anchor: end;
+        }
+        .node circle {
+          cursor: pointer;
+          stroke: #3182bd;
+          stroke-width: 2.5px;
+          fill: white;
+        }
+
+        .node text {
+          font-family: sans-serif;
+          pointer-events: none;
+          text-anchor: middle;
+        }
+
+        line.link {
+          fill: none;
+          stroke: #9ecae1;
+        }
+
+    </style>
+    <gridgraph-chart></gridgraph-chart>
+</div>

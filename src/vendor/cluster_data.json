@@ -1,0 +1,106 @@
+{"escluster_str_year,cluster": [
+        {
+          "field": "escluster_str_year",
+          "value": 2018,
+          "count": 970,
+          "pivot": [
+            {
+              "field": "cluster",
+              "value": "gun,device,spray,electric",
+              "count": 287
+            },
+            {
+              "field": "cluster",
+              "value": "gun,flower,device,machine",
+              "count": 286
+            },
+            {
+              "field": "cluster",
+              "value": "flower,case,device,type",
+              "count": 103
+            },
+            {
+              "field": "cluster",
+              "value": "flower,case,device,watering",
+              "count": 95
+            },
+            {
+              "field": "cluster",
+              "value": "gun,spray,device,paint",
+              "count": 93
+            },
+            {
+              "field": "cluster",
+              "value": "flower,basket,hanging,composition",
+              "count": 81
+            },
+            {
+              "field": "cluster",
+              "value": "plant,named,gun,nail",
+              "count": 50
+            },
+            {
+              "field": "cluster",
+              "value": "gun,welding,method,device",
+              "count": 48
+            },
+            {
+              "field": "cluster",
+              "value": "material,fabric,flower,anti",
+              "count": 21
+            },
+            {
+              "field": "cluster",
+              "value": "gun,water,toy,spray",
+              "count": 7
+            }
+          ]
+        },
+        {
+          "field": "escluster_str_year",
+          "value": 2017,
+          "count": 4,
+          "pivot": [
+            {
+              "field": "cluster",
+              "value": "gun,device,spray,electric",
+              "count": 3
+            },
+            {
+              "field": "cluster",
+              "value": "gun,spray,device,paint",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "field": "escluster_str_year",
+          "value": 2011,
+          "count": 2,
+          "pivot": [
+            {
+              "field": "cluster",
+              "value": "gun,device,spray,electric",
+              "count": 1
+            },
+            {
+              "field": "cluster",
+              "value": "gun,flower,device,machine",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "field": "escluster_str_year",
+          "value": 2015,
+          "count": 1,
+          "pivot": [
+            {
+              "field": "cluster",
+              "value": "gun,device,spray,electric",
+              "count": 1
+            }
+          ]
+        }
+      ]
+}

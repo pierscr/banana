@@ -6,7 +6,6 @@ define([
   'jquery',
   'underscore',
   'require',
-
   'elasticjs',
   'solrjs',
   'bootstrap',
@@ -105,7 +104,7 @@ function (angular, $, _, appLevelRequire) {
                     goto = '../login?return=' + window.location.pathname;
                 goto += (hash ? hash : "");
                 goto += (query ? "?" + encodeURIComponent(query) : "");
-                goto = goto.replace(/#/g, '%23');  
+                goto = goto.replace(/#/g, '%23');
                 window.location = goto;
                 return;
               } else if (err.status === 404) {
@@ -117,7 +116,7 @@ function (angular, $, _, appLevelRequire) {
     // }]);
     });
   }]);
-  
+
   var apps_deps = [
     'elasticjs.service',
     'solrjs.service',

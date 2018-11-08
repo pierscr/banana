@@ -71,7 +71,7 @@ define('dataGraphMapping',[],function () {
         return (_nodeLinkCompare(cluster1,filter) || _nodeLinkCompare(cluster2,filter));
       }
 
-      function build(){
+      var build=function(){
         /*use of 'for' because of performance*/
         for(var i=0; i<links.length; i++){
           if(filter.length!==0){
@@ -87,34 +87,34 @@ define('dataGraphMapping',[],function () {
           }
         }
         return this;
-      }
+      };
 
-      function nodesFn(nodesArg){
+      var nodesFn=function(nodesArg){
         if(nodesArg){
           nodes=nodesArg;
           return this;
         }else{
           return nodes;
         }
-      }
+      };
 
-      function linksFn(linksArg){
+      var linksFn=function(linksArg){
         if(linksArg){
           links=linksArg;
           return this;
         }else{
           return links;
         }
-      }
+      };
 
-      function filterFn(filterArg){
+      var filterFn=function(filterArg){
         if(filterArg){
           filter.push(filterArg);
           return this;
         }else{
           return filter;
         }
-      }
+      };
 
       function indexedLinksFn(){
         return indexedLinks;

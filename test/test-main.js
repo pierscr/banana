@@ -11,8 +11,10 @@ for (var file in window.__karma__.files) {
 
 require.config({
   // Karma serves files under /base, which is the basePath from your config file
+  // '../../bower_components/requirejs-plugins/lib/require',
   baseUrl: '/base/src/app',
   paths: {
+    'cluster_data':           '../example_data/cluster_data',
     config:                   '../config',
     settings:                 'components/settings',
     kbn:                      'components/kbn',
@@ -52,7 +54,8 @@ require.config({
     solrjs:                   '../vendor/solrjs/solr-angular-client',
     d3:                       '../vendor/d3',
     dataGraphMapping:         'utils/dataGraphMapping',
-    filterDialog              'utils/filterDialog'
+    filterDialog:              'utils/filterDialog',
+    grid:                      'utils/grid'
   },
   shim: {
     underscore: {

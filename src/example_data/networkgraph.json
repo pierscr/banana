@@ -1,42 +1,9 @@
 {
   "nodes" : [
     {"name":"inorganic_chemistry|ceramic_industry|company|music"},
-    {"name":"chemistry|military|aeronautics|electronics"},
-    {"name":"telecommunications|military|electronics|aeronautics"},
-    {"name":"weaponry|military|sport|linguistics"},
-    {"name":"mechanics|technology|company|building_industry"},
-    {"name":"company|politics|city_planning|electronics"},
-    {"name":"military|computer_science|company|medicine"},
-    {"name":"inorganic_chemistry|linguistics|ceramic_industry|military"}
+    {"name":"chemistry|military|aeronautics|electronics"}
   ],
   "links" : [
-    {"source":0,"target":1,"value":0.03773499123883661},
-    {"source":7,"target":0,"value":0.03686145960888665},
-    {"source":2,"target":7,"value":0.03352562267082004},
-    {"source":2,"target":0,"value":0.028210043754338665},
-    {"source":4,"target":1,"value":0.025453154607320005},
-    {"source":4,"target":5,"value":0.025157082593933566},
-    {"source":6,"target":4,"value":0.024968652489569365},
-    {"source":6,"target":0,"value":0.02200442559430915},
-    {"source":3,"target":1,"value":0.021297509570381568},
-    {"source":4,"target":0,"value":0.020885597548695123},
-    {"source":6,"target":1,"value":0.01965816212894822},
-    {"source":6,"target":5,"value":0.015690304528500842},
-    {"source":2,"target":3,"value":0.014823700566164999},
-    {"source":2,"target":1,"value":0.013206314778925532},
-    {"source":7,"target":1,"value":0.011663640756291449},
-    {"source":5,"target":0,"value":0.007085161679535101},
-    {"source":6,"target":2,"value":0.003103183892568695},
-    {"source":5,"target":1,"value":0.0022372594940378576},
-    {"source":2,"target":5,"value":0.001482898094974927},
-    {"source":4,"target":7,"value":0.0006241739282741854},
-    {"source":6,"target":3,"value":0.00029783413787898283},
-    {"source":3,"target":7,"value":0.00029298416352030454},
-    {"source":5,"target":7,"value":0.00028682974058924504},
-    {"source":2,"target":4,"value":0.0002588610575582351},
-    {"source":3,"target":5,"value":0.00023690871067127972},
-    {"source":4,"target":3,"value":0.00021801819172440062},
-    {"source":6,"target":7,"value":0.0001836673046574644},
-    {"source":3,"target":0,"value":0.000836005317416122}
+    {"source":0,"target":1,"value":0.03773499123883661}
   ]
 }

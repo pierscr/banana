@@ -44,10 +44,16 @@ require.config({
     elasticjs:                '../vendor/elasticjs/elastic-angular-client',
     solrjs:                   '../vendor/solrjs/solr-angular-client',
     d3:                       '../vendor/d3',
+    'd3-collection':          '../vendor/d3-collection.min',
     d3tip:                   '../vendor/d3.tip',
     palettejs:                 '../vendor/palette',
     d3ZoomExt:                    'extensions/d3ZoomExt',
-    dataGraphMapping:         'utils/dataGraphMapping'
+    dataGraphMapping:         'utils/dataGraphMapping',
+    'd3-array':         '../vendor/d3-array',
+    'd3-path':          '../vendor/d3-path.min',
+    'd3-shape':         '../vendor/d3-shape.min',
+    'd3-sanky':         '../vendor/d3-sankey.min',
+    grid:               'utils/grid'
   },
   shim: {
     underscore: {
@@ -91,12 +97,13 @@ require.config({
     'angular-touch':        ['angular'],
 
     'angular-strap':        ['angular', 'bootstrap','timepicker', 'datepicker'],
+    'd3-sanky':             ['d3-shape', 'd3-path','d3-array','d3-collection'],
 
     timepicker:             ['jquery', 'bootstrap'],
     datepicker:             ['jquery', 'bootstrap'],
 
     elasticjs:              ['angular', '../vendor/elasticjs/elastic'],
     solrjs:                 ['angular', '../vendor/solrjs/solr'],
-    app:                     ['d3ZoomExt','dataGraphMapping']
+    app:                     ['d3ZoomExt','dataGraphMapping','grid']
   }
 });
