@@ -35,12 +35,19 @@ define([
 
     var build_search = function(field,value,mode) {
       DEBUG && console.log(d3.event);
+      var active=true;
+      if(mode==='either'){
+        active=false;
+      }
+
       if(value) {
-        filterSrv.set({type:'terms',field:field,value:value,mandate:mode});
+        filterSrv.set({type:'terms',field:field,value:value,mandate:mode,active:active});
       } else {
         return;
       }
-      dashboard.refresh();
+      if(mode!=='either'){
+        dashboard.refresh();
+      }
     };
 
     var hasFilter=function(type,field,value){

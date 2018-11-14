@@ -401,7 +401,8 @@ define(['dataGraphMapping'],function(dataGraphMapping){
          .links(links)
          .build();
 
-      expect(6).toEqual(initModule.filteredNodes().length);
+      //without filters even the nodes without a link are gave back
+      expect(8).toEqual(initModule.filteredNodes().length);
       expect(8).toEqual(initModule.indexedLinks().length);
       expect(0).toEqual(initModule.indexedLinks()[0].source);
       expect(4).toEqual(initModule.indexedLinks()[7].target);
@@ -534,5 +535,98 @@ define(['dataGraphMapping'],function(dataGraphMapping){
       expect(0).toEqual(initModule.indexedLinks().length);
 
     });
+
+    it('build - just one node',function(){
+      var filteredNodes=new Array();
+      var links=new Array();
+      links.push({Cluster1:['plant,named,gun,nail'],Cluster2:['terzo']});
+      links.push({Cluster1:['secondo'],Cluster2:['terzo']});
+      links.push({Cluster1:['quinto'],Cluster2:['terzo']});
+      links.push({Cluster1:['quinto'],Cluster2:['sesto']});
+      links.push({Cluster1:['quinto'],Cluster2:['primo']});
+      links.push({Cluster1:['secondo'],Cluster2:['sesto']});
+      links.push({Cluster1:['primo'],Cluster2:['sesto']});
+      links.push({Cluster1:['settimo'],Cluster2:['sesto']});
+
+      var nodes=new Array();
+      //nodes.push({field:"cluster_h",value:'secondo',count:10});
+      nodes.push({field: "cluster_h", value: "fsd", count: 16});
+
+
+      var initModule=dataGraphMapping();
+      initModule
+         .nodes(nodes)
+         .links(links)
+         .build();
+
+      expect(1).toEqual(initModule.filteredNodes().length);
+      expect(0).toEqual(initModule.indexedLinks().length);
+
+    });
+
+    it('build - just two nodes just one is in links and filters',function(){
+
+      // todo : if a node is in
+      var filteredNodes=new Array();
+      var links=new Array();
+      links.push({Cluster1:['plant,named,gun,nail'],Cluster2:['terzo']});
+      links.push({Cluster1:['secondo'],Cluster2:['terzo']});
+      links.push({Cluster1:['quinto'],Cluster2:['terzo']});
+      links.push({Cluster1:['quinto'],Cluster2:['sesto']});
+      links.push({Cluster1:['quinto'],Cluster2:['primo']});
+      links.push({Cluster1:['secondo'],Cluster2:['sesto']});
+      links.push({Cluster1:['primo'],Cluster2:['sesto']});
+      links.push({Cluster1:['settimo'],Cluster2:['sesto']});
+
+      var nodes=new Array();
+      //nodes.push({field:"cluster_h",value:'secondo',count:10});
+      nodes.push({field: "cluster_h", value: "fsd", count: 16});
+      nodes.push({field: "cluster_h", value: "secondo", count: 16});
+
+
+      var initModule=dataGraphMapping();
+      initModule
+         .nodes(nodes)
+         .links(links)
+         .filter("secondo")
+         .build();
+
+      expect(1).toEqual(initModule.filteredNodes().length);
+      expect(0).toEqual(initModule.indexedLinks().length);
+
+    });
+
+
+    it('build - just one node without link but in filters',function(){
+
+      // todo : if a node is in
+      var filteredNodes=new Array();
+      var links=new Array();
+      links.push({Cluster1:['plant,named,gun,nail'],Cluster2:['terzo']});
+      links.push({Cluster1:['secondo'],Cluster2:['terzo']});
+      links.push({Cluster1:['quinto'],Cluster2:['terzo']});
+      links.push({Cluster1:['quinto'],Cluster2:['sesto']});
+      links.push({Cluster1:['quinto'],Cluster2:['primo']});
+      links.push({Cluster1:['secondo'],Cluster2:['sesto']});
+      links.push({Cluster1:['primo'],Cluster2:['sesto']});
+      links.push({Cluster1:['settimo'],Cluster2:['sesto']});
+
+      var nodes=new Array();
+      //nodes.push({field:"cluster_h",value:'secondo',count:10});
+      nodes.push({field: "cluster_h", value: "fsd", count: 16});
+
+
+      var initModule=dataGraphMapping();
+      initModule
+         .nodes(nodes)
+         .links(links)
+         .filter("secondo")
+         .build();
+
+      expect(1).toEqual(initModule.filteredNodes().length);
+      expect(0).toEqual(initModule.indexedLinks().length);
+
+    });
+
   });
 });

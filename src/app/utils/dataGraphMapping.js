@@ -21,7 +21,7 @@ define('dataGraphMapping',[],function () {
         return nodeValue && linkValue && _clusterStringReplace(nodeValue) === _clusterStringReplace(linkValue);
       }
 
-      /* map the filteredNodes index into the link node reference parameter - add the matching node to filteredNodes Array*/
+      /* map the node index into the link node reference parameter - add the matching node to filteredNodes Array*/
       function _linkNodeMap(link,clusterName,destinationParam,node,flag,filteredNodes,mapFunction){
         if(!flag  && _nodeLinkCompare(node.value,link[clusterName][0])){
           flag=true;
@@ -72,7 +72,12 @@ define('dataGraphMapping',[],function () {
       }
 
       var build=function(){
-        /*use of 'for' because of performance*/
+        /*if the node is just one there isn't link to calculate*/
+        if(nodes.length===1){
+          filteredNodes=nodes;
+          return;
+        }
+        /*using 'for' because of performance*/
         for(var i=0; i<links.length; i++){
           if(filter.length!==0){
             for(var k=0 ; k<filter.length; k++){
@@ -80,11 +85,14 @@ define('dataGraphMapping',[],function () {
                 _linkIndexer(links[i],nodes,filteredNodes) &&  indexedLinks.push(links[i]);
                 break;
               }
-
             }
           }else{
               _linkIndexer(links[i],nodes,filteredNodes) &&  indexedLinks.push(links[i]);
+              //filteredNodes=filteredNodes.concat(nodes);
           }
+        }
+        if(filter.length===0){
+          filteredNodes=filteredNodes.concat(nodes);
         }
         return this;
       };

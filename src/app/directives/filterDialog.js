@@ -4,7 +4,7 @@ define(['angular'],function(angular){
 
     var module = angular.module('kibana.directives');
 
-    module.directive('filterDialog', function(filterDialogSrv,$q) {
+    module.directive('filterDialog', function(filterDialogSrv,$q,filterSrv,dashboard) {
       console.log("directive filterDialog loaded");
       return {
           restrict: 'E',
@@ -18,7 +18,6 @@ define(['angular'],function(angular){
             var initAddPromise=function(){
               showAddDeferred=$q.defer();
               filterDialogSrv.subscribeShow(showAddDialog);
-
             };
 
             var initRemovePromise=function(){
@@ -30,6 +29,7 @@ define(['angular'],function(angular){
               $scope.dialog='add';
               $scope.style.top=posy;
               $scope.style.left=posx;
+              $scope.showCompare= filterSrv.idsByMandate('either').length>0?true:false;
               $scope.$apply();
               return showAddDeferred.promise;
             };
@@ -74,6 +74,13 @@ define(['angular'],function(angular){
             $scope.abort=function(){
               $scope.close();
               initAddPromise();
+            };
+
+
+            $scope.applyCompare=function(){
+              filterSrv.applyCompare();
+              $scope.close();
+              dashboard.refresh();
             };
 
             initAddPromise();

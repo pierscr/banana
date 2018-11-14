@@ -96,7 +96,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
     //   dashboard.refresh();
     // };
 
-    $scope.constructSolrQuery=function(facetField){
+    $scope.constructSolrQuery=function(facetField,addGlobalQueryFlag){
       // Construct Solr query
       // var fq = '';
       // if (filterSrv.getSolrFq()) {
@@ -109,13 +109,20 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
       if(facetField){
         result+=pivot_field;
       }
-      return $scope.panel.queries.query = querySrv.getQuery(0)+result;
+      if(addGlobalQueryFlag){
+        result+="&"+querySrv.getQuery(0);
+      }else{
+        result+="&q=*:*";
+      }
+      return $scope.panel.queries.query = result;
     };
 
       $scope.forEachFilter=function(fn){
         d3.keys(dashboard.current.services.filter.list)
           .forEach(function(item){
-            fn(dashboard.current.services.filter.list[item].field,dashboard.current.services.filter.list[item].value);
+            if(dashboard.current.services.filter.list[item].active){
+              fn(dashboard.current.services.filter.list[item].field,dashboard.current.services.filter.list[item].value);
+            }
           });
       };
 
@@ -133,7 +140,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
       //   });
       filtersQr = '&' + filterSrv.getSolrFq(false,$scope.panel.nodesField);
       nodeRequest.setQuery(
-        $scope.constructSolrQuery($scope.panel.nodesField)+filtersQr
+        $scope.constructSolrQuery($scope.panel.nodesField,true)+filtersQr
       );
       var results = nodeRequest.doSearch();
       results
@@ -306,7 +313,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
               .attr("transform", function(d){
                 return "translate("+d.x+","+d.y+")";
               })
-              .on('click', function(d){  tipLink.hide(); tipNode.hide(); filterDialogSrv.showDialog(scope.panel.nodesField,d.name);})
+              .on('click', function(d){  tipLink.hide(); tipNode.hide(); filterDialogSrv.showDialog(scope.panel.nodesField,d.name || d.value);})
               .on('mousedown',function(){
                   zoomScale=zoom.scale();
                   zoomtX=zoom.translate();
@@ -336,7 +343,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
 
               node
                   .append('text')
-                  .text(function(d){return d.name;})
+                  .text(function(d){return  d.name || d.value;})
                   .attr('x',20)
                   .attr('y',-10)
                   .style('font-size',scope.panel.fontSize+'px');

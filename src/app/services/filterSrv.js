@@ -53,7 +53,8 @@ define([
     // If an id is passed, the filter at that id is updated.
     this.set = function(filter,id) {
       _.defaults(filter,{mandate:'must'});
-      filter.active = true;
+
+      if(filter.active===undefined){filter.active = true;}
 
       // Need to url encode the filter query or value
       if (filter.query) {
@@ -236,15 +237,22 @@ define([
         }
       });
 
-      // For undefined time field, return filter_fq and strip-off the prefix '&'.
-      // This will enable the dashboard without timepicker to function properly.
-      if (!start_time || !end_time || !time_field) {
-        return filter_fq.replace(/^&/,'');
-      }
+      //se primo filtro (un filtro)
+      //metti in must
+
+      //se secondo filter (due filtri)
+        //
+
 
       // parse filter_either array values, if exists
       if (filter_either.length > 0) {
         filter_fq = filter_fq + '&fq=(' + filter_either.join(' OR ') + ')';
+      }
+
+      // For undefined time field, return filter_fq and strip-off the prefix '&'.
+      // This will enable the dashboard without timepicker to function properly.
+      if (!start_time || !end_time || !time_field) {
+        return filter_fq.replace(/^&/,'');
       }
 
       if (noTime) {
@@ -325,6 +333,10 @@ define([
 
     this.getByType = function(type,inactive) {
       return _.pick(self.list,self.idsByType(type,inactive));
+    };
+
+    this.idsByMandate = function(mandate) {
+      return _.pluck(_.where(self.list,{mandate:mandate}),'id');
     };
 
     // get the ids of filters using type and field
@@ -420,6 +432,14 @@ define([
       } else {
         return false;
       }
+    };
+
+    this.applyCompare = function(){
+      for(var index in self.list){
+            if(self.list[index].mandate==='either'){
+              self.list[index].active=true;
+            }
+        }
     };
 
     var nextId = function() {
