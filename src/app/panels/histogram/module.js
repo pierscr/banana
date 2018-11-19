@@ -232,7 +232,7 @@ function (angular, app, $, _, kbn, moment, timeSeries) {
 
       var request = $scope.sjs.Request().indices(dashboard.indices[segment]);
       $scope.panel.queries.ids = querySrv.idsByMode($scope.panel.queries);
-      
+
 
       $scope.panel.queries.query = "";
       // Build the query
@@ -300,7 +300,7 @@ function (angular, app, $, _, kbn, moment, timeSeries) {
           values_mode_query += '&group=true&group.field=' + $scope.panel.group_field + '&group.limit=' + $scope.panel.max_rows;
         }
       }
-      
+
       var mypromises = [];
        _.each($scope.panel.queries.ids, function(id) {
         var temp_q =  querySrv.getQuery(id) + wt_json + rows_limit + fq + facet + values_mode_query;
@@ -652,13 +652,13 @@ function (angular, app, $, _, kbn, moment, timeSeries) {
             return "%m/%y";
           }
           if(_int >= 86400) {
-            return "%m/%d/%y";
+            return "%d/%m/%y";
           }
           if(_int >= 60) {
-            return "%H:%M<br>%m/%d";
+            return "%H:%M<br>%d/%m";
           }
 
-          return "%H:%M:%S";
+          return "%H:%M";
         }
 
         var $tooltip = $('<div>');

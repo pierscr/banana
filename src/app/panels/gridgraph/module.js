@@ -127,18 +127,23 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid) {
       setTimeout(function(){
 
             $scope.nodes=[
-              {id:0,"name":"flower|case|device|watering",value:"210",year:"2016"},
-              {id:1,"name":"flower|case|device|type",value:"120",year:"2016"},
-              {id:2,"name":"gun,flower,device,machine",value:"60",year:"2016"},
-              {id:3,"name":"flower|case|device|watering",value:"250",year:"2017"},
-              {id:4,"name":"material,fabric,flower,anti",value:"35",year:"2017"},
-              {id:5,"name":"flower|case|device|watering",value:"310",year:"2018"}
+              {id:0,"name":"a",value:"210",year:"2016"},
+              {id:1,"name":"b",value:"120",year:"2016"},
+              {id:2,"name":"c",value:"60",year:"2016"},
+              {id:3,"name":"a,b",value:"250",year:"2017"},
+              {id:4,"name":"d",value:"35",year:"2017"},
+              {id:5,"name":"c",value:"35",year:"2017"},
+              {id:6,"name":"a,b,d",value:"310",year:"2018"},
+              {id:7,"name":"c",value:"35",year:"2018"}
             ];
 
             $scope.links=[
               {"source": 0,"target": 3,"value": [0.29499688199934504]},
-              {"source": 2,"target": 3,"value": [0.054597872395713454]},
-              {"source": 4,"target": 5,"value": [0.046069246728398294]}
+              {"source": 1,"target": 3,"value": [0.054597872395713454]},
+              {"source": 2,"target": 5,"value": [0.046069246728398294]},
+              {"source": 3,"target": 6,"value": [0.046069246728398294]},
+              {"source": 4,"target": 6,"value": [0.046069246728398294]},
+              {"source": 5,"target": 7,"value": [0.046069246728398294]}
             ];
 
 
