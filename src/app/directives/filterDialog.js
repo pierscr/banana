@@ -25,8 +25,12 @@ define(['angular'],function(angular){
               filterDialogSrv.subscribeRemoveCallback(showRemoveDialog);
             };
 
-            var showAddDialog=function(posy,posx){
-              $scope.dialog='add';
+            var showAddDialog=function(posy,posx,mode){
+              if(mode!==undefined){
+                $scope.dialog=mode;
+              }else{
+                $scope.dialog='add';
+              }
               $scope.style.top=posy;
               $scope.style.left=posx;
               $scope.showCompare= filterSrv.idsByMandate('either').length>0?true:false;

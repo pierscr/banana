@@ -121,11 +121,18 @@ define([
         });
     };
 
+    var showDialog2=function(){
+      var pageY=d3.event.pageY;
+      var pageX=d3.event.pageX;
+      callback(pageY+"px",pageX+10+"px","send");
+    };
+
     return {
       subscribeShow:subscribeShow,
       subscribeHide:subscribeHide,
       subscribeRemoveCallback:subscribeRemoveCallback,
       showDialog:showDialog,
+      showDialog2:showDialog2,
       hideDialog:hideDialog
     };
   });

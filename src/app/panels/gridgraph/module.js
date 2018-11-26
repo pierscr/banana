@@ -127,14 +127,17 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid) {
       setTimeout(function(){
 
             $scope.nodes=[
-              {id:0,"name":"a",value:"210",year:"2016"},
-              {id:1,"name":"b",value:"120",year:"2016"},
-              {id:2,"name":"c",value:"60",year:"2016"},
-              {id:3,"name":"a,b",value:"250",year:"2017"},
-              {id:4,"name":"d",value:"35",year:"2017"},
-              {id:5,"name":"c",value:"35",year:"2017"},
-              {id:6,"name":"a,b,d",value:"310",year:"2018"},
-              {id:7,"name":"c",value:"35",year:"2018"}
+              {id:8,"name":"2016",value:"210",year:"2016",size:"0"},
+              {id:9,"name":"2017",value:"210",year:"2017",size:"0"},
+              {id:10,"name":"2018",value:"210",year:"2018",size:"0"},
+              {id:0,"name":"a",value:"210",year:"2016",size:"7"},
+              {id:1,"name":"b",value:"120",year:"2016",size:"10"},
+              {id:2,"name":"c",value:"60",year:"2016",size:"20"},
+              {id:3,"name":"a,b",value:"250",year:"2017",size:"20"},
+              {id:4,"name":"d",value:"35",year:"2017",size:"15"},
+              {id:5,"name":"c",value:"35",year:"2017",size:"15"},
+              {id:6,"name":"a,b,d",value:"310",year:"2018",size:"30"},
+              {id:7,"name":"c",value:"35",year:"2018",size:"10"}
             ];
 
             $scope.links=[
@@ -154,7 +157,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid) {
     };
   });
 
-  module.directive('gridgraphChart', function() {
+  module.directive('gridgraphChart', function(filterDialogSrv) {
     return {
       restrict: 'E',
       link: function(scope, element)  {
@@ -221,13 +224,17 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid) {
 
 
           node.append('circle')
-            .attr('r',"10px");
+            .attr('r',function(d){return d.size+"px";});
 
           node.append('text')
             .text(function(d){return d.name;})
             .attr('x',20)
             .attr('y',-10)
             .style('font-size',scope.panel.fontSize+'px');
+
+        node.on('click', function(){
+          filterDialogSrv.showDialog2();
+        });
 
     }
 

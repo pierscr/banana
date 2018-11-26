@@ -742,7 +742,7 @@ function (angular, app, $, _, kbn, moment, timeSeries) {
                     group = kbn.query_color_dot(s.color, 15) + ' ';
                   }
 
-                  lsItemTT = group + dashboard.numberWithCommas(value) + " @ " + (scope.panel.timezone === 'utc'? moment.utc(p[0]).format('MM/DD HH:mm:ss') : moment(p[0]).format('MM/DD HH:mm:ss'));
+                  lsItemTT = group + dashboard.numberWithCommas(value) + " @ " + (scope.panel.timezone === 'utc'? moment.utc(p[0]).format('DD/MM HH:mm:ss') : moment(p[0]).format('DD/MM HH:mm:ss'));
                   lsTT = lsTT +"</br>"+ lsItemTT;
                   break;
                 }
