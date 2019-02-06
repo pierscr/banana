@@ -1,5 +1,5 @@
 
-# PLATANO - NEW VERSION UPLOAD 6 FEB  version 2
+# PLATANO - NEW VERSION UPLOAD 6 FEB  version 3
 
 The Banana project was forked from [Kibana](https://github.com/elastic/kibana), and works with all kinds of time series
 (and non-time series) data stored in [Apache Solr](https://lucene.apache.org/solr/). It uses Kibana's powerful dashboard
