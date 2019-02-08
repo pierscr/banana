@@ -154,7 +154,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
         $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.linksCore);
         var linksRequest = $scope.sjs.Request();
             linksRequest.setQuery(
-              $scope.constructSolrQuery()
+              $scope.constructSolrQuery()+"&rows=4000"
             );
         linksRequest
           .doSearch()
@@ -239,11 +239,13 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
               .attr('class', 'd3-tip')
               .offset([-10, 0])
               .html(function(d) {
-                return "<div><strong>Frequency</strong> <span style='color:red'>" + d.count + "</span></div>";
+                return "<div><strong>Name</strong> <span style='color:red'>"+ (typeof d.name === 'string' ?  d.name.split("/").pop(): '') +"</span></div>"
+                +"<div><strong>Frequency</strong> <span style='color:red'>" + d.count + "</span></div>";
               });
 
           // node distance scale
-          var distanceScale =  d3.scale.linear()
+          var distanceScale =   d3.scale.log()
+                            .base(Math.E)
                             .domain([d3.min(scope.data.links,function(link){
                                         return link.Similarity;
                                     }),d3.max(scope.data.links,function(link){
@@ -252,22 +254,24 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
                             .rangeRound([scope.panel.maxLinkDistance,scope.panel.minLinkDistance]);
 
           // node distance scale
-          var lineStroke =  d3.scale.linear()
+          var lineStroke =   d3.scale.log()
+            .base(Math.E)
             .domain([d3.min(scope.data.links,function(link){
               return link.Similarity;
             }),d3.max(scope.data.links,function(link){
               return link.Similarity;
             })])
-            .rangeRound([3,8]);
+            .rangeRound([1,1]);
 
                             // node distance scale
-          var nodeSize =  d3.scale.linear()
+          var nodeSize =  d3.scale.log()
+            .base(Math.E)
             .domain([d3.min(scope.data.nodes,function(node){
               return node.count;
             }),d3.max(scope.data.nodes,function(node){
               return node.count;
             })])
-            .rangeRound([width/scope.panel.maxNodeSize,width/scope.panel.minNodeSize]);
+            .rangeRound([scope.panel.minNodeSize,scope.panel.maxNodeSize]);
 
 
           var force = d3.layout
@@ -341,12 +345,12 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
                 })
                 .call(force.drag);
 
-              node
-                  .append('text')
-                  .text(function(d){return  d.name || d.value;})
-                  .attr('x',20)
-                  .attr('y',-10)
-                  .style('font-size',scope.panel.fontSize+'px');
+              // node
+              //     .append('text')
+              //     .text(function(d){return  d.name || d.value;})
+              //     .attr('x',20)
+              //     .attr('y',-10)
+              //     .style('font-size',scope.panel.fontSize+'px');
 
             chart.call(tipLink);
             chart.call(tipNode);
