@@ -58,7 +58,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
       minLinkDistance:50,
       minNodeSize:80,
       maxNodeSize:120,
-      fontSize:12
+      fontSize:12,
+      linkValue:0.1
     };
 
     // Set panel's default values
@@ -285,7 +286,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
 
            force
               .nodes(scope.data.nodes)
-              .links(scope.data.links);
+              .links(scope.data.links.filter(function(link){return link.Similarity>scope.panel.linkValue}));
 
             var link = chart.selectAll('.link')
               .data(scope.data.links)
