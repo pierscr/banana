@@ -155,7 +155,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
         $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.linksCore);
         var linksRequest = $scope.sjs.Request();
             linksRequest.setQuery(
-              $scope.constructSolrQuery()+"&rows=60000"
+              $scope.constructSolrQuery()+"&rows=60000"+"&fq=Similarity:["+$scope.panel.linkValue+" TO *]"
             );
         linksRequest
           .doSearch()
