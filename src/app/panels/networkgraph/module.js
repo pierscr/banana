@@ -155,7 +155,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
         $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.linksCore);
         var linksRequest = $scope.sjs.Request();
             linksRequest.setQuery(
-              $scope.constructSolrQuery()+"&rows=4000"
+              $scope.constructSolrQuery()+"&rows=60000"
             );
         linksRequest
           .doSearch()
@@ -165,7 +165,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
              var initModule=dataGraphMapping();
              initModule
                 .nodes($scope.data.nodes)
-                .links($scope.data.links);
+                .links($scope.data.links.filter(function(link){return link.Similarity>$scope.panel.linkValue;}));
 
               $scope.forEachFilter(function(key,value){
                   if(key===$scope.panel.nodesField){
@@ -240,7 +240,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
               .attr('class', 'd3-tip')
               .offset([-10, 0])
               .html(function(d) {
-                return "<div><strong>Name</strong> <span style='color:red'>"+ (typeof d.name === 'string' ?  d.name.split("/").pop(): '') +"</span></div>"
+                return "<div><strong>Name</strong> <span style='color:red'>"+ (typeof d.name === 'string' ?  d.name.split("/").pop(): d.value.split("/").pop()) +"</span></div>"
                 +"<div><strong>Frequency</strong> <span style='color:red'>" + d.count + "</span></div>";
               });
 
@@ -285,11 +285,11 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
             .size([width, height]);
 
            force
-              .nodes(scope.data.nodes)
-              .links(scope.data.links.filter(function(link){return link.Similarity>scope.panel.linkValue}));
+              .nodes(scope.data.nodes.filter(function(node){return node.count}))
+              .links(scope.data.links.filter(function(link){return link.Similarity>scope.panel.linkValue;}));
 
             var link = chart.selectAll('.link')
-              .data(scope.data.links)
+              .data(scope.data.links.filter(function(link){return link.Similarity>scope.panel.linkValue;}))
               .enter().append('line')
               .attr('class', 'link')
               .attr('x1', function(d) { return d.source.x; })
@@ -306,7 +306,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
               .attr('y1', function() { return this.parentNode.__data__.source.y; })
               .attr('x2', function() { return this.parentNode.__data__.target.x; })
               .attr('y2', function() { return this.parentNode.__data__.target.y; })
-              .attr("stroke-width", 5);
+              .attr("stroke-width", 15);
 
           // Now it's the nodes turn. Each node is drawn as a circle.
 
@@ -362,6 +362,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
                 node.transition().ease('linear').duration(animationStep)
                                       .attr("transform",function(d){
                                                           if(zoomEnable){
+                                                            if(isNaN(d.x) || isNaN(d.y)) {return;}
                                                             return "translate("+d.x*zoom.scale()+","+d.y*zoom.scale()+")translate("+zoom.translate()[0]+","+zoom.translate()[1]+")";
                                                           }else{
                                                             return "translate("+d.x*zoomScale+","+d.y*zoomScale+")translate("+zoomtX[0]+","+zoomtX[1]+")";
