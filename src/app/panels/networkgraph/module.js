@@ -59,7 +59,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
       minNodeSize:80,
       maxNodeSize:120,
       fontSize:12,
-      linkValue:0.1
+      linkValue:0.1,
+      nodelimit:''
     };
 
     // Set panel's default values
@@ -113,8 +114,9 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
       if(addGlobalQueryFlag){
         result+="&"+querySrv.getQuery(0);
       }else{
-        result+="&q=*:*";
+        result+="&q=*:*&rows=0";
       }
+      result+=$scope.panel.nodelimit!==''?'&facet.limit='+$scope.panel.nodelimit:'';
       return $scope.panel.queries.query = result;
     };
 
@@ -133,13 +135,12 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
 
       $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.nodesCore);
       var nodeRequest = $scope.sjs.Request();
-      var filtersQr='';
       // $scope.forEachFilter(function(key,value){
       //     if(key!==$scope.panel.nodesField){
       //       filtersQr=filtersQr+'&fq=' +key+':'+value;
       //     }
       //   });
-      filtersQr = '&' + filterSrv.getSolrFq(false,$scope.panel.nodesField);
+      var filtersQr= filterSrv.getSolrFq(false,$scope.panel.nodesField)!==''?'&' + filterSrv.getSolrFq(false,$scope.panel.nodesField):'';
       nodeRequest.setQuery(
         $scope.constructSolrQuery($scope.panel.nodesField,true)+filtersQr
       );
@@ -153,9 +154,18 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
             };
       }).then(function(){
         $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.linksCore);
+        var nodesClouse="";
+        if(Array.isArray($scope.data.nodes) && $scope.data.nodes.length>0){
+        nodesClouse="("+$scope.data.nodes[0].value;
+          for(var index=1;index<$scope.data.nodes.length;index++){
+            nodesClouse+=" OR "+$scope.data.nodes[index].value;
+          }
+        nodesClouse+=")";
+        }
+        var nodePar="&q=Cluster1:"+nodesClouse+" AND Cluster2:"+nodesClouse;
         var linksRequest = $scope.sjs.Request();
             linksRequest.setQuery(
-              $scope.constructSolrQuery()+"&rows=60000"+"&fq=Similarity:["+$scope.panel.linkValue+" TO *]"
+              "wt=json&rows=60000"+"&fq=Similarity:["+$scope.panel.linkValue+" TO *]"+nodePar
             );
         linksRequest
           .doSearch()
@@ -262,7 +272,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
             }),d3.max(scope.data.links,function(link){
               return link.Similarity;
             })])
-            .rangeRound([1,1]);
+            .rangeRound([1,10]);
 
                             // node distance scale
           var nodeSize =  d3.scale.log()
@@ -285,7 +295,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
             .size([width, height]);
 
            force
-              .nodes(scope.data.nodes.filter(function(node){return node.count}))
+              .nodes(scope.data.nodes.filter(function(node){return node.count;}))
               .links(scope.data.links.filter(function(link){return link.Similarity>scope.panel.linkValue;}));
 
             var link = chart.selectAll('.link')

@@ -53,7 +53,10 @@ require.config({
     'd3-path':          '../vendor/d3-path.min',
     'd3-shape':         '../vendor/d3-shape.min',
     'd3-sanky':         '../vendor/d3-sankey.min',
-    grid:               'utils/grid'
+      grid:               'utils/grid',
+      dataRetrieval:      'utils/dataRetrieval',
+      rangeDate:          'utils/rangeDate',
+      strHandler:         'utils/strHandler'
   },
   shim: {
     underscore: {
@@ -104,6 +107,6 @@ require.config({
 
     elasticjs:              ['angular', '../vendor/elasticjs/elastic'],
     solrjs:                 ['angular', '../vendor/solrjs/solr'],
-    app:                     ['d3ZoomExt','dataGraphMapping','grid']
+    app:                    ['d3ZoomExt','dataGraphMapping','grid']
   }
 });

@@ -55,7 +55,9 @@ require.config({
     d3:                       '../vendor/d3',
     dataGraphMapping:         'utils/dataGraphMapping',
     filterDialog:              'utils/filterDialog',
-    grid:                      'utils/grid'
+    grid:                      'utils/grid',
+    dataRetrieval:      'utils/dataRetrieval',
+    rangeDate:          'utils/rangeDate'
   },
   shim: {
     underscore: {

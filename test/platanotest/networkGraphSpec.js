@@ -57,7 +57,7 @@ define(['dataGraphMapping'],function(dataGraphMapping){
     it('_linkNodeMap  - already found flag true',function(){
       initData1();
       var filteredNodes=new Array();
-      var found=initModule._linkNodeMap(link,'Cluster1','source',nodes[2],true,filteredNodes);
+      var found=initModule._linkNodeMap(link,'Cluster1','source',nodes[1],true,filteredNodes);
       expect(found).toEqual(true);
     });
 
@@ -158,20 +158,20 @@ define(['dataGraphMapping'],function(dataGraphMapping){
     var filteredNodes=new Array();
     var links=new Array();
 
-    links.push({Cluster1:['quinto'],Cluster2:['terzo']});//qui
+    links.push({Cluster1:['terzo'],Cluster2:['quarto']});//qui
 
 
-    var nodes=new Array();
+    // var nodes=new Array();
 
-    filteredNodes.push({field:"cluster_h",value:'primo',count:1});
-    filteredNodes.push({field:"cluster_h",value:'secondo',count:10});
-    filteredNodes.push({field:"cluster_h",value:'terzo',count:13});
-
-    nodes.push({field:"cluster_h",value:'quarto',count:11});
-    nodes.push({field:"cluster_h",value:'quinto',count:14});
-    nodes.push({field:"cluster_h",value:'sesto',count:13});
-    nodes.push({field:"cluster_h",value:'settimo',count:11});//qui
-    nodes.push({field:"cluster_h",value:'ottavo',count:14});//qui
+    // filteredNodes.push({field:"cluster_h",value:'primo',count:1});
+    // filteredNodes.push({field:"cluster_h",value:'secondo',count:10});
+    // filteredNodes.push({field:"cluster_h",value:'terzo',count:13});
+    //
+    // nodes.push({field:"cluster_h",value:'quarto',count:11});
+    // nodes.push({field:"cluster_h",value:'quinto',count:14});
+    // nodes.push({field:"cluster_h",value:'sesto',count:13});
+    // nodes.push({field:"cluster_h",value:'settimo',count:11});//qui
+    // nodes.push({field:"cluster_h",value:'ottavo',count:14});//qui
 
     var initModule=dataGraphMapping();
     var filter;
@@ -181,7 +181,10 @@ define(['dataGraphMapping'],function(dataGraphMapping){
           initModule._linkIndexer(links[i],nodes,filteredNodes) &&  indexedLinks.push(links[i]);
         }
       }
+    //console.log(filteredNodes)
     expect(1).toEqual(indexedLinks.length);
+    expect(1).toEqual(indexedLinks[0].target)
+    expect(0).toEqual(indexedLinks[0].source)
     });
 
 
@@ -215,6 +218,7 @@ define(['dataGraphMapping'],function(dataGraphMapping){
        // expect(0).toEqual(links[0].Cluster1);
        // expect(1).toEqual(links[0].Cluster2);
        var result1=initModule._linkIndexer(links[0],nodes,filteredNodes);
+       //expect(2).toEqual(links[0].target);
        var result2=initModule._linkIndexer(links[1],nodes,filteredNodes);
        var result3=initModule._linkIndexer(links[2],nodes,filteredNodes);
        var result4=initModule._linkIndexer(links[3],nodes,filteredNodes);
@@ -404,7 +408,12 @@ define(['dataGraphMapping'],function(dataGraphMapping){
       //without filters even the nodes without a link are gave back
       expect(8).toEqual(initModule.filteredNodes().length);
       expect(8).toEqual(initModule.indexedLinks().length);
-      expect(0).toEqual(initModule.indexedLinks()[0].source);
+      // expect(0).toEqual(initModule.indexedLinks()[0].source);
+      // expect(2).toEqual(initModule.indexedLinks()[0].target);
+      // expect(1).toEqual(initModule.indexedLinks()[1].source);
+      // expect(2).toEqual(initModule.indexedLinks()[1].target);
+      // expect(4).toEqual(initModule.indexedLinks()[2].source);
+      // expect(2).toEqual(initModule.indexedLinks()[2].target);
       expect(4).toEqual(initModule.indexedLinks()[7].target);
     });
 
@@ -627,6 +636,82 @@ define(['dataGraphMapping'],function(dataGraphMapping){
       expect(0).toEqual(initModule.indexedLinks().length);
 
     });
+
+    it('build - simulation 2',function(){
+      var filteredNodes=new Array();
+      var links=new Array();
+      // links.push({Cluster1:['primo'],Cluster2:['terzo']});
+      // links.push({Cluster1:['secondo'],Cluster2:['terzo']});
+      // links.push({Cluster1:['quinto'],Cluster2:['terzo']});
+      // links.push({Cluster1:['quinto'],Cluster2:['sesto']});
+      // links.push({Cluster1:['quinto'],Cluster2:['primo']});
+      // links.push({Cluster1:['secondo'],Cluster2:['sesto']});
+      // links.push({Cluster1:['primo'],Cluster2:['sesto']});
+      // links.push({Cluster1:['settimo'],Cluster2:['sesto']});
+
+      var nodes=new Array();
+      nodes.push({field:"cluster_h",value:'primo',count:1});
+      nodes.push({field:"cluster_h",value:'secondo',count:10});
+      // nodes.push({field:"cluster_h",value:'terzo',count:13});
+      // nodes.push({field:"cluster_h",value:'quarto',count:11});
+      // nodes.push({field:"cluster_h",value:'quinto',count:14});
+      // nodes.push({field:"cluster_h",value:'sesto',count:13});
+      // nodes.push({field:"cluster_h",value:'settimo',count:11});
+      // nodes.push({field:"cluster_h",value:'ottavo',count:14});
+
+      var initModule=dataGraphMapping();
+      initModule
+         .nodes(nodes)
+         .links(links)
+         .build();
+
+      //without filters even the nodes without a link are gave back
+      //expect(8).toEqual(initModule.filteredNodes().length);
+      // expect(8).toEqual(initModule.indexedLinks().length);
+      // expect(0).toEqual(initModule.indexedLinks()[0].source);
+      // expect(4).toEqual(initModule.indexedLinks()[7].target);
+      // expect(2).toEqual(initModule.filteredNodes().length);
+      // expect(1).toEqual(initModule.filteredNodes()[0].id);
+      //console.log(initModule.filteredNodes());
+    });
+
+    describe('simple test',function(){
+
+
+      var links=new Array();
+      links.push({Cluster1:['primo'],Cluster2:['terzo']});
+      links.push({Cluster1:['secondo'],Cluster2:['terzo']});
+      links.push({Cluster1:['quinto'],Cluster2:['terzo']});
+      links.push({Cluster1:['quinto'],Cluster2:['sesto']});
+      links.push({Cluster1:['quinto'],Cluster2:['primo']});
+      links.push({Cluster1:['secondo'],Cluster2:['sesto']});
+      links.push({Cluster1:['primo'],Cluster2:['sesto']});
+      links.push({Cluster1:['settimo'],Cluster2:['sesto']});
+
+      var nodes=new Array();
+      nodes.push({field:"cluster_h",value:'primo',count:1});
+      nodes.push({field:"cluster_h",value:'secondo',count:10});
+      nodes.push({field:"cluster_h",value:'terzo',count:13});
+      nodes.push({field:"cluster_h",value:'quarto',count:11});
+      nodes.push({field:"cluster_h",value:'quinto',count:14});
+      nodes.push({field:"cluster_h",value:'sesto',count:13});
+      nodes.push({field:"cluster_h",value:'settimo',count:11});
+      nodes.push({field:"cluster_h",value:'ottavo',count:14});
+
+      var initModule=dataGraphMapping();
+      initModule
+         .nodes(nodes)
+         .links(links)
+         .build();
+
+      //console.log(initModule.filteredNodes()[1])
+
+
+       // expect(2).toEqual(initModule.indexedLinks()[2].target);//2
+       // expect(1).toEqual(initModule.indexedLinks()[2].source);//4
+
+
+    })
 
   });
 });

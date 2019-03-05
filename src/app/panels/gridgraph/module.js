@@ -10,16 +10,19 @@ define([
   'd3',
   'd3tip',
   'dataGraphMapping',
-  'grid'
+  'grid',
+  'dataRetrieval',
+  'rangeDate',
+  'strHandler'
 ],
-function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid) {
+function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,rangeDate,strHandler) {
   'use strict';
 
   var module = angular.module('kibana.panels.gridgraph', []);
   app.useModule(module);
 
 //  module.controller('multibar', function($scope, dashboard, querySrv, filterSrv) {
-  module.controller('gridgraph', function($scope, dashboard, querySrv) {
+  module.controller('gridgraph', function($scope, dashboard, querySrv,$q,filterSrv) {
     $scope.panelMeta = {
       modals: [
         {
@@ -59,7 +62,9 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid) {
       minLinkDistance:50,
       minNodeSize:80,
       maxNodeSize:120,
-      fontSize:12
+      fontSize:12,
+      startYear:'2000',
+      stepYear:'1'
     };
 
     // Set panel's default values
@@ -88,79 +93,56 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid) {
       $scope.$emit('render');
     };
 
-    // $scope.build_search = function(field1,word) {
-    //   if(word) {
-    //     filterSrv.set({type:'terms',field:field1,value:word,mandate:'either'});
-    //   } else {
-    //     return;
-    //   }
-    //   dashboard.refresh();
-    // };
-
-    $scope.constructSolrQuery=function(facetField){
-      // Construct Solr query
-      // var fq = '';
-      // if (filterSrv.getSolrFq()) {
-      //     fq = '&' + filterSrv.getSolrFq();
-      // }
-      var wt = '&wt=json';
-      //var facet_limit="&facet.limit="+$scope.panel.max_number_r;
-      var pivot_field="&facet=true&facet.pivot="+facetField;
-      var result=wt;
-      if(facetField){
-        result+=pivot_field;
-      }
-      return $scope.panel.queries.query = querySrv.getQuery(0)+result;
-    };
-
-      $scope.forEachFilter=function(fn){
-        d3.keys(dashboard.current.services.filter.list)
-          .forEach(function(item){
-            fn(dashboard.current.services.filter.list[item].field,dashboard.current.services.filter.list[item].value);
-          });
-      };
+    var range=rangeDate($scope.panel.startYear,$scope.panel.stepYear,2019);
 
 
+    $scope.myGrid=grid();
+    var processor=$scope.myGrid.plainDataProcessor();
+    processor.getXDomain=range.getRange;
+
+      $scope.myGrid
+        .setDataProcessor(processor);
+
+    var dataSource=dataRetrieval($scope,dashboard,$q,filterSrv);
 
     $scope.get_data = function() {
 
-      setTimeout(function(){
 
-            $scope.nodes=[
-              {id:8,"name":"2016",value:"210",year:"2016",size:"0"},
-              {id:9,"name":"2017",value:"210",year:"2017",size:"0"},
-              {id:10,"name":"2018",value:"210",year:"2018",size:"0"},
-              {id:0,"name":"a",value:"210",year:"2016",size:"7"},
-              {id:1,"name":"b",value:"120",year:"2016",size:"10"},
-              {id:2,"name":"c",value:"60",year:"2016",size:"20"},
-              {id:3,"name":"a,b",value:"250",year:"2017",size:"20"},
-              {id:4,"name":"d",value:"35",year:"2017",size:"15"},
-              {id:5,"name":"c",value:"35",year:"2017",size:"15"},
-              {id:6,"name":"a,b,d",value:"310",year:"2018",size:"30"},
-              {id:7,"name":"c",value:"35",year:"2018",size:"10"}
-            ];
-
-            $scope.links=[
-              {"source": 0,"target": 3,"value": [0.29499688199934504]},
-              {"source": 1,"target": 3,"value": [0.054597872395713454]},
-              {"source": 2,"target": 5,"value": [0.046069246728398294]},
-              {"source": 3,"target": 6,"value": [0.046069246728398294]},
-              {"source": 4,"target": 6,"value": [0.046069246728398294]},
-              {"source": 5,"target": 7,"value": [0.046069246728398294]}
-            ];
-
-
-      $scope.render();
-
-    },1000);
+      $scope.myGrid.reset();
+      //-->
+      dataSource
+        .createRequest()
+        .addYearsCostraint(range.getRange(0).split("-"))
+        .getNodes()
+        .then(function(results){
+            $scope.myGrid.addNode(results.facet_counts.facet_pivot['cluster_h'].map(function(item){ item.year=range.getRange(0);return item;}));
+            $scope.$emit('render');
+        });
 
     };
+
+    $scope.$on('addStep',function(event,nodeList){
+      var stepNumber=nodeList[0].col;
+      dataSource
+        .createRequest()
+        .addYearsCostraint(range.getRange(stepNumber+1).split("-"))
+        .getGridStep(nodeList)
+        .then(function(results){
+            $scope.myGrid.addLink(results.links.map(function(item){ item.step=stepNumber+1;return item;}));
+            $scope.myGrid.addNode(results.nodes.map(function(item){ item.year=range.getRange(stepNumber+1);return item;}));
+            $scope.myGrid.stepFn(stepNumber);
+            $scope.$emit('render');
+        });
+
+    });
+
   });
 
   module.directive('gridgraphChart', function(filterDialogSrv) {
     return {
       restrict: 'E',
       link: function(scope, element)  {
+
         scope.$on('render',function(){
           render_panel();
         });
@@ -170,32 +152,46 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid) {
           render_panel();
         });
 
+
         // Function for rendering panel
         function render_panel() {
+
           // Clear the panel
           element.html('');
-
 
           var parent_width = element.parent().width(),
             parentheight = parseInt(scope.row.height);
 
+          var tipNode = d3tip()
+              .attr('class', 'd3-tip')
+              .offset([-10, 0])
+              .html(function(d) {
+                return "<div>"+strHandler.lstName(d.value)+"</div><div>"+d.count+"</div>";
+              });
+
+          scope.myGrid
+            .size([parentheight,parent_width]);
 
           var chart = d3.select(element[0]).append('svg')
             .attr('width', parent_width)
             .attr('height', parentheight);
 
-          var myGrid=grid(scope.nodes,scope.links);
-
-          myGrid
-            .setDataProcessor(myGrid.plainDataProcessor)
+          scope.myGrid
             .rowField("name")
             .colField("year")
-            .size([parentheight,parent_width])
             .build();
 
+          var nodeSize =  d3.scale.log()
+            .base(Math.E)
+            .domain([d3.min(scope.myGrid.nodes(),function(node){
+              return node.count;
+            }),d3.max(scope.myGrid.nodes(),function(node){
+              return node.count;
+            })])
+            .rangeRound([3,12]);
 
             chart.selectAll('.link')
-              .data(myGrid.links())
+              .data(scope.myGrid.links())
               .enter().append('line')
 
               .attr('class', 'link')
@@ -208,7 +204,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid) {
               .attr('transform','scale(1)');
 
           var node = chart.selectAll('.node')
-            .data(myGrid.nodes())
+            .data(scope.myGrid.nodes())
             .enter().append('g');
 
           node
@@ -218,28 +214,31 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid) {
               return "translate("+d.x+","+d.y+")";
             });
 
-
-
-
-
-
           node.append('circle')
-            .attr('r',function(d){return d.size+"px";});
+            .attr('r',function(d){return nodeSize(d.count)+"px";});
 
-          node.append('text')
-            .text(function(d){return d.name;})
-            .attr('x',20)
-            .attr('y',-10)
-            .style('font-size',scope.panel.fontSize+'px');
+          // node.append('text')
+          //   .text(function(d){return "";})
+          //   .attr('x',20)
+          //   .attr('y',-10)
+          //   .style('font-size',scope.panel.fontSize+'px');
 
-        node.on('click', function(){
-          filterDialogSrv.showDialog2();
+        node.on('click', function(d){
+          //filterDialogSrv.showDialog2();
+          tipNode.hide();
+          scope.$emit('addStep',[d]);
+        })
+        .on('mouseover', tipNode.show)
+        .on('mouseout', function(){
+          tipNode.hide();
+          //filterDialogSrv.hideDialog();
         });
+
+
+        chart.call(tipNode);
 
     }
 
-
-    render_panel();
   }};
 });
 });

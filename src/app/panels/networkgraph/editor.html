@@ -21,6 +21,13 @@
   </br>
     <div class="span3">
         <label class="small">
+            Nodes limit<tip>Max number of nodes</tip>
+        </label>
+        <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.nodelimit" ng-change="set_refresh(true)">
+    </div>
+    </br>
+    <div class="span3">
+        <label class="small">
           Max Link distance <tip>The link distance</tip>
         </label>
         <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.maxLinkDistance" ng-change="set_refresh(true)">

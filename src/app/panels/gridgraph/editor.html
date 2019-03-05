@@ -62,6 +62,18 @@
         </label>
         <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.fontSize" ng-change="set_refresh(true)">
     </div>
+    <div class="span3">
+        <label class="small">
+          Start year <tip>TODO</tip>
+        </label>
+        <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.startYear" ng-change="set_refresh(true)">
+    </div>
+    <div class="span3">
+        <label class="small">
+          Step year <tip>TODO</tip>
+        </label>
+        <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.stepYear" ng-change="set_refresh(true)">
+    </div>
     <!-- <div class="span2">
         <label class="small">
             Number of Rows <tip>Specify a number of rows to retrieve the result set.</tip>
