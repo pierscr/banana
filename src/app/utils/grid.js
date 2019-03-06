@@ -12,7 +12,8 @@ define('grid',['dataGraphMapping','d3'],function(dataGraphMapping,d3){
       var sizeParameter;
       var nodeListResult=[];
       var step=-1;
-
+      var columnTitles=[];
+      var titleHeigth=0;
 
       var _nodeIndexing=function(nodeList){
 
@@ -76,7 +77,7 @@ define('grid',['dataGraphMapping','d3'],function(dataGraphMapping,d3){
       var addNode=function(nodeListPar){
         nodeList=nodeList
         .filter(function(item){
-          return item.year!==nodeListPar[0].year;
+          return item.step<nodeListPar[0].step;
         })
         .concat(nodeListPar);
         return this;
@@ -100,6 +101,19 @@ define('grid',['dataGraphMapping','d3'],function(dataGraphMapping,d3){
       }
 
 
+      var addTitleList=function(columnTitlesPar){
+        columnTitles=columnTitlesPar;
+      }
+
+      var addTitleHeight=function(titleHeigthPar){
+        titleHeigth=titleHeigthPar;
+        return this;
+      }
+
+      var getTitleList=function(){
+          return columnTitles;
+      }
+
       return {
         nodes:nodes,
         links:links,
@@ -113,7 +127,10 @@ define('grid',['dataGraphMapping','d3'],function(dataGraphMapping,d3){
         addLink:addLink,
         _nodeIndexing:_nodeIndexing,
         stepFn:stepFn,
-        reset:reset
+        reset:reset,
+        addTitleList:addTitleList,
+        getTitleList:getTitleList,
+        addTitleHeight:addTitleHeight
       };
 
 
@@ -140,7 +157,9 @@ define('grid',['dataGraphMapping','d3'],function(dataGraphMapping,d3){
             return this;
         };
 
+
         var iterate=function(nodeList,rowField,colFieldName,callback){
+
           var nestedData=d3.nest()
           .key(function(d){return d[colFieldName];})
           .entries(nodeList);
@@ -152,7 +171,7 @@ define('grid',['dataGraphMapping','d3'],function(dataGraphMapping,d3){
 
           var yScale=d3.scale.ordinal()
           .domain(dataProcessor.getYDomain(nestedData,rowFieldName))
-          .rangePoints([0,sizeParameter[0]],0.5);
+          .rangePoints([titleHeigth,sizeParameter[0]-titleHeigth],0.5);
 
 
           nestedData.forEach(function(colArray, colIndex){
@@ -198,7 +217,19 @@ define('grid',['dataGraphMapping','d3'],function(dataGraphMapping,d3){
      // };
 
 
+     function buildTitle(titlesList){
+       if(titleHeigth>0){
+         var titleScale=d3.scale.ordinal()
+         .domain(dataProcessor.getXDomain(nodeList,colFieldName))
+         .rangePoints([0,sizeParameter[1]],0.5);
 
+         columnTitles=dataProcessor.getXDomain(nodeList,colFieldName)
+           .map(function(item){
+             var obj={x:(titleScale(item)-10),y:12,title:item};
+             return obj;
+         });
+       }
+     };
 
 
       function build(){
@@ -226,6 +257,8 @@ define('grid',['dataGraphMapping','d3'],function(dataGraphMapping,d3){
             });
           };
 
+          buildTitle(columnTitles);
+
          //this._bindNodesLinks();
          //console.log(addedLinks)
           dataProcessor.iterate(nodeList,rowField,colFieldName,function(obj){
@@ -235,7 +268,7 @@ define('grid',['dataGraphMapping','d3'],function(dataGraphMapping,d3){
 
           linkList=linkList
           .filter(function(item){
-            return item.step!==addedLinks[0].step;
+            return item.step<addedLinks[0].step;
           })
           .concat(addedLinks.filter(function(link){
             // console.log("--- link ---")

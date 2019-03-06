@@ -115,7 +115,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
         .addYearsCostraint(range.getRange(0).split("-"))
         .getNodes()
         .then(function(results){
-            $scope.myGrid.addNode(results.facet_counts.facet_pivot['cluster_h'].map(function(item){ item.year=range.getRange(0);return item;}));
+            $scope.myGrid.addNode(results.facet_counts.facet_pivot['cluster_h'].map(function(item){ item.step=0;item.year=range.getRange(0);return item;}));
             $scope.$emit('render');
         });
 
@@ -129,7 +129,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
         .getGridStep(nodeList)
         .then(function(results){
             $scope.myGrid.addLink(results.links.map(function(item){ item.step=stepNumber+1;return item;}));
-            $scope.myGrid.addNode(results.nodes.map(function(item){ item.year=range.getRange(stepNumber+1);return item;}));
+            $scope.myGrid.addNode(results.nodes.map(function(item){ item.step=stepNumber+1; item.year=range.getRange(stepNumber+1);return item;}));
             $scope.myGrid.stepFn(stepNumber);
             $scope.$emit('render');
         });
@@ -165,12 +165,26 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
           var tipNode = d3tip()
               .attr('class', 'd3-tip')
               .offset([-10, 0])
+              .direction(function(d) {
+                var dir;
+                (d.x>(parent_width/2))?dir='w':dir='e';
+                return dir;
+              })
               .html(function(d) {
                 return "<div>"+strHandler.lstName(d.value)+"</div><div>"+d.count+"</div>";
               });
 
+          var tipLink = d3tip()
+              .attr('class', 'd3-tip')
+              .offset([-10, 0])
+              .html(function(d) {
+                return "<div><strong>Similarity</strong> <span style='color:red'>" + d.Similarity + "</span></div>";
+              });
+
+
           scope.myGrid
-            .size([parentheight,parent_width]);
+            .size([parentheight,parent_width])
+            .addTitleHeight(30);
 
           var chart = d3.select(element[0]).append('svg')
             .attr('width', parent_width)
@@ -180,6 +194,23 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
             .rowField("name")
             .colField("year")
             .build();
+
+          chart.selectAll('.title')
+            .data(scope.myGrid.getTitleList())
+            .enter().append('text')
+            .text(function(d){return d.title;})
+            .attr('x',function(d){return d.x;})
+            .attr('y',function(d){return d.y;})
+            .style('font-size',scope.panel.fontSize+'px');
+
+        var lineStroke =   d3.scale.linear()
+          .domain([d3.min(scope.myGrid.links(),function(link){
+            return link.Similarity;
+          }),d3.max(scope.myGrid.links(),function(link){
+            return link.Similarity;
+          })])
+          .rangeRound([1,10]);
+
 
           var nodeSize =  d3.scale.log()
             .base(Math.E)
@@ -199,9 +230,13 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
               .attr('y1', function(d) { return d.y1; })
               .attr('x2', function(d) { return d.x2; })
               .attr('y2', function(d) { return d.y2; })
+              .attr("stroke-width", function(link){return lineStroke(link.Similarity);})
               .attr('transform','scale(0)')
+              .on('mouseover', tipLink.show)
+              .on('mouseout', tipLink.hide)
               .transition().duration(1000)
               .attr('transform','scale(1)');
+
 
           var node = chart.selectAll('.node')
             .data(scope.myGrid.nodes())
@@ -236,6 +271,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
 
 
         chart.call(tipNode);
+        chart.call(tipLink);
 
     }
 
