@@ -236,7 +236,8 @@ define('grid',['dataGraphMapping','d3'],function(dataGraphMapping,d3){
         nodeListResult=[];
 
           var isStep=function(obj,step){
-            return step>0?obj.col===step:true;
+            //return step>0?obj.col===step:true;
+            return obj.col===step;
           };
 
           var _linkMap=function(obj,links,step){
