@@ -50,7 +50,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
         custom: ''
       },
       nodesCore: '',
-      nodesField: '',
+      nodesField: 'cluster_h',
       linksCore:'',
       max_rows: 10,
       spyable: true,

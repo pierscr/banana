@@ -15,12 +15,12 @@ define('dataRetrieval',['angular'],function(angular){
             function getNodes(nodeList,deactiveGlobalFilter,callback){
               var filters="";
               $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.nodesCore);
-              var nodeFilter="&wt=json&facet=true&facet.pivot=cluster_h&q=*:*&rows=0&facet.limit="+ $scope.panel.max_rows;
+              var nodeFilter="&wt=json&facet=true&facet.pivot="+$scope.panel.nodesField+"&q=*:*&rows=0&facet.limit="+ $scope.panel.max_rows;
               var separator=function(index){
                 return 0===index?"\"":" OR \"";
               };
               if(nodeList!==undefined){
-                filters+="&fq=cluster_h:"+nodeList.reduce(function(tot,curr,index, arr){return tot+separator(index)+callback(curr)+"\"";},"(")+")";
+                filters+="&fq="+$scope.panel.nodesField+":"+nodeList.reduce(function(tot,curr,index, arr){return tot+separator(index)+callback(curr)+"\"";},"(")+")";
               }
               if(!deactiveGlobalFilter){
                 filters += filterSrv.getSolrFq(false,"cluste_h")!==''?'&' + filterSrv.getSolrFq(false,"cluste_h"):'';
@@ -33,7 +33,7 @@ define('dataRetrieval',['angular'],function(angular){
             function getGridStep(nodeList){
               var deferred = $injQ.defer();
               $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.linksCore);
-              var join="&q={!join from=cluster_h to=Cluster2 fromIndex="+$scope.panel.nodesCore+"}*:*"
+              var join="&q={!join from="+$scope.panel.nodesField+" to=Cluster2 fromIndex="+$scope.panel.nodesCore+"}*:*"
               var nodeFilter="&wt=json&fq=Cluster1:\""+nodeList[0].value+"\"&rows=500";
               var stepResults={stepNodes:[],selfNode:[],links:[],stepNodesResponse:false,selfNodeResponse:false};
               function semaphore(){
@@ -52,8 +52,8 @@ define('dataRetrieval',['angular'],function(angular){
                           return item.Cluster2;
                       })
                       .then(function(results){
-                          //$scope.myGrid.addNode(results.facet_counts.facet_pivot['cluster_h'].map(function(item){ item.year=range.getRange(0);return item;}));
-                          stepResults.stepNodes=results.facet_counts.facet_pivot['cluster_h'];
+                          //$scope.myGrid.addNode(results.facet_counts.facet_pivot['"+$scope.panel.nodesField+"'].map(function(item){ item.year=range.getRange(0);return item;}));
+                          stepResults.stepNodes=results.facet_counts.facet_pivot[$scope.panel.nodesField];
                           stepResults.stepNodesResponse=true;
                           semaphore();
                           //deferred.resolve({nodes:results.facet_counts.facet_pivot['cluster_h'],links:links});
@@ -63,7 +63,7 @@ define('dataRetrieval',['angular'],function(angular){
                       })
                       .then(function(results){
                           //$scope.myGrid.addNode(results.facet_counts.facet_pivot['cluster_h'].map(function(item){ item.year=range.getRange(0);return item;}));
-                          stepResults.selfNode=results.facet_counts.facet_pivot['cluster_h'];
+                          stepResults.selfNode=results.facet_counts.facet_pivot[$scope.panel.nodesField];
                           stepResults.selfNode.map(function(item){item.myself=true;return item;})
                           stepResults.selfNodeResponse=true;
                           semaphore();
