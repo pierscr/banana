@@ -115,7 +115,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
         .addYearsCostraint(range.getRange(0).split("-"))
         .getNodes()
         .then(function(results){
-            $scope.myGrid.addNode(results.facet_counts.facet_pivot['cluster_h'].map(function(item){ item.step=0;item.year=range.getRange(0);return item;}));
+            $scope.myGrid.addNode(results.facet_counts.facet_pivot[$scope.panel.nodesField].map(function(item){ item.step=0;item.year=range.getRange(0);return item;}));
             $scope.$emit('render');
         });
 
@@ -230,7 +230,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
               .attr('y1', function(d) { return d.y1; })
               .attr('x2', function(d) { return d.x2; })
               .attr('y2', function(d) { return d.y2; })
-              .attr("stroke-width", function(link){return lineStroke(link.Similarity);})
+              .attr("stroke-width", function(link){ var r=lineStroke(link.Similarity);return r<10?r:10})
               .attr('transform','scale(0)')
               .on('mouseover', tipLink.show)
               .on('mouseout', tipLink.hide)
