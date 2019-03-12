@@ -33,7 +33,8 @@ define('dataRetrieval',['angular'],function(angular){
             function getGridStep(nodeList){
               var deferred = $injQ.defer();
               $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.linksCore);
-              var join="&q={!join from="+$scope.panel.nodesField+" to=Cluster2 fromIndex="+$scope.panel.nodesCore+"}*:*"
+              //var join="&q={!join from="+$scope.panel.nodesField+" to=Cluster2 fromIndex="+$scope.panel.nodesCore+"}*:*"
+              var q="&q=*:*";
               var nodeFilter="&wt=json&fq=Cluster1:\""+nodeList[0].value+"\"&rows=500";
               var stepResults={stepNodes:[],selfNode:[],links:[],stepNodesResponse:false,selfNodeResponse:false};
               function semaphore(){
@@ -44,7 +45,7 @@ define('dataRetrieval',['angular'],function(angular){
               };
 
               $scope.sjs.Request()
-                  .setQuery(nodeFilter+join)
+                  .setQuery(nodeFilter+q)
                   .doSearch()
                   .then(function(results){
                       stepResults.links=results.response.docs;
