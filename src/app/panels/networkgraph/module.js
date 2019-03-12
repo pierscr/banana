@@ -156,11 +156,11 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
         $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.linksCore);
         var nodesClouse="";
         if(Array.isArray($scope.data.nodes) && $scope.data.nodes.length>0){
-        nodesClouse="("+$scope.data.nodes[0].value;
+        nodesClouse="(\""+$scope.data.nodes[0].value;
           for(var index=1;index<$scope.data.nodes.length;index++){
-            nodesClouse+=" OR "+$scope.data.nodes[index].value;
+            nodesClouse+="\" OR \""+$scope.data.nodes[index].value;
           }
-        nodesClouse+=")";
+        nodesClouse+="\")";
         }
         var nodePar="&q=Cluster1:"+nodesClouse+" AND Cluster2:"+nodesClouse;
         var linksRequest = $scope.sjs.Request();
