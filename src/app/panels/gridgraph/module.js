@@ -93,19 +93,22 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
       $scope.$emit('render');
     };
 
-    var range=rangeDate($scope.panel.startYear,$scope.panel.stepYear,2019);
-
-
-    $scope.myGrid=grid();
-    var processor=$scope.myGrid.plainDataProcessor();
-    processor.getXDomain=range.getRange;
-
-      $scope.myGrid
-        .setDataProcessor(processor);
-
-    var dataSource=dataRetrieval($scope,dashboard,$q,filterSrv);
+    var dataSource;
+    var range;
 
     $scope.get_data = function() {
+
+      range=rangeDate($scope.panel.startYear,$scope.panel.stepYear,2019);
+
+
+      $scope.myGrid=grid();
+      var processor=$scope.myGrid.plainDataProcessor();
+      processor.getXDomain=range.getRange;
+
+        $scope.myGrid
+          .setDataProcessor(processor);
+
+      dataSource=dataRetrieval($scope,dashboard,$q,filterSrv);
 
 
       $scope.myGrid.reset();
