@@ -17,7 +17,7 @@ define('dataRetrieval',['angular'],function(angular){
               $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.nodesCore);
               var nodeFilter="&wt=json&facet=true&facet.pivot="+$scope.panel.nodesField+"&q=*:*&rows=0&facet.limit="+ $scope.panel.max_rows;
               var separator=function(index){
-                return 0===index?"\"":" OR \"";
+                return 0===index?"\"":" || \"";
               };
               if(nodeList!==undefined){
                 filters+="&fq="+$scope.panel.nodesField+":"+nodeList.reduce(function(tot,curr,index, arr){return tot+separator(index)+callback(curr)+"\"";},"(")+")";

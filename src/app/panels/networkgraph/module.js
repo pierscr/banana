@@ -46,7 +46,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
         custom: ''
       },
       nodesCore: '',
-      nodesField: '',
+      nodesField: 'cluster_h',
       linksCore:'',
       max_rows: 10,
       spyable: true,
@@ -60,7 +60,10 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
       maxNodeSize:120,
       fontSize:12,
       linkValue:0.1,
-      nodelimit:''
+      nodelimit:'',
+      nodeSearch:'cluster_h',
+      nodeLink1:'Cluster1',
+      nodeLink2:'Cluster2'
     };
 
     // Set panel's default values
@@ -99,6 +102,15 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
     // };
 
     $scope.constructSolrQuery=function(facetField,addGlobalQueryFlag){
+      $scope.forEachFilter=function(fn){
+        d3.keys(dashboard.current.services.filter.list)
+          .forEach(function(item){
+            if(dashboard.current.services.filter.list[item].active){
+              fn(dashboard.current.services.filter.list[item].field,dashboard.current.services.filter.list[item].value);
+            }
+          });
+      };
+
       // Construct Solr query
       // var fq = '';
       // if (filterSrv.getSolrFq()) {
@@ -106,7 +118,10 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
       // }
       var wt = '&wt=json';
       //var facet_limit="&facet.limit="+$scope.panel.max_number_r;
-      var pivot_field="&facet=true&facet.pivot="+facetField;
+
+      //facet.contains---->
+
+      var pivot_field="&facet=true&facet.pivot="+facetField+"&facet.mincount=1";
       var result=wt;
       if(facetField){
         result+=pivot_field;
@@ -117,6 +132,14 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
         result+="&q=*:*&rows=0";
       }
       result+=$scope.panel.nodelimit!==''?'&facet.limit='+$scope.panel.nodelimit:'';
+      var flag=0
+      var facetFilter="";
+      $scope.forEachFilter(function(key,value){
+        if(key===$scope.panel.nodeSearch && value.length>flag){
+          facetFilter="&facet.contains="+value;
+        }
+      });
+      result+=facetFilter;
       return $scope.panel.queries.query = result;
     };
 
@@ -129,8 +152,6 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
           });
       };
 
-
-
     $scope.get_data = function() {
 
       $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.nodesCore);
@@ -140,7 +161,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
       //       filtersQr=filtersQr+'&fq=' +key+':'+value;
       //     }
       //   });
-      var filtersQr= filterSrv.getSolrFq(false,$scope.panel.nodesField)!==''?'&' + filterSrv.getSolrFq(false,$scope.panel.nodesField):'';
+      // $scope.panel.nodeSearch
+      var filtersQr= filterSrv.getSolrFq(false,'test')!==''?'&' + filterSrv.getSolrFq(false,'test'):'';
       nodeRequest.setQuery(
         $scope.constructSolrQuery($scope.panel.nodesField,true)+filtersQr
       );
@@ -158,11 +180,11 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
         if(Array.isArray($scope.data.nodes) && $scope.data.nodes.length>0){
         nodesClouse="(\""+$scope.data.nodes[0].value;
           for(var index=1;index<$scope.data.nodes.length;index++){
-            nodesClouse+="\" OR \""+$scope.data.nodes[index].value;
+            nodesClouse+="\" || \""+$scope.data.nodes[index].value;
           }
         nodesClouse+="\")";
         }
-        var nodePar="&q=Cluster1:"+nodesClouse+" AND Cluster2:"+nodesClouse;
+        var nodePar="&q="+$scope.panel.nodeLink1+":"+nodesClouse+" && "+$scope.panel.nodeLink2+":"+nodesClouse;
         var linksRequest = $scope.sjs.Request();
             linksRequest.setQuery(
               "wt=json&rows=60000"+"&fq=Similarity:["+$scope.panel.linkValue+" TO *]"+nodePar
@@ -251,7 +273,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
               .offset([-10, 0])
               .html(function(d) {
                 return "<div><strong>Name</strong> <span style='color:red'>"+ (typeof d.name === 'string' ?  d.name.split("/").pop(): d.value.split("/").pop()) +"</span></div>"
-                +"<div><strong>Frequency</strong> <span style='color:red'>" + d.count + "</span></div>";
+                +"<div><strong>Frequency</strong> <span style='color:red'>" + d.count + "</span></div>"
+                +"<div><strong>Level</strong> <span style='color:red'>" +  (typeof d.name === 'string' ?  d.name.split("/").length-1: d.value.split("/").length-1) + "</span></div>";
               });
 
           // node distance scale
@@ -328,7 +351,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
               .attr("transform", function(d){
                 return "translate("+d.x+","+d.y+")";
               })
-              .on('click', function(d){  tipLink.hide(); tipNode.hide(); filterDialogSrv.showDialog(scope.panel.nodesField,d.name || d.value);})
+              .on('click', function(d){  tipLink.hide(); tipNode.hide(); filterDialogSrv.showDialog(scope.panel.nodeSearch,d.name || d.value);})
               .on('mousedown',function(){
                   zoomScale=zoom.scale();
                   zoomtX=zoom.translate();

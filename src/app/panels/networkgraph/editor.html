@@ -75,6 +75,24 @@
         </label>
         <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.fontSize" ng-change="set_refresh(true)">
     </div>
+    <div class="span3">
+        <label class="small">
+          Node Search <tip>The search field which is search when click on node</tip>
+        </label>
+        <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.nodeSearch" ng-change="set_refresh(true)">
+    </div>
+    <div class="span3">
+        <label class="small">
+          Node link 1 <tip>the cluster 1 field link to the node field</tip>
+        </label>
+        <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.nodeLink1" ng-change="set_refresh(true)">
+    </div>
+    <div class="span3">
+        <label class="small">
+          Node link 2 <tip>the cluster 1 field link to the node field</tip>
+        </label>
+        <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.nodeLink2" ng-change="set_refresh(true)">
+    </div>
     <!-- <div class="span2">
         <label class="small">
             Number of Rows <tip>Specify a number of rows to retrieve the result set.</tip>
