@@ -64,7 +64,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
       maxNodeSize:120,
       fontSize:12,
       startYear:'2000',
-      stepYear:'1'
+      stepYear:'1',
+      yearFieldName:'year'
     };
 
     // Set panel's default values

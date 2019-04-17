@@ -116,6 +116,7 @@ function (Settings) {
       'rangeFacet',
       'heatmap',
       'scatterplot',
+      'scatterplotFacet',      
       'fullTextSearch',
       'facet',
       'tagcloud',

@@ -96,9 +96,9 @@ define('dataRetrieval',['angular'],function(angular){
 
             function addYearsCostraint(years){
               if(years.length===1){
-                yearsCostraint="&fq=year:"+years[0];
+                yearsCostraint="&fq="+$scope.panel.yearFieldName+":"+years[0];
               }else{
-                yearsCostraint="&fq=year:["+years[0]+" TO "+years[1]+"]";
+                yearsCostraint="&fq="+$scope.panel.yearFieldName+":["+years[0]+" TO "+years[1]+"]";
               }
               return this;
             }

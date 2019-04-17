@@ -11,11 +11,17 @@
         </label>
         <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.field2" ng-change="set_refresh(true)">
     </div>
-    <div class="span2">
+    <div class="span3">
         <label class="small">
-            Number of results <tip>Specify a number of rows to retrieve the result set.</tip>
+            Field 1 for displaying values <tip>Specify a field to show values on the bar chart</tip>
         </label>
-        <input class="input-small" type="number" ng-model="panel.max_number_r" ng-change="set_refresh(true)">
+        <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.field1" ng-change="set_refresh(true)">
+    </div>
+    <div class="span3">
+        <label class="small">
+            Aggregation function <tip></tip>
+        </label>
+        <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.aggregation_function" ng-change="set_refresh(true)">
     </div>
     <div class="span2">
         <label class="small">
@@ -42,7 +48,14 @@
         <select class="input-small" ng-model="panel.number_mode" ng-change="set_refresh(true)">
             <option value="F">frequency</option>
             <option value="P">percentage</option>
+            <option value="O">other</option>
         </select>
+    </div>
+    <div class="span3">
+        <label class="small">
+            Aggregation function <tip></tip>
+        </label>
+        <input type="text" class="input-large" bs-typeahead="fields.list" ng-model="panel.yAxisValues" ng-change="set_refresh(true)">
     </div>
 
 </div>

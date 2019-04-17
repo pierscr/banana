@@ -14,8 +14,9 @@ define([
 function (angular, app, _, $, d3, d3tip,palette) {
   'use strict';
 
+  var ACTIVE=false;
+
   var debug = function(message){
-    var ACTIVE=false;
     if(ACTIVE){
       console.log(message);
     }
@@ -65,7 +66,9 @@ function (angular, app, _, $, d3, d3tip,palette) {
       max_rows: 10,
       spyable: true,
       show_queries: true,
-      number_mode: "F"
+      number_mode: "F",
+      aggregation_function:"count",
+      yAxisValues:""
     };
 
     // Set panel's default values
@@ -122,7 +125,31 @@ function (angular, app, _, $, d3, d3tip,palette) {
       //var pivot_field = '&facet=true&facet.pivot=' + $scope.panel.field1 +","+$scope.panel.field2;
       var facet_fields = '&facet.field=' + $scope.panel.field1 +"&facet.field=" +$scope.panel.field2;
       var facet_limit="&facet.limit="+$scope.panel.max_number_r;
-      var pivot_field="&facet=true&json.facet={top_field1:{type: terms,field: "+$scope.panel.field1+",allBuckets:true,numBuckets:true,limit:"+$scope.panel.max_number_r+",facet:{top_field2:{type : terms,field: "+$scope.panel.field2+",limit:"+$scope.panel.max_number_r+",allBuckets:true,numBuckets:true}}}}";
+
+      var firstField={};
+      firstField.field=$scope.panel.field1;
+      firstField.allBuckets=true;
+      firstField.numBuckets=true;
+      firstField.limit=$scope.panel.max_number_r;
+      firstField.facet={}
+
+      var secondField={};
+      secondField.field = $scope.panel.field2;
+      secondField.limit = $scope.panel.max_number_r;
+      secondField.allBuckets = true;
+      secondField.numBuckets = true;
+      secondField.facet={};
+      if($scope.panel.aggregation_function!="count"){
+        secondField.facet.aggFn=$scope.panel.aggregation_function;
+        firstField.facet.aggFn=$scope.panel.aggregation_function;
+      }
+
+      firstField.facet.top_field2={terms:secondField};
+
+      var json_facet={};
+      json_facet.top_field1={terms:firstField};
+
+      var pivot_field="&facet=true&json.facet="+JSON.stringify(json_facet);
 
 
       $scope.panel.queries.query = querySrv.getQuery(0) + fq + pivot_field +facet_fields+facet_limit+ wt + rows_limit;
@@ -186,8 +213,8 @@ function (angular, app, _, $, d3, d3tip,palette) {
           $scope.data.field1stat.tot_docs=results.facets['top_field1'].allBuckets.count;
           $scope.data.field1stat.field_count=results.facets['top_field1'].numBuckets;
 
-          $scope.addToSet=function(set,val){
-              return set.add(val.val);
+          $scope.addToSet=function(set,item){
+              return set.add(item.val);
           };
 
           $scope.flatNestedArray=function(array,curr){
@@ -206,14 +233,6 @@ function (angular, app, _, $, d3, d3tip,palette) {
                 .reduce($scope.flatNestedArray,[])
                 .reduce($scope.addToSet,new Set())
           );
-
-
-            debug("data:"+results);
-            debug("panale field1:"+$scope.panel.field1);
-            debug("panale field2:"+$scope.panel.field2);
-            debug("values:"+  $scope.data.values);
-            debug("range1:"+  $scope.data.range1);
-            debug("range2:"+  $scope.data.range2);
 
           $scope.render();
       });
@@ -285,7 +304,7 @@ function (angular, app, _, $, d3, d3tip,palette) {
                     debug("object to count");
                     debug(obj.count);
                     */
-                    return obj.count;
+                    return obj.aggFn || obj.count;
                   });
                   }
                 )]).nice()
@@ -296,7 +315,7 @@ function (angular, app, _, $, d3, d3tip,palette) {
 
           var totalY =  d3.scale.linear()
                               .domain([0,d3.max(scope.data.values,function(d){
-                                          return d.count;
+                                          return d.aggFn || d.count;;
                                       })])
                               .rangeRound([ height,0]);
 
@@ -314,11 +333,19 @@ function (angular, app, _, $, d3, d3tip,palette) {
           });
 
           var yAxis=d3.svg.axis().scale(y)
-          .orient("left")
-          .ticks(null, "s");
 
+          .orient("left");
 
-
+          //value format [{value:0.5,name:"medium"},{value:0.0,name:"min"},{value:1,name:"max"}]
+          if(scope.panel.yAxisValues!=""){
+            var values=JSON.parse(scope.panel.yAxisValues);
+            yAxis.tickValues(values.map(function(item){return item.value}))
+            .tickFormat(function(d) {
+              return values.find(function(n){
+                  return n.value==Number(d.toFixed(1))
+                }).name;
+            });
+          }
 
           var svg = d3.select(element[0]).append('svg')
                         .attr('width', panel_width)
@@ -350,26 +377,23 @@ function (angular, app, _, $, d3, d3tip,palette) {
               .offset([-10, 0])
               .html(function(p) {
                   var patent_number;
-                  if(scope.panel.number_mode==="F"){
-                    patent_number="<div><strong>Frequency</strong> <span style='color:red'>" + p.count + "</span></div>";
-                  }else{
-                    patent_number="<div><strong>Percentage</strong> <span style='color:red'>" + ((p.count/scope.data.field1stat.tot_docs)*100).toFixed(2)  + "%</span></div>";
+                  switch (scope.panel.number_mode) {
+                    case "F":
+                      patent_number="<div><strong>Frequency</strong> <span style='color:red'>" + p.count + "</span></div>";
+                      break;
+                    case "P":
+                      patent_number="<div><strong>Percentage</strong> <span style='color:red'>" + ((p.count/scope.data.field1stat.tot_docs)*100).toFixed(2)  + "%</span></div>";
+                      break;
+                    case "O":
+                      patent_number="<div><strong>"+scope.panel.docname+"</strong> <span style='color:red'>" + (p.aggFn || p.count) + "%</span></div>";
+                      break;
+                    default:
+                      patent_number="<div><strong>Frequency</strong> <span style='color:red'>" + p.count + "</span></div>";
                   }
-
-              //     return "<div class='category1-tip'><div><strong>"+scope.panel.labelXaxis+"</strong> <span style='color:red'>" + p.val+ "</span></div>"+
-              //     patent_number+
-              //     "<div><strong>Unique "+scope.panel.labelYaxis +"</strong> <span style='color:red'>" + this.__data__.top_field2.numBuckets + "</span></div>"+
-              //     "<div><strong>"+scope.panel.labelYaxis+"</strong> <span style='color:red'>" + this.__data__.top_field2.allBuckets.count + "</span></div>"+
-              //     "<hr>"+
-              //     "<h4>Total</h4>"+
-              //     "<div><strong>"+scope.panel.labelXaxis+"</strong> <span style='color:red'>" + scope.data.field1stat.field_count + "</span></div>"+
-              //     "<div><strong>"+scope.panel.docname+"</strong> <span style='color:red'>" + scope.data.field1stat.tot_docs + "</span></div></div>";
-              // });
-              return "<div class='category1-tip'><div><strong>"+scope.panel.labelXaxis+"</strong> <span style='color:red'>" + p.val+ "</span></div>"+
-              patent_number+
-              "<hr>"+
-              "<div>Total "+scope.panel.labelXaxis+"</strong> <span style='color:red'>" + scope.data.field1stat.field_count + "</span></div>";
-
+                  return "<div class='category1-tip'><div><strong>"+scope.panel.labelXaxis+"</strong> <span style='color:red'>" + p.val+ "</span></div>"+patent_number;
+                          // +
+                          // "<hr>"+
+                          // "<div>Total "+scope.panel.labelXaxis+"</strong> <span style='color:red'>" + scope.data.field1stat.field_count + "</span></div>";
           });
 
 
@@ -378,10 +402,18 @@ function (angular, app, _, $, d3, d3tip,palette) {
               .offset([-10, 0])
               .html(function(d) {
                   var tipField2;
-                  if(scope.panel.number_mode==="F"){
-                    tipField2="<div><strong>Frequency</strong> <span style='color:red'>" + d.count + "</span></div>";
-                  }else{
-                    tipField2="<div><strong>Percentage</strong> <span style='color:red'>" + ((d.count/this.parentNode.__data__.top_field2.allBuckets.count)*100).toFixed(2) + "%</span></div>";
+                  switch (scope.panel.number_mode) {
+                    case "F":
+                      tipField2="<div><strong>Frequency</strong> <span style='color:red'>" + d.count + "</span></div>";
+                      break;
+                    case "P":
+                      tipField2="<div><strong>Percentage</strong> <span style='color:red'>" + ((d.count/scope.data.field1stat.tot_docs)*100).toFixed(2)  + "%</span></div>";
+                      break;
+                    case "O":
+                      tipField2="<div><strong>"+scope.panel.docname+"</strong> <span style='color:red'>" + (d.aggFn || d.count) + "%</span></div>";
+                      break;
+                    default:
+                      tipField2="<div><strong>Frequency</strong> <span style='color:red'>" + d.count + "</span></div>";
                   }
                   return "<div><strong>"+scope.panel.labelYaxis+":</strong> <span style='color:red'>" + d.val + "</span></div>"+
                   tipField2;
@@ -432,19 +464,11 @@ function (angular, app, _, $, d3, d3tip,palette) {
                 return this.parentNode.__data__.newScale(d.val);
               })
               .attr("y", function(d) {
-                return y(d.count);
+                return y(d.aggFn || d.count);
               })
               .attr("width", function(){return this.parentNode.__data__.newScale.rangeBand();})
               .attr("height", function(d) {
-                debug("object to draw");
-                debug(d);
-                debug("height calculation");
-                debug("height:"+height);
-                debug("d.value:"+d.count);
-                debug(" y(d.value):"+ y(d.count));
-                debug("eventualy y value:"+ height - y(d.count));
-
-                return height - y(d.count);
+                return height - y(d.aggFn || d.count);
               })
               .attr("fill", function(d) {
                 debug("color number:"+d.val);
@@ -469,7 +493,7 @@ function (angular, app, _, $, d3, d3tip,palette) {
               return (x.rangeBand()/2);
               })
               .attr("cy",function(d){
-                return totalY(d.count);
+                return totalY(d.aggFn || d.count);
               })
             .on('mouseover', tipField1.show)
             .on('mouseout', tipField1.hide)
