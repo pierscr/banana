@@ -35,7 +35,7 @@ define([
   'kbn',
   'moment',
   './timeSeries',
-
+  'palettejs',
   'jquery.flot',
   'jquery.flot.pie',
   'jquery.flot.selection',
@@ -44,7 +44,7 @@ define([
   'jquery.flot.stackpercent',
   'jquery.flot.axislabels'
 ],
-function (angular, app, $, _, kbn, moment, timeSeries) {
+function (angular, app, $, _, kbn, moment, timeSeries,palette) {
   'use strict';
 
   var module = angular.module('kibana.panels.histogram', []);
@@ -111,7 +111,9 @@ function (angular, app, $, _, kbn, moment, timeSeries) {
       refresh: {
         enable: false,
         interval: 2
-      }
+      },
+      facet:"",
+      facetNumber:5
     };
 
     _.defaults($scope.panel,_d);
@@ -278,12 +280,15 @@ function (angular, app, $, _, kbn, moment, timeSeries) {
       var rows_limit = '&rows=0'; // for histogram, we do not need the actual response doc, so set rows=0
       var facet_gap = $scope.sjs.convertFacetGap($scope.panel.interval);
       var facet = '&facet=true' +
-                  '&facet.range=' + time_field +
+                  '&facet.range={!tag=r1}' + time_field +
                   '&facet.range.start=' + start_time +
                   '&facet.range.end=' + end_time +
                   '&facet.range.gap=' + facet_gap;
       var values_mode_query = '';
-
+      if($scope.panel.facet!=''){
+        facet+='&facet.pivot={!range=r1}'+$scope.panel.facet;
+        //TODO $scope.panel.queries.ids lasciare solo una query, l'ultima
+      }
       // For mode = value
       if($scope.panel.mode === 'values') {
         if (!$scope.panel.value_field) {
@@ -334,6 +339,8 @@ function (angular, app, $, _, kbn, moment, timeSeries) {
               hits;
 
             _.each($scope.panel.queries.ids, function(id,index) {
+
+
               // Check for error and abort if found
               if (!(_.isUndefined(results[index].error))) {
                 $scope.panel.error = $scope.parse_error(results[index].error.msg);
@@ -359,20 +366,52 @@ function (angular, app, $, _, kbn, moment, timeSeries) {
                 $scope.hits = 0;
               }
 
+
               // Solr facet counts response is in one big array.
               // So no need to get each segment like Elasticsearch does.
               var entry_time, entries, entry_value;
-              if ($scope.panel.mode === 'count') {
-                // Entries from facet_ranges counts
-                entries = results[index].facet_counts.facet_ranges[time_field].counts;
+              function facetCount(entries,queryItem,totalHits){
+                var hits=0;
+                var time_series = new timeSeries.ZeroFilled({
+                  interval: _interval,
+                  start_date: _range && _range.from,
+                  end_date: _range && _range.to,
+                  fill_style: 'minimal'
+                });
                 for (var j = 0; j < entries.length; j++) {
                   entry_time = new Date(entries[j]).getTime(); // convert to millisec
                   j++;
                   var entry_count = entries[j];
                   time_series.addValue(entry_time, entry_count);
                   hits += entry_count; // The series level hits counter
-                  $scope.hits += entry_count; // Entire dataset level hits counter
+                  totalHits += entry_count; // Entire dataset level hits counter
                 }
+                return {
+                  info: queryItem,
+                  time_series: time_series,
+                  hits: hits
+                };
+              }
+
+              if ($scope.panel.mode === 'count') {
+                // Entries from facet_ranges counts
+                if($scope.panel.facet==''){
+                  var entries = results[index].facet_counts.facet_ranges[time_field].counts;
+                  $scope.data[i]=facetCount(entries,querySrv.list[id],$scope.hits);
+                }else{
+                  var colors=palette('tol-rainbow', $scope.panel.facetNumber).map(function(a){return "#"+a;})
+                  var entriesGroup=results[index].facet_counts.facet_pivot[$scope.panel.facet];
+                  entriesGroup.slice(0,$scope.panel.facetNumber).reduce(function(tot,curr){
+                    tot.push(facetCount(
+                      curr.ranges[time_field].counts,
+                      {alias:curr.value,color:colors.pop()},
+                      $scope.hits
+                    ));
+                    return tot;
+                  },$scope.data);
+
+                }
+
               } else if ($scope.panel.mode === 'values') {
                 if ($scope.panel.group_field) {
                   // Group By Field is specified
@@ -433,14 +472,6 @@ function (angular, app, $, _, kbn, moment, timeSeries) {
                     hits: hits
                   };
                 }
-              }
-
-              if ($scope.panel.mode !== 'values') {
-                $scope.data[i] = {
-                  info: querySrv.list[id],
-                  time_series: time_series,
-                  hits: hits
-                };
               }
 
               i++;

@@ -55,8 +55,11 @@ require.config({
     'd3-sanky':         '../vendor/d3-sankey.min',
       grid:               'utils/grid',
       dataRetrieval:      'utils/dataRetrieval',
+      crossProduct:      'utils/crossProduct',
+      dataFacetRetrieval: 'utils/dataFacetRetrieval',
       rangeDate:          'utils/rangeDate',
-      strHandler:         'utils/strHandler'
+      strHandler:         'utils/strHandler',
+      legend:             'utils/legend'
   },
   shim: {
     underscore: {
@@ -107,6 +110,6 @@ require.config({
 
     elasticjs:              ['angular', '../vendor/elasticjs/elastic'],
     solrjs:                 ['angular', '../vendor/solrjs/solr'],
-    app:                    ['d3ZoomExt','dataGraphMapping','grid']
+    app:                    ['d3ZoomExt','dataGraphMapping','grid','crossProduct','dataFacetRetrieval']
   }
 });

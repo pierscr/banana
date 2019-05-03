@@ -56,6 +56,7 @@ require.config({
     dataGraphMapping:         'utils/dataGraphMapping',
     filterDialog:              'utils/filterDialog',
     grid:                      'utils/grid',
+    crossProduct:              'utils/crossProduct',
     dataRetrieval:      'utils/dataRetrieval',
     rangeDate:          'utils/rangeDate'
   },

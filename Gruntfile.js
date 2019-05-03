@@ -259,6 +259,14 @@ module.exports = function (grunt) {
       name: 'grid'
     });
 
+    requireModules.push({
+      name: 'crossProduct'
+    });
+
+    requireModules.push({
+      name: 'dataFacetRetrieval'
+    });
+
   //exclude the literal config definition from all modules
   requireModules
     .forEach(function (module) {

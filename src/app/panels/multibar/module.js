@@ -9,9 +9,10 @@ define([
   'jquery',
   'd3',
   'd3tip',
-  'palettejs'
+  'palettejs',
+  'legend'
 ],
-function (angular, app, _, $, d3, d3tip,palette) {
+function (angular, app, _, $, d3, d3tip,palette,legend) {
   'use strict';
 
   var ACTIVE=false;
@@ -264,7 +265,7 @@ function (angular, app, _, $, d3, d3tip,palette) {
           // Clear the panel
           element.html('');
 
-          var margin = {top: 30, right: 30, bottom: 100, left: 70};
+          var margin = {top: 30, right: 100, bottom: 100, left: 70};
 
           var panel_width = element.parent().width(),
               panel_height = parseInt(scope.row.height),
@@ -322,9 +323,22 @@ function (angular, app, _, $, d3, d3tip,palette) {
 
 //anni
           //console.log(palette('tol-rainbow', 10).map(function(a){return "#"+a}));
+        function colorStep(tot,curr){
+          return tot.add(curr.val)
+        }
+
+
+        function colorDomainFn(){
+          return Array.from(scope.data.values.reduce(function(tot,curr){
+            return curr.top_field2.buckets.reduce(colorStep,tot)
+          },new Set()));
+        }
 
         var z = d3.scale.ordinal()
-            .range(palette('tol-rainbow', scope.data.range2.length).map(function(a){return "#"+a;}));
+            .range(palette('tol-rainbow', scope.data.range2.length).map(function(a){return "#"+a;}))
+            .domain(colorDomainFn());
+
+        var legendFn=legend.init({colorScale:z,colorField:"test",width:panel_width});
 
           var xAxis=d3.svg.axis().scale(x)
           .orient("bottom")
@@ -499,10 +513,11 @@ function (angular, app, _, $, d3, d3tip,palette) {
             .on('mouseout', tipField1.hide)
             .on('click', function(d){ tipField1.hide();filterDialogSrv.showDialog(scope.panel.field1,d.val);});
 
-
+          svg.call(legendFn);
           chart.call(tipField1);
           chart.call(tipField2);
           chart.call(axisTip);
+
 
           // var xAxisTipFn=d3tip()
           //     .attr('class', 'd3-tip')

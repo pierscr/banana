@@ -3,7 +3,7 @@
 
 define(['grid','cluster_data','rangeDate'],function(grid,data,rangeDate){
 
-
+/*
   function initGrid(){
     var myGridL=grid();
     return myGridL
@@ -630,5 +630,5 @@ define(['grid','cluster_data','rangeDate'],function(grid,data,rangeDate){
           {"field":"cluster_h","value":"internet,game,money,advertisement/money,advertisement,transaction,recording/money,advertisement,advertising,game/shopping,mall,account_book,incentive","count":3,"year":"2004-2005","x":143.5263157894737,"y":303.94736842105266,"row":8,"col":2},
           {"field":"cluster_h","value":"internet,game,money,advertisement/money,advertisement,transaction,recording/trading,auction,profit,stock/trading,stock,profit,goods/trading,stock,profit,investment","count":3,"year":"2004-2005","x":143.5263157894737,"y":340.7894736842106,"row":9,"col":2}]
       });
-
+      */
 });
