@@ -70,3 +70,17 @@
         <input type="number" min="2" class="input-mini" ng-model="panel.refresh.interval">
     </div>
 </div>
+<div class="row-fluid">
+  <div class="span2">
+      <label class="small">Min value of impact shown
+          <tip>min value of impact</tip>
+      </label>
+      <input type="number" class="input-medium" ng-model="panel.agg_function_" ng-change="set_refresh(true)">
+  </div>
+    <div class="span2">
+        <label class="small">Min value of impact shown
+            <tip>min value of impact</tip>
+        </label>
+        <input type="number" class="input-medium" ng-model="panel.filterValue" ng-change="set_refresh(true)">
+    </div>
+</div>

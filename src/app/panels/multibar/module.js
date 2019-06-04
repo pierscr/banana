@@ -68,7 +68,7 @@ function (angular, app, _, $, d3, d3tip,palette,legend) {
       spyable: true,
       show_queries: true,
       number_mode: "F",
-      aggregation_function:"count",
+      aggregation_function:"avg",
       yAxisValues:""
     };
 
@@ -316,7 +316,7 @@ function (angular, app, _, $, d3, d3tip,palette,legend) {
 
           var totalY =  d3.scale.linear()
                               .domain([0,d3.max(scope.data.values,function(d){
-                                          return d.aggFn || d.count;;
+                                          return d.aggFn || d.count;
                                       })])
                               .rangeRound([ height,0]);
 
@@ -374,17 +374,17 @@ function (angular, app, _, $, d3, d3tip,palette,legend) {
                .attr("text-anchor", "start")
                .text(scope.panel.labelXaxis+" - "+scope.panel.labelYaxis);
 
-          var zoom=d3.extensions.zoomBounded()
-                              .scaleExtent([1, width])
-                              .setXaxis(x)
-                              .onZoom(function(translate){
-                                draw(d3.event.scale,translate);
-                                tipField1.hide();
-                                tipField2.hide();
-                              });
-                              //.on("zoom", zoomed);
+          // var zoom=d3.extensions.zoomBounded()
+          //                     .scaleExtent([1, width-100])
+          //                     .setXaxis(x)
+          //                     .onZoom(function(translate){
+          //                       draw(d3.event.scale,translate);
+          //                       tipField1.hide();
+          //                       tipField2.hide();
+          //                     });
+          //                     //.on("zoom", zoomed);
 
-          svg.call(zoom);
+          //svg.call(zoom);
 
           var tipField1 = d3tip()
               .attr('class', 'd3-tip')
@@ -399,7 +399,7 @@ function (angular, app, _, $, d3, d3tip,palette,legend) {
                       patent_number="<div><strong>Percentage</strong> <span style='color:red'>" + ((p.count/scope.data.field1stat.tot_docs)*100).toFixed(2)  + "%</span></div>";
                       break;
                     case "O":
-                      patent_number="<div><strong>"+scope.panel.docname+"</strong> <span style='color:red'>" + (p.aggFn || p.count) + "%</span></div>";
+                      patent_number="<div><strong>"+scope.panel.docname+"</strong> <span style='color:red'>" + (p.aggFn || p.count).toFixed(2)  + " </span></div>";
                       break;
                     default:
                       patent_number="<div><strong>Frequency</strong> <span style='color:red'>" + p.count + "</span></div>";
@@ -424,7 +424,7 @@ function (angular, app, _, $, d3, d3tip,palette,legend) {
                       tipField2="<div><strong>Percentage</strong> <span style='color:red'>" + ((d.count/scope.data.field1stat.tot_docs)*100).toFixed(2)  + "%</span></div>";
                       break;
                     case "O":
-                      tipField2="<div><strong>"+scope.panel.docname+"</strong> <span style='color:red'>" + (d.aggFn || d.count) + "%</span></div>";
+                      tipField2="<div><strong>"+scope.panel.docname+"</strong> <span style='color:red'>" + (d.aggFn || d.count).toFixed(2) + "</span></div>";
                       break;
                     default:
                       tipField2="<div><strong>Frequency</strong> <span style='color:red'>" + d.count + "</span></div>";

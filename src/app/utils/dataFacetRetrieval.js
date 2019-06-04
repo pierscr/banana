@@ -21,27 +21,29 @@ define('dataFacetRetrieval',[],function(){
 
     var createFacetNode=function(list,object,aggregation_function){
       field=list.pop()
-      object.facet={};
+      object.facet || (object.facet={});
       object.facet[field]={
         type:"terms",
         field:field,
         limit:$scope.panel.max_number_r
       }
       if(aggregation_function!="count" && aggregation_function!=undefined){
-        object.facet.aggFn=aggregation_function;
+        aggregation_function:"avg",
+        object.facet[field].facet={};
+        object.facet[field].facet[$scope.panel.bubbleSizeField]=aggregation_function+"("+$scope.panel.bubbleSizeField+")";
       }
-      !list.length || createFacetNode(list,object.facet[field]);
+      !list.length || createFacetNode(list,object.facet[field],aggregation_function);
       object.allBuckets = true;
       object.numBuckets = true;
     };
     var json_facet={};
 
-    createFacetNode(facetList.reverse(),json_facet,$scope.panel.aggregation_function);
+    createFacetNode(facetList.reverse(),json_facet,$scope.panel.agg_function_);
 
     var pivot_field="&facet=true&json.facet="+JSON.stringify(json_facet.facet);
+    var clusterSubset="&fq=(dim_s:"+$scope.panel.xaxis+" || dim_s:"+$scope.panel.yaxis+")"
 
-
-    $scope.panel.queries.query = querySrv.getQuery(0) + fq + pivot_field + wt + rows_limit;
+    $scope.panel.queries.query = querySrv.getQuery(0) + fq + pivot_field + wt + rows_limit+clusterSubset;
 
 
     // Set the additional custom query

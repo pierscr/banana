@@ -301,7 +301,7 @@ define([
                             if (scope.panel.bubbleSizeField) {
                                 return rScale(d[scope.panel.bubbleSizeField]);
                             } else {
-                                return 3;
+                                return 10;
                             }
                         })
                         .attr("cx", function (d) {

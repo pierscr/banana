@@ -50,6 +50,8 @@ define([
             bubbleSizeField: '',
             spyable: true,
             show_queries: true,
+            agg_function_: "avg",
+            filterValue:0,
             refresh: {
                 enable: false,
                 interval: 2
@@ -98,16 +100,24 @@ define([
                  $scope.data=[];
 
                 var createFn=function(obj){
-                  return {int:obj[0].val,risk:obj[1].val,score:obj[0].count+obj[1].count};
+                  var result={};
+                  result[$scope.panel.xaxis]=obj[0].val;
+                  result[$scope.panel.yaxis]=obj[1].val;
+                  var first=Math.pow(obj[0][$scope.panel.bubbleSizeField], 2);
+                  var second=Math.pow(obj[1][$scope.panel.bubbleSizeField], 2);
+                  result.score=Math.sqrt((first+second)/2);
+                  return result;
                 }
 
                 var filterFn=function(obj){
-                  return obj.score>1 ;
+                  return obj.score>$scope.panel.filterValue ;
                 }
 
 
                 var addFn=function(ob1,ob2){
                   ob1.score=ob1.score+ob2.score;
+                  var tech=[];
+                  ob1.tech_s= tech.concat(ob1.tech_s,ob2.tech_s);
                   return ob1;
                 }
 
@@ -130,8 +140,9 @@ define([
 
                       var checkUnique=function(obj){
                         return $scope.data.find(function(curr){
-                          return curr.int===obj.risk &&
-                                curr.int===obj.risk
+                          // return curr.risk===obj.risk &&
+                          //       curr.int===obj.int
+                          return false;
                         })
                       }
 
@@ -145,6 +156,10 @@ define([
                         .addFn(addFn)
                         .build());
 
+                    });
+
+                    $scope.data=$scope.data.sort(function(a,b){
+                      return b.score-a.score;
                     });
                     /*
                      $scope.data=[{dim1: 'Economic', dim2: 'Stragetic', score: 1.7999999523162842, nuovo: 'new field'},{dim1: 'Economic', dim2: 'tactical', score: 1.5999999642372131, nuovo: 'new field'}, {dim1: 'Economic', dim2: 'gran strategyc', score: 1.399999976158142, nuovo: 'new field'},{dim1: 'Economic', dim2: 'Operational', score: 1.199999988079071, nuovo: 'new field'}, {dim1: 'Environmental risks', dim2: 'Stragetic', score: 1.5999999642372131, nuovo: 'new field'}, {dim1: 'Environmental risks',dim2:'tactical', score: 1.399999976158142, nuovo: 'new field'}, {dim1: 'Environmental risks', dim2: 'gran strategyc', score: 1.199999988079071, nuovo: 'new field'}, {dim1: 'Environmental risks', dim2: 'Operational', score: 1, nuovo: 'new field'}, {dim1: 'Technological risks', dim2: 'Stragetic', score: 1.399999976158142, nuovo: 'new field'}, {dim1: 'Technological risks', dim2: 'tactical', score: 1.199999988079071, nuovo: 'new field'}, {dim1: 'Technological risks', dim2: 'granstrategyc', score: 1, nuovo: 'new field'}, {dim1: 'Technological risks', dim2: 'Operational', score: 0.800000011920929, nuovo: 'new field'}];
@@ -226,7 +241,7 @@ define([
                     if (scope.panel.bubbleSizeField) {
                         rScale = d3.scale.linear()
                             .domain(d3.extent(scope.data, function (d) {
-                                return d[scope.panel.bubbleSizeField];
+                                return d.score;
                             }))
                             .range([3, 20])
                             .nice();
@@ -246,6 +261,45 @@ define([
                     //     return d[scope.panel.yaxis];
                     // }));
 
+                    var renderSinglePie=function(){
+                        var pie = d3.layout.pie()
+                            .value(function(d) {
+                              return d.value;
+                            })
+
+                        var arc = d3.svg.arc()
+                            .outerRadius(radius)
+
+                        var myChart = d3.select('#chart').append('svg')
+                            .attr('width', width)
+                            .attr('height', height)
+                            .append('g')
+                            .attr('transform', 'translate('+(width-radius)+','+(height - radius)+')')
+                            .selectAll('path').data(pie(piedata))
+                            .enter().append('g')
+                                .attr('class', 'slice')
+
+                        var slices = d3.selectAll('g.slice')
+                                .append('path')
+                                .attr('fill', function(d,i) {
+                                  return colors(i);
+                                })
+                                .attr('d', arc)
+
+                        var text = d3.selectAll('g.slice')
+                            .append('text')
+                            .text(function(d,i) {
+                                return d.data.label;
+                            })
+                            .attr('text-anchor', 'middle')
+                            .attr('fill', 'white')
+                            .attr('transform', function(d) {
+                                d.innerRadius = radius/3;
+                                d.outerRadius = radius;
+                                return 'translate('+ arc.centroid(d)+')'
+                            })
+                      }
+
                     var svg = d3.select(el).append("svg")
                         .attr("width", width + margin.left + margin.right)
                         .attr("height", height + margin.top + margin.bottom)
@@ -257,6 +311,7 @@ define([
                     // add the tooltip area to the webpage
                     var $tooltip = $('<div>');
 
+
                     // Bubble
                     svg.selectAll(".dot")
                         .data(scope.data)
@@ -264,7 +319,7 @@ define([
                         .attr("class", "dot")
                         .attr("r", function (d) {
                             if (scope.panel.bubbleSizeField) {
-                                return rScale(d[scope.panel.bubbleSizeField]);
+                                return rScale(d.score);
                             } else {
                                 return 3;
                             }
@@ -278,12 +333,12 @@ define([
                         .style("fill", function (d) {
                             return color(d[scope.panel.colorField]);
                         })
-                        .attr("fill-opacity","0.5")
+                        // .attr("fill-opacity","0.5")
                         .on("mouseover", function (d) {
                             var colorField = d[scope.panel.colorField] ? d[scope.panel.colorField] : "";
                             $tooltip
                                 .html('<i class="icon-circle" style="color:' + color(d[scope.panel.colorField]) + ';"></i>' + ' ' +
-                                    colorField + " (" + d[scope.panel.xaxis] + ", " + d[scope.panel.yaxis] + ")<br>")
+                                    colorField + " (" + d[scope.panel.xaxis] + ", " + d[scope.panel.yaxis] + ")<br>Score:"+(d.score).toFixed(2))
                                 .place_tt(d3.event.pageX, d3.event.pageY);
                         })
                         .on("mouseout", function () {
