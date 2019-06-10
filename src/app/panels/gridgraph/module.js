@@ -73,7 +73,11 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
 
     $scope.init = function() {
       $scope.$on('refresh',function(){
-        $scope.get_data();
+        if(!$scope.refreshByGridgraph){
+          $scope.get_data();
+        }else{
+          $scope.refreshByGridgraph=false;
+        }
       });
       $scope.get_data();
     };
@@ -136,18 +140,27 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
     });
 
     $scope.$on('addStep',function(event,nodeList){
-      var stepNumber=nodeList[0].col;
-      dataSource
-        .createRequest()
-        .addYearsCostraint(range.getRange(stepNumber+1).split("-"))
-        .getGridStep(nodeList)
-        .then(function(results){
-            $scope.myGrid.addLink(results.links.map(function(item){ item.step=stepNumber+1;return item;}));
-            $scope.myGrid.addNode(results.nodes.map(function(item){ item.step=stepNumber+1; item.year=range.getRange(stepNumber+1);return item;}));
-            $scope.myGrid.stepFn(stepNumber);
-            $scope.$emit('render');
-        });
+      var ids=filterSrv.idsByMandate('must');
+      for(var index in ids){
+          filterSrv.remove(ids[index]);
+      }
 
+      $scope.refreshByGridgraph=true;
+      filterSrv.set({type:'terms',field:nodeList[0].field,value:nodeList[0].value,mandate:'either'});
+      var stepNumber=nodeList[0].col;
+      if(range.getRange(stepNumber+1)!=undefined){
+        dataSource
+          .createRequest()
+          .addYearsCostraint(range.getRange(stepNumber+1).split("-"))
+          .getGridStep(nodeList)
+          .then(function(results){
+              $scope.myGrid.addLink(results.links.map(function(item){ item.step=stepNumber+1;return item;}));
+              $scope.myGrid.addNode(results.nodes.map(function(item){ item.step=stepNumber+1; item.year=range.getRange(stepNumber+1);return item;}));
+              $scope.myGrid.stepFn(stepNumber);
+              $scope.$emit('render');
+          });
+      }
+      dashboard.refresh();
     });
 
   });

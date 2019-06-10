@@ -40,6 +40,9 @@ define([
         active=false;
       }
 
+      //---->
+      //mode='either';
+
       if(value) {
         filterSrv.set({type:'terms',field:field,value:value,mandate:mode,active:active});
       } else {

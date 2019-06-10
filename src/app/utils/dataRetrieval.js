@@ -35,7 +35,7 @@ define('dataRetrieval',['angular'],function(angular){
               $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.linksCore);
               //var join="&q={!join from="+$scope.panel.nodesField+" to=Cluster2 fromIndex="+$scope.panel.nodesCore+"}*:*"
               var q="&q=*:*";
-              var nodeFilter="&wt=json&fq=Cluster1:\""+nodeList[0].value+"\"&rows=500";
+              var nodeFilter="&wt=json&fq=Cluster1:\""+nodeList[0].value+"\"&rows=500"+"&sort=Similarity_f desc";
               var stepResults={stepNodes:[],selfNode:[],links:[],stepNodesResponse:false,selfNodeResponse:false};
               function semaphore(){
                 if(stepResults.stepNodesResponse && stepResults.selfNodeResponse){
@@ -43,6 +43,16 @@ define('dataRetrieval',['angular'],function(angular){
                   deferred.resolve({nodes:nodes,links:stepResults.links});
                 }
               };
+
+              function addSimilarity(nodes,links){
+                return nodes.map(function(item){
+                  var linkFound=links.find(function(link){
+                    return link.Cluster2==item.value;
+                  });
+                  item.Similarity_f=linkFound.Similarity_f;
+                  return item;
+                })
+              }
 
               $scope.sjs.Request()
                   .setQuery(nodeFilter+q)
@@ -55,6 +65,10 @@ define('dataRetrieval',['angular'],function(angular){
                       .then(function(results){
                           //$scope.myGrid.addNode(results.facet_counts.facet_pivot['"+$scope.panel.nodesField+"'].map(function(item){ item.year=range.getRange(0);return item;}));
                           stepResults.stepNodes=results.facet_counts.facet_pivot[$scope.panel.nodesField];
+                          stepResults.stepNodes=addSimilarity(stepResults.stepNodes,stepResults.links);
+                          stepResults.stepNodes=stepResults.stepNodes.sort(function(a,b){
+                            return b.Similarity_f-a.Similarity_f;
+                          })
                           stepResults.stepNodesResponse=true;
                           semaphore();
                           //deferred.resolve({nodes:results.facet_counts.facet_pivot['cluster_h'],links:links});
