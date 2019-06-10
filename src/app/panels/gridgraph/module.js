@@ -114,16 +114,26 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
 
       $scope.myGrid.reset();
       //-->
-      dataSource
-        .createRequest()
-        .addYearsCostraint(range.getRange(0).split("-"))
-        .getNodes()
-        .then(function(results){
-            $scope.myGrid.addNode(results.facet_counts.facet_pivot[$scope.panel.nodesField].map(function(item){ item.step=0;item.year=range.getRange(0);return item;}));
-            $scope.$emit('render');
-        });
+      $scope.$emit('getNodes',0);
 
     };
+
+    $scope.$on('getNodes',function(event,index){
+      dataSource
+        .createRequest()
+        .addYearsCostraint(range.getRange(index).split("-"))
+        .getNodes()
+        .then(function(results){
+            var nodeFacet=results.facet_counts.facet_pivot[$scope.panel.nodesField];
+            var newIndex=index+1;
+            if(nodeFacet.length>0  || range.getRange(index)==undefined){
+              $scope.myGrid.addNode(results.facet_counts.facet_pivot[$scope.panel.nodesField].map(function(item){ item.step=0;item.year=range.getRange(index);return item;}));
+              $scope.$emit('render');
+            }else{
+              $scope.$emit('getNodes',newIndex);
+            }
+        });
+    });
 
     $scope.$on('addStep',function(event,nodeList){
       var stepNumber=nodeList[0].col;
