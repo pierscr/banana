@@ -367,6 +367,13 @@ define([
       return ids;
     };
 
+    this.removeAll = function(){
+      var ids = _.pluck(self.list,'id');
+      _.each(ids,function(id) {
+        self.remove(id);
+      });
+    }
+
     this.idsByType = function(type,inactive) {
       var _require = inactive ? {type:type} : {type:type,active:true};
       return _.pluck(_.where(self.list,_require),'id');
