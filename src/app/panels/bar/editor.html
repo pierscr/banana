@@ -12,3 +12,17 @@
         <input class="input-small" type="number" ng-model="panel.size" ng-change="set_refresh(true)">
     </div>
 </div>
+<div class="row-fluid">
+    <div class="span4">
+        <label class="small">Margin bottom
+            <tip>Use this parameter to enlarge the x axis space </tip>
+        </label>
+        <input class="input-small" type="number" ng-model="panel.marginBottom" ng-change="set_refresh(true)">
+    </div>
+    <div class="span4">
+        <label class="small">Height
+            <tip>The height of the chart </tip>
+        </label>
+        <input class="input-small" type="number" ng-model="panel.height" ng-change="set_refresh(true)">
+    </div>
+</div>

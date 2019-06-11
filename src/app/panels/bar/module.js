@@ -49,6 +49,8 @@ define([
         spyable: true,
         show_queries: true,
         error: '',
+        marginBottom: 60,
+        height:''
       };
       _.defaults($scope.panel, _d);
 
@@ -185,11 +187,13 @@ define([
           function render_panel() {
             element.html("");
             var width = element.parent().width();
-            var height = parseInt(scope.row.height);
+            //-->
+
+            var height = scope.panel.height!=''?scope.panel.height:parseInt(scope.row.height);
 
              var margin = {top: 40, right: 20, bottom: 60, left: 40};
               width = width - margin.left - margin.right;
-              height = height - margin.top - margin.bottom;
+              height = height - margin.top - scope.panel.marginBottom;
 
               var formatPercent = d3.format(".0");
 
@@ -210,7 +214,7 @@ define([
 
               var svg = d3.select(element[0]).append("svg")
                   .attr("width", width + margin.left + margin.right)
-                  .attr("height", height + margin.top + margin.bottom)
+                  .attr("height", height + margin.top + scope.panel.marginBottom)
                 .append("g")
                   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
