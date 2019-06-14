@@ -82,6 +82,7 @@ define('dataGraphMapping',[],function () {
           if(links[i].source !== undefined && links[i].target !== undefined){
             continue;
           }
+          filter.length=0;
           if(filter.length!==0){
             for(var k=0 ; k<filter.length; k++){
               if(_isFilterInCluster(filter[k],links[i].Cluster1[0],links[i].Cluster2[0])){
