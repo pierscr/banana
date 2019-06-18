@@ -84,3 +84,30 @@
         <input type="number" class="input-medium" ng-model="panel.filterValue" ng-change="set_refresh(true)">
     </div>
 </div>
+<div class="row-fluid">
+    <h5>Margin</h5>
+    <div class="span3">
+        <label class="small">
+          Margin top <tip>Node name font size</tip>
+        </label>
+        <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.marginTop" ng-change="set_refresh(true)">
+    </div>
+    <div class="span3">
+        <label class="small">
+          Margin right <tip>Node name font size</tip>
+        </label>
+        <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.marginRight" ng-change="set_refresh(true)">
+    </div>
+    <div class="span3">
+        <label class="small">
+          Margin bottom <tip>Node name font size</tip>
+        </label>
+        <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.marginBottom" ng-change="set_refresh(true)">
+    </div>
+    <div class="span3">
+        <label class="small">
+          Margin left <tip>Node name font size</tip>
+        </label>
+        <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.marginLeft" ng-change="set_refresh(true)">
+    </div>
+</div>

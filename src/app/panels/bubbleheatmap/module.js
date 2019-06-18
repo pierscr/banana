@@ -55,7 +55,11 @@ define([
             refresh: {
                 enable: false,
                 interval: 2
-            }
+            },
+            marginTop: 20,
+            marginRight: 20,
+            marginBottom: 100,
+            marginLeft: 50
         };
 
         _.defaults($scope.panel, _d);
@@ -225,12 +229,12 @@ define([
                     var parent_width = element.parent().width(),
                         height = parseInt(scope.row.height),
                         padding = 50;
-                    var margin = {
-                            top: 20,
-                            right: 20,
-                            bottom: 100,
-                            left: 50
-                        },
+                        var margin = {
+                                top: scope.panel.marginTop,
+                                right: scope.panel.marginRight,
+                                bottom: scope.panel.marginBottom,
+                                left: scope.panel.marginLeft
+                            },
                         width = parent_width - margin.left - margin.right;
 
                     height = height - margin.top - margin.bottom;
@@ -358,7 +362,7 @@ define([
                             .enter().append("g")
                             .attr("class", "legend")
                             .attr("transform", function (d, i) {
-                                return "translate(0," + i * 20 + ")";
+                                return 'translate('  + -margin.right +  ',' + ((i * 20 )- margin.top) +')';
                             })
                             .on("mouseover", function () {
                                 el.style.cursor = 'pointer';
@@ -414,7 +418,7 @@ define([
                         .call(xAxis)
                         .append("text")
                         .attr("class", "label")
-                        .attr("transform", "translate(" + ((width / 2) - margin.left) + " ," + 30 + ")")
+                        .attr("transform", "translate(" + ((width / 2) - margin.left + 30) + " ," + 50 + ")")
                         .style("text-anchor", "middle")
                         .text(xaxisLabel);
 
