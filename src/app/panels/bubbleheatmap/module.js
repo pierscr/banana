@@ -352,7 +352,7 @@ define([
                             if (scope.panel.colorField) {
                                 filterDialogSrv.showDialog( scope.panel.colorField,d[scope.panel.colorField]);
                                 $tooltip.detach();
-                                dashboard.refresh();
+                                /*dashboard.refresh();*/
                             }
                         });
 
