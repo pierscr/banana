@@ -12,7 +12,7 @@ define('dataRetrieval',['angular','d3'],function(angular,d3){
 
             var yearsCostraint="";
             var containsConstraint="";
-            var row=0;
+            var row=$scope.panel.max_rows;
 
             var addRow=function(rowParam){
               row=rowParam;
@@ -53,7 +53,7 @@ define('dataRetrieval',['angular','d3'],function(angular,d3){
             function getNodes(nodeList,deactiveGlobalFilter,callback){
               var filters="";
               $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.nodesCore);
-              var nodeFilter="&wt=json&facet=true&facet.pivot="+$scope.panel.nodesField+"&q=*:*&rows=0&facet.limit="+ $scope.panel.max_rows;
+              var nodeFilter="&wt=json&facet=true&facet.pivot="+$scope.panel.nodesField+"&q=*:*&rows=0&facet.limit="+ row;
               if(nodeList!==undefined){
                 filters+="&fq="+$scope.panel.nodesField+":"+_createNodeFiltersList(nodeList,callback);
               }

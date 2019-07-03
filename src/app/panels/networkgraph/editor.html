@@ -40,6 +40,12 @@
     </div>
     <div class="span3">
         <label class="small">
+          Link number<tip>Max number of link in the chart </tip>
+        </label>
+        <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.linkNumber" ng-change="set_refresh(true)">
+    </div>
+    <div class="span3">
+        <label class="small">
           Min Link distance <tip>The link distance</tip>
         </label>
         <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.minLinkDistance" ng-change="set_refresh(true)">

@@ -155,12 +155,13 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
       dataSource
         .createRequest()
         .addCointainsConstraint($scope.panel.nodeSearch)
-        .addRow($scope.panel.max_rows)
+        .addRow($scope.panel.max_rows*3)
         .addYearsCostraint(range.getRange(index).split("-"))
         .getNodes()
         .then(function(results){
             updateGlobalHirarchy();
             var nodeFacet=results.facet_counts.facet_pivot[$scope.panel.nodesField].filter(hierarchyFilter);
+            nodeFacet=nodeFacet.slice(0,$scope.panel.max_rows);
             var newIndex=index+1;
             if(nodeFacet.length>0  || range.getRange(index)==undefined){
               $scope.myGrid.addNode(nodeFacet.map(function(item){ item.step=0;item.year=range.getRange(index);return item;}));
