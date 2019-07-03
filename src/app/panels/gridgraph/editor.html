@@ -50,10 +50,10 @@
         </label>
         <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.max_rows" ng-change="set_refresh(true)">
     </div>
-    <!-- <div class="span2">
+    <div class="span3">
         <label class="small">
-            Number of Rows <tip>Specify a number of rows to retrieve the result set.</tip>
+          Node Search <tip>The search field which is search when click on node</tip>
         </label>
-        <input class="input-small" type="number" ng-model="panel.max_rows" ng-change="set_refresh(true)">
-    </div> -->
+        <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.nodeSearch" ng-change="set_refresh(true)">
+    </div>
 </div>

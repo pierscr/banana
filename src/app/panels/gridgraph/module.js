@@ -65,7 +65,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
       fontSize:12,
       startYear:'2000',
       stepYear:'1',
-      yearFieldName:'year'
+      yearFieldName:'year',
+      nodeSearch:'cluster_str'
     };
 
     // Set panel's default values
@@ -123,15 +124,39 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
     };
 
     $scope.$on('getNodes',function(event,index){
+      var hierarchy=0;
       dataSource
         .createRequest()
+        .addCointainsConstraint($scope.panel.nodeSearch)
+        .addRow($scope.panel.max_rows)
         .addYearsCostraint(range.getRange(index).split("-"))
         .getNodes()
         .then(function(results){
-            var nodeFacet=results.facet_counts.facet_pivot[$scope.panel.nodesField];
+            $scope.forEachFilter(function(filter,index){
+              if(filter.field===$scope.panel.nodeSearch){
+                if(filter.mandate!="either"){
+                    hierarchy=(decodeURIComponent(filter.value).split("/").length)
+                    $scope.filteredValue=filter.value;
+                }else{
+                    hierarchy=-1;
+                }
+              }
+            });
+            var hierarchyFilter=function(item){
+              if(hierarchy==-1){
+                return true;
+              }
+              var currentLevel=item.value.split("/").length-1;
+              if(hierarchy>0){
+                return (currentLevel==hierarchy || currentLevel==hierarchy-1);
+              }else{
+                return currentLevel==hierarchy;
+              }
+            };
+            var nodeFacet=results.facet_counts.facet_pivot[$scope.panel.nodesField].filter(hierarchyFilter);
             var newIndex=index+1;
             if(nodeFacet.length>0  || range.getRange(index)==undefined){
-              $scope.myGrid.addNode(results.facet_counts.facet_pivot[$scope.panel.nodesField].map(function(item){ item.step=0;item.year=range.getRange(index);return item;}));
+              $scope.myGrid.addNode(nodeFacet.map(function(item){ item.step=0;item.year=range.getRange(index);return item;}));
               $scope.$emit('render');
             }else{
               $scope.$emit('getNodes',newIndex);
@@ -152,7 +177,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
         dataSource
           .createRequest()
           .addYearsCostraint(range.getRange(stepNumber+1).split("-"))
-          .getGridStep(nodeList)
+          .addRow($scope.panel.max_rows)
+          .getGridStep(nodeList,range.getRange(stepNumber+1).split("-")[0])
           .then(function(results){
               $scope.myGrid.addLink(results.links.map(function(item){ item.step=stepNumber+1;return item;}));
               $scope.myGrid.addNode(results.nodes.map(function(item){ item.step=stepNumber+1; item.year=range.getRange(stepNumber+1);return item;}));
@@ -189,6 +215,18 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
           var parent_width = element.parent().width(),
             parentheight = parseInt(scope.row.height);
 
+          var createLabelRow=function(string){
+            var self=this;
+            this.concat=function(attr,value){
+              string=string.concat("<div><strong>"+attr+"</strong> <span style='color:red'>"+ value +"</span></div>")
+              return self;
+            }
+            this.build=function(){
+              return string;
+            }
+            return self;
+          }
+
           var tipNode = d3tip()
               .attr('class', 'd3-tip')
               .offset([-10, 0])
@@ -198,7 +236,17 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
                 return dir;
               })
               .html(function(d) {
-                return "<div>"+strHandler.lstName(d.value)+"</div><div>"+d.count+"</div>";
+                var cluster_levels=(typeof d.name === 'string' ?  d.name.split("/"): d.value.split("/"));
+                var label = createLabelRow.call({},"")
+                  .concat("Name",(typeof d.name === 'string' ?  cluster_levels.pop(): cluster_levels.pop()) )
+                  .concat("Frequency",d.count)
+                  .concat("Level",(typeof d.name === 'string' ?  d.name.split("/").length-1: d.value.split("/").length-1));
+
+                  cluster_levels.map(function(value,index){
+                    label.concat("Parent"+index,value);
+                  });
+
+                  return label.build();
               });
 
           var tipLink = d3tip()

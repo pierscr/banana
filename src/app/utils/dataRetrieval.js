@@ -1,4 +1,4 @@
-define('dataRetrieval',['angular'],function(angular){
+define('dataRetrieval',['angular','d3'],function(angular,d3){
       'use strict';
       return function($scope,dashboard,$injQ,filterSrv){
         var $injQ;
@@ -11,6 +11,34 @@ define('dataRetrieval',['angular'],function(angular){
 
 
             var yearsCostraint="";
+            var containsConstraint="";
+            var row=0;
+
+            var addRow=function(rowParam){
+              row=rowParam;
+              return this;
+            }
+
+            var addCointainsConstraint=function(searchField){
+              $scope.forEachFilter=function(fn){
+                d3.keys(dashboard.current.services.filter.list)
+                  .forEach(function(item,index){
+                    if(dashboard.current.services.filter.list[item].active){
+                      //fn(dashboard.current.services.filter.list[item].field,dashboard.current.services.filter.list[item].value);
+                      fn(dashboard.current.services.filter.list[item],index);
+                    }
+                  });
+              };
+
+              //--contains features-->
+              $scope.forEachFilter(function(filter,index){
+                if(filter.field===searchField && filter.value.length>0){
+                  containsConstraint="&facet.contains="+filter.value;
+                }
+              });
+              return this;
+            }
+
 
             function getNodes(nodeList,deactiveGlobalFilter,callback){
               var filters="";
@@ -25,17 +53,19 @@ define('dataRetrieval',['angular'],function(angular){
               if(!deactiveGlobalFilter){
                 filters += filterSrv.getSolrFq(false,"cluste_h")!==''?'&' + filterSrv.getSolrFq(false,"cluste_h"):'';
               }
+
+
               return $scope.sjs.Request()
-                  .setQuery(nodeFilter+filters+yearsCostraint)
+                  .setQuery(nodeFilter+filters+yearsCostraint+containsConstraint)
                   .doSearch();
             }
 
-            function getGridStep(nodeList){
+            function getGridStep(nodeList,step){
               var deferred = $injQ.defer();
               $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.linksCore);
               //var join="&q={!join from="+$scope.panel.nodesField+" to=Cluster2 fromIndex="+$scope.panel.nodesCore+"}*:*"
               var q="&q=*:*";
-              var nodeFilter="&wt=json&fq=Cluster1:\""+nodeList[0].value+"\"&rows=500"+"&sort=Similarity_f desc";
+              var nodeFilter="&wt=json&fq=Cluster1_str:\""+nodeList[0].value+"\"&rows="+row+"&fq=Cluster2Run_str:*/"+step+"/*&sort=Similarity_f desc";
               var stepResults={stepNodes:[],selfNode:[],links:[],stepNodesResponse:false,selfNodeResponse:false};
               function semaphore(){
                 if(stepResults.stepNodesResponse && stepResults.selfNodeResponse){
@@ -49,7 +79,10 @@ define('dataRetrieval',['angular'],function(angular){
                   var linkFound=links.find(function(link){
                     return link.Cluster2==item.value;
                   });
-                  item.Similarity_f=linkFound.Similarity_f;
+                  if(linkFound)
+                    item.Similarity_f=linkFound.Similarity_f;
+                  else
+                    item.Similarity_f=0;
                   return item;
                 })
               }
@@ -59,6 +92,7 @@ define('dataRetrieval',['angular'],function(angular){
                   .doSearch()
                   .then(function(results){
                       stepResults.links=results.response.docs;
+
                       getNodes(stepResults.links,true,function(item){
                           return item.Cluster2;
                       })
@@ -73,6 +107,7 @@ define('dataRetrieval',['angular'],function(angular){
                           semaphore();
                           //deferred.resolve({nodes:results.facet_counts.facet_pivot['cluster_h'],links:links});
                       });
+
                       getNodes(nodeList,true,function(item){
                           return item.value;
                       })
@@ -120,7 +155,9 @@ define('dataRetrieval',['angular'],function(angular){
             return {
               addYearsCostraint:addYearsCostraint,
               getNodes:getNodes,
-              getGridStep:getGridStep
+              getGridStep:getGridStep,
+              addCointainsConstraint:addCointainsConstraint,
+              addRow:addRow
             };
 
           }

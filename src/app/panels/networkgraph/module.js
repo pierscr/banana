@@ -100,13 +100,16 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
     //   }
     //   dashboard.refresh();
     // };
+    //dashboard.current.services.filter.list[item].mandate
+
 
     $scope.constructSolrQuery=function(facetField,addGlobalQueryFlag){
       $scope.forEachFilter=function(fn){
         d3.keys(dashboard.current.services.filter.list)
-          .forEach(function(item){
+          .forEach(function(item,index){
             if(dashboard.current.services.filter.list[item].active){
-              fn(dashboard.current.services.filter.list[item].field,dashboard.current.services.filter.list[item].value);
+              //fn(dashboard.current.services.filter.list[item].field,dashboard.current.services.filter.list[item].value);
+              fn(dashboard.current.services.filter.list[item],index);
             }
           });
       };
@@ -127,51 +130,64 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
         result+=pivot_field;
       }
       if(addGlobalQueryFlag){
-        result+="&"+querySrv.getQuery(0);
+        result+="&"+querySrv.getQuery(querySrv.ids[0]);
       }else{
         result+="&q=*:*&rows=0";
       }
       result+=$scope.panel.nodelimit!==''?'&facet.limit='+$scope.panel.nodelimit:'';
       var flag=0
       var facetFilter="";
-      $scope.forEachFilter(function(key,value){
-        if(key===$scope.panel.nodeSearch && value.length>flag){
-          facetFilter="&facet.contains="+value;
+
+      $scope.forEachFilter(function(filter,index){
+        if(filter.field===$scope.panel.nodeSearch && filter.value.length>flag){
+          if(filter.mandate!="either"){
+            facetFilter="&facet.contains="+filter.value;
+          }
         }
       });
       result+=facetFilter;
       return $scope.panel.queries.query = result;
     };
 
-      $scope.forEachFilter=function(fn){
-        d3.keys(dashboard.current.services.filter.list)
-          .forEach(function(item){
-            if(dashboard.current.services.filter.list[item].active){
-              fn(dashboard.current.services.filter.list[item].field,dashboard.current.services.filter.list[item].value);
-            }
-          });
-      };
-
     $scope.get_data = function() {
-
+      $scope.filteredValue="";
+      var hierarchy=0;
       $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.nodesCore);
       var nodeRequest = $scope.sjs.Request();
-      // $scope.forEachFilter(function(key,value){
-      //     if(key!==$scope.panel.nodesField){
-      //       filtersQr=filtersQr+'&fq=' +key+':'+value;
-      //     }
-      //   });
-      // $scope.panel.nodeSearch
       var filtersQr= filterSrv.getSolrFq(false,'test')!==''?'&' + filterSrv.getSolrFq(false,'test'):'';
       nodeRequest.setQuery(
         $scope.constructSolrQuery($scope.panel.nodesField,true)+filtersQr
       );
+
+      $scope.forEachFilter(function(filter,index){
+        if(filter.field===$scope.panel.nodeSearch){
+          if(filter.mandate!="either"){
+              hierarchy=(decodeURIComponent(filter.value).split("/").length)
+              $scope.filteredValue=decodeURIComponent(filter.value);
+          }else{
+              hierarchy=-1;
+          }
+        }
+      });
+
       var results = nodeRequest.doSearch();
       results
         .then(function(results) {
+          var hierarchyFilter=function(item){
+            if(hierarchy==-1){
+              return true;
+            }
+            var currentLevel=item.value.split("/").length-1;
+            if(hierarchy>0){
+              return (currentLevel==hierarchy || currentLevel==hierarchy-1);
+            }else{
+              return currentLevel==hierarchy;
+            }
+
+          };
           $scope.data=
             {
-              nodes:results.facet_counts.facet_pivot[$scope.panel.nodesField],
+              nodes:results.facet_counts.facet_pivot[$scope.panel.nodesField].filter(hierarchyFilter),
               links:[]
             };
       }).then(function(){
@@ -184,10 +200,11 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
           }
         nodesClouse+="\")";
         }
-        var nodePar="&q="+$scope.panel.nodeLink1+":"+nodesClouse+" && "+$scope.panel.nodeLink2+":"+nodesClouse;
+        // var nodePar="&q="+$scope.panel.nodeLink1+":"+nodesClouse+" && "+$scope.panel.nodeLink2+":"+nodesClouse;
+        var nodePar="&q="+$scope.panel.nodeLink1+":"+nodesClouse;
         var linksRequest = $scope.sjs.Request();
             linksRequest.setQuery(
-              "wt=json&rows=60000"+"&fq=Similarity:["+$scope.panel.linkValue+" TO *]"+nodePar
+              "wt=json&rows=60000"+"&fq=Similarity:["+$scope.panel.linkValue+" TO *]"+nodePar+"&sort=Similarity_f desc"
             );
         linksRequest
           .doSearch()
@@ -199,9 +216,9 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
                 .nodes($scope.data.nodes)
                 .links($scope.data.links.filter(function(link){return link.Similarity>$scope.panel.linkValue;}));
 
-              $scope.forEachFilter(function(key,value){
-                  if(key===$scope.panel.nodesField){
-                    initModule.filter(decodeURIComponent(value));
+              $scope.forEachFilter(function(filter,index){
+                  if(filter.field===$scope.panel.nodesField){
+                    initModule.filter(decodeURIComponent(filter.value));
                   }
                 });
 
@@ -268,14 +285,34 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
                 return "<div><strong>Similarity</strong> <span style='color:red'>" + d.Similarity + "</span></div>";
               });
 
+          var createLabelRow=function(string){
+            var self=this;
+            this.concat=function(attr,value){
+              string=string.concat("<div><strong>"+attr+"</strong> <span style='color:red'>"+ value +"</span></div>")
+              return self;
+            }
+            this.build=function(){
+              return string;
+            }
+            return self;
+          }
+
           var tipNode = d3tip()
               .attr('class', 'd3-tip')
               .offset([-10, 0])
               .html(function(d) {
-                return "<div><strong>Name</strong> <span style='color:red'>"+ (typeof d.name === 'string' ?  d.name.split("/").pop(): d.value.split("/").pop()) +"</span></div>"
-                +"<div><strong>Frequency</strong> <span style='color:red'>" + d.count + "</span></div>"
-                +"<div><strong>Level</strong> <span style='color:red'>" +  (typeof d.name === 'string' ?  d.name.split("/").length-1: d.value.split("/").length-1) + "</span></div>";
-              });
+                var cluster_levels=(typeof d.name === 'string' ?  d.name.split("/"): d.value.split("/"));
+                var label = createLabelRow.call({},"")
+                  .concat("Name",(typeof d.name === 'string' ?  cluster_levels.pop(): cluster_levels.pop()) )
+                  .concat("Frequency",d.count)
+                  .concat("Level",(typeof d.name === 'string' ?  d.name.split("/").length-1: d.value.split("/").length-1));
+
+                  cluster_levels.map(function(value,index){
+                    label.concat("Parent"+index,value);
+                  });
+
+                  return label.build();
+                });
 
           // node distance scale
           var distanceScale =   d3.scale.log()
@@ -347,7 +384,12 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
           var node = chart.selectAll('.node')
               .data(scope.data.nodes)
               .enter().append('g')
-              .attr('class', 'node')
+              .attr('class', function(d){
+                if(d.value===scope.filteredValue){
+                  return 'node2';
+                }
+                return 'node';
+              })
               .attr("transform", function(d){
                 return "translate("+d.x+","+d.y+")";
               })
