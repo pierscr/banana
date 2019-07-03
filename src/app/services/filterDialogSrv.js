@@ -12,7 +12,7 @@ define([
 
     var callback;
     var showRemoveCallback;
-
+    var mode;
 
     var hideDialogCallback;
 
@@ -20,6 +20,10 @@ define([
       hideDialogCallback();
       console.log(d3.event);
     };
+
+    var addMode=function(modePar){
+      mode=modePar;
+    }
 
     var subscribeShow=function(fn){
         callback=fn;
@@ -84,7 +88,7 @@ define([
         pageY=d3.event.pageY;
         pageX=d3.event.pageX;
       }
-      callback(pageY+"px",pageX+10+"px")
+      callback(pageY+"px",pageX+10+"px",mode)
         .then(resolve,reject);
     };
 
@@ -136,7 +140,8 @@ define([
       subscribeRemoveCallback:subscribeRemoveCallback,
       showDialog:showDialog,
       showDialog2:showDialog2,
-      hideDialog:hideDialog
+      hideDialog:hideDialog,
+      addMode:addMode
     };
   });
 

@@ -204,7 +204,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
         var nodePar="&q="+$scope.panel.nodeLink1+":"+nodesClouse;
         var linksRequest = $scope.sjs.Request();
             linksRequest.setQuery(
-              "wt=json&rows=60000"+"&fq=Similarity:["+$scope.panel.linkValue+" TO *]"+nodePar+"&sort=Similarity_f desc"
+              //"wt=json&rows=60000"+"&fq=Similarity:["+$scope.panel.linkValue+" TO *]"+nodePar+"&sort=Similarity_f desc"
+              "wt=json&rows="+$scope.panel.nodelimit*3+nodePar+"&sort=Similarity_f desc"
             );
         linksRequest
           .doSearch()
@@ -393,7 +394,12 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
               .attr("transform", function(d){
                 return "translate("+d.x+","+d.y+")";
               })
-              .on('click', function(d){  tipLink.hide(); tipNode.hide(); filterDialogSrv.showDialog(scope.panel.nodeSearch,d.name || d.value);})
+              .on('click', function(d){
+                tipLink.hide();
+                tipNode.hide();
+                filterDialogSrv.addMode('compare');
+                filterDialogSrv.showDialog(scope.panel.nodeSearch,d.name || d.value);
+              })
               .on('mousedown',function(){
                   zoomScale=zoom.scale();
                   zoomtX=zoom.translate();
