@@ -101,6 +101,33 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
 
     var dataSource;
     var range;
+    var hierarchy;
+
+    var updateGlobalHirarchy= function(){
+      hierarchy=0;
+      $scope.forEachFilter(function(filter,index){
+        if(filter.field===$scope.panel.nodeSearch){
+          if(filter.mandate!="either"){
+              hierarchy=(decodeURIComponent(filter.value).split("/").length)
+              $scope.filteredValue=filter.value;
+          }else{
+              hierarchy=-1;
+          }
+        }
+      });
+    }
+
+    var hierarchyFilter=function(item){
+      if(hierarchy==-1){
+        return true;
+      }
+      var currentLevel=item.value.split("/").length-1;
+      if(hierarchy>0){
+        return (currentLevel==hierarchy || currentLevel==hierarchy-1);
+      }else{
+        return currentLevel==hierarchy;
+      }
+    };
 
     $scope.get_data = function() {
 
@@ -124,7 +151,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
     };
 
     $scope.$on('getNodes',function(event,index){
-      var hierarchy=0;
+
       dataSource
         .createRequest()
         .addCointainsConstraint($scope.panel.nodeSearch)
@@ -132,46 +159,29 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
         .addYearsCostraint(range.getRange(index).split("-"))
         .getNodes()
         .then(function(results){
-            $scope.forEachFilter(function(filter,index){
-              if(filter.field===$scope.panel.nodeSearch){
-                if(filter.mandate!="either"){
-                    hierarchy=(decodeURIComponent(filter.value).split("/").length)
-                    $scope.filteredValue=filter.value;
-                }else{
-                    hierarchy=-1;
-                }
-              }
-            });
-            var hierarchyFilter=function(item){
-              if(hierarchy==-1){
-                return true;
-              }
-              var currentLevel=item.value.split("/").length-1;
-              if(hierarchy>0){
-                return (currentLevel==hierarchy || currentLevel==hierarchy-1);
-              }else{
-                return currentLevel==hierarchy;
-              }
-            };
+            updateGlobalHirarchy();
             var nodeFacet=results.facet_counts.facet_pivot[$scope.panel.nodesField].filter(hierarchyFilter);
             var newIndex=index+1;
             if(nodeFacet.length>0  || range.getRange(index)==undefined){
               $scope.myGrid.addNode(nodeFacet.map(function(item){ item.step=0;item.year=range.getRange(index);return item;}));
-              $scope.$emit('render');
+              $scope.$emit('addCiclesSteps',nodeFacet,index);
             }else{
               $scope.$emit('getNodes',newIndex);
             }
         });
     });
 
-    $scope.$on('addStep',function(event,nodeList){
+    $scope.$on('addStepFilter',function(event,node){
       var ids=filterSrv.idsByMandate('must');
       for(var index in ids){
           filterSrv.remove(ids[index]);
       }
 
       $scope.refreshByGridgraph=true;
-      filterSrv.set({type:'terms',field:nodeList[0].field,value:nodeList[0].value,mandate:'either'});
+      filterSrv.set({type:'terms',field:node.field,value:node.value,mandate:'either'});
+    })
+
+    $scope.$on('addStep',function(event,nodeList){
       var stepNumber=nodeList[0].col;
       if(range.getRange(stepNumber+1)!=undefined){
         dataSource
@@ -187,6 +197,27 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
           });
       }
       dashboard.refresh();
+    });
+
+    $scope.$on('addCiclesSteps',function(event,nodeList,stepNumber){;
+      if(range.getRange(stepNumber+1)!=undefined){
+        dataSource
+          .createRequest()
+          .addYearsCostraint(range.getRange(stepNumber+1).split("-"))
+          .addRow($scope.panel.max_rows)
+          .getGridStep(nodeList,range.getRange(stepNumber+1).split("-")[0],function(item){
+              return item.value;
+          })
+          .then(function(results){
+              var nodes=results.nodes.map(function(item){ item.step=stepNumber+1; item.year=range.getRange(stepNumber+1);return item;})
+              $scope.myGrid.addLink(results.links.map(function(item){ item.step=stepNumber+1;return item;}));
+              $scope.myGrid.addNode(nodes);
+              $scope.myGrid.stepFn(stepNumber);
+              $scope.$emit('render');
+              $scope.$emit('addCiclesSteps',nodes,stepNumber+1);
+          });
+      }
+      //dashboard.refresh();
     });
 
   });
@@ -336,7 +367,9 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
         node.on('click', function(d){
           //filterDialogSrv.showDialog2();
           tipNode.hide();
+          scope.$emit('addStepFilter',d);
           scope.$emit('addStep',[d]);
+
         })
         .on('mouseover', tipNode.show)
         .on('mouseout', function(){
