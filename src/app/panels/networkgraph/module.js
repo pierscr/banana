@@ -9,16 +9,17 @@ define([
   'jquery',
   'd3',
   'd3tip',
-  'dataGraphMapping'
+  'dataGraphMapping',
+  'dataRetrieval'
 ],
-function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
+function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval) {
   'use strict';
 
   var module = angular.module('kibana.panels.networkgraph', []);
   app.useModule(module);
 
 //  module.controller('multibar', function($scope, dashboard, querySrv, filterSrv) {
-  module.controller('networkgraph', function($scope, dashboard, querySrv, filterSrv) {
+  module.controller('networkgraph', function($scope, dashboard, querySrv, filterSrv,$q) {
     $scope.panelMeta = {
       modals: [
         {
@@ -103,134 +104,92 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping) {
     // };
     //dashboard.current.services.filter.list[item].mandate
 
-
-    $scope.constructSolrQuery=function(facetField,addGlobalQueryFlag){
-      $scope.forEachFilter=function(fn){
-        d3.keys(dashboard.current.services.filter.list)
-          .forEach(function(item,index){
-            if(dashboard.current.services.filter.list[item].active){
-              //fn(dashboard.current.services.filter.list[item].field,dashboard.current.services.filter.list[item].value);
-              fn(dashboard.current.services.filter.list[item],index);
-            }
-          });
-      };
-
-      // Construct Solr query
-      // var fq = '';
-      // if (filterSrv.getSolrFq()) {
-      //     fq = '&' + filterSrv.getSolrFq();
-      // }
-      var wt = '&wt=json';
-      //var facet_limit="&facet.limit="+$scope.panel.max_number_r;
-
-      //facet.contains---->
-
-      var pivot_field="&facet=true&facet.pivot="+facetField+"&facet.mincount=1";
-      var result=wt;
-      if(facetField){
-        result+=pivot_field;
-      }
-      if(addGlobalQueryFlag){
-        result+="&"+querySrv.getQuery(querySrv.ids[0]);
-      }else{
-        result+="&q=*:*&rows=0";
-      }
-      result+=$scope.panel.nodelimit!==''?'&facet.limit='+$scope.panel.nodelimit:'';
-      var flag=0
-      var facetFilter="";
-
-      $scope.forEachFilter(function(filter,index){
-        if(filter.field===$scope.panel.nodeSearch && filter.value.length>flag){
-          if(filter.mandate!="either"){
-            facetFilter="&facet.contains="+filter.value;
-          }
-        }
-      });
-      result+=facetFilter;
-      return $scope.panel.queries.query = result;
-    };
-
-    $scope.get_data = function() {
-      $scope.filteredValue=[];
-      var hierarchy=0;
-      $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.nodesCore);
-      var nodeRequest = $scope.sjs.Request();
-      var filtersQr= filterSrv.getSolrFq(false,'test')!==''?'&' + filterSrv.getSolrFq(false,'test'):'';
-      nodeRequest.setQuery(
-        $scope.constructSolrQuery($scope.panel.nodesField,true)+filtersQr
-      );
-
+    $scope.filteredValue=[];
+    var hierarchy;
+    var updateGlobalHirarchy= function(){
+      hierarchy=0;
       $scope.forEachFilter(function(filter,index){
         if(filter.field===$scope.panel.nodeSearch){
           if(filter.mandate!="either"){
               hierarchy=(decodeURIComponent(filter.value).split("/").length)
+
           }else{
               hierarchy=-1;
           }
           $scope.filteredValue.push(decodeURIComponent(filter.value));
         }
       });
+    }
 
-      var results = nodeRequest.doSearch();
-      results
-        .then(function(results) {
-          var hierarchyFilter=function(item){
-            if(hierarchy==-1){
-              return true;
-            }
-            var currentLevel=item.value.split("/").length-1;
-            if(hierarchy>0){
-              return (currentLevel==hierarchy || currentLevel==hierarchy-1);
-            }else{
-              return currentLevel==hierarchy;
-            }
+    var hierarchyFilter=function(item){
+      if(hierarchy==-1){
+        return true;
+      }
+      var currentLevel=item.value.split("/").length-1;
+      if(hierarchy>0){
+        return (currentLevel==hierarchy || currentLevel==hierarchy-1);
+      }else{
+        return currentLevel==hierarchy;
+      }
 
-          };
+    };
+
+    $scope.get_data = function() {
+      $scope.filteredValue=[];
+      var dataSource=dataRetrieval($scope,dashboard,$q,filterSrv);
+
+      dataSource
+        .createRequest()
+        .addCointainsConstraint($scope.panel.nodeSearch)
+        .addRow($scope.panel.nodelimit)
+        .getNodes()
+        .then(function(results){
+          updateGlobalHirarchy();
           $scope.data=
             {
               nodes:results.facet_counts.facet_pivot[$scope.panel.nodesField].filter(hierarchyFilter),
               links:[]
             };
-      }).then(function(){
-        $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.linksCore);
-        var nodesClouse="";
-        if(Array.isArray($scope.data.nodes) && $scope.data.nodes.length>0){
-        nodesClouse="(\""+$scope.data.nodes[0].value;
-          for(var index=1;index<$scope.data.nodes.length;index++){
-            nodesClouse+="\" || \""+$scope.data.nodes[index].value;
-          }
-        nodesClouse+="\")";
-        }
-        // var nodePar="&q="+$scope.panel.nodeLink1+":"+nodesClouse+" && "+$scope.panel.nodeLink2+":"+nodesClouse;
-        var nodePar="&q="+$scope.panel.nodeLink1+":"+nodesClouse;
-        var linksRequest = $scope.sjs.Request();
-            linksRequest.setQuery(
-              //"wt=json&rows=60000"+"&fq=Similarity:["+$scope.panel.linkValue+" TO *]"+nodePar+"&sort=Similarity_f desc"
-              "wt=json&rows="+$scope.panel.linkNumber*3+"&fq=Similarity:["+$scope.panel.linkValue+" TO *]"+nodePar+"&sort=Similarity_f desc"
-            );
-        linksRequest
-          .doSearch()
-          .then(function(linkResults){
-             $scope.data.links=linkResults.response.docs;
+            $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.linksCore);
+            var nodesClouse="";
+            if(Array.isArray($scope.data.nodes) && $scope.data.nodes.length>0){
+            nodesClouse="(\""+$scope.data.nodes[0].value;
+              for(var index=1;index<$scope.data.nodes.length;index++){
+                nodesClouse+="\" || \""+$scope.data.nodes[index].value;
+              }
+            nodesClouse+="\")";
+            }
+            var nodePar="&q="+$scope.panel.nodeLink1+":"+nodesClouse+" && "+$scope.panel.nodeLink2+":"+nodesClouse;
+            //var nodePar="&q="+$scope.panel.nodeLink1+":"+nodesClouse;
+            var linksRequest = $scope.sjs.Request();
+                linksRequest.setQuery(
+                  //"wt=json&rows=60000"+"&fq=Similarity:["+$scope.panel.linkValue+" TO *]"+nodePar+"&sort=Similarity_f desc"
+                  "wt=json&rows="+$scope.panel.linkNumber*3+"&fq=Similarity:["+$scope.panel.linkValue+" TO *]"+nodePar+"&sort=Similarity_f desc"
+                );
+            linksRequest
+              .doSearch()
+              .then(function(linkResults){
+                 $scope.data.links=linkResults.response.docs;
 
-             var initModule=dataGraphMapping();
-             initModule
-                .nodes($scope.data.nodes)
-                .links($scope.data.links.filter(function(link){return link.Similarity>$scope.panel.linkValue;}));
+                 var initModule=dataGraphMapping();
+                 initModule
+                    .nodes($scope.data.nodes)
+                    .links($scope.data.links.filter(function(link){return link.Similarity>$scope.panel.linkValue;}));
 
-              $scope.forEachFilter(function(filter,index){
-                  if(filter.field===$scope.panel.nodesField){
-                    initModule.filter(decodeURIComponent(filter.value));
-                  }
-                });
+                  $scope.forEachFilter(function(filter,index){
+                      if(filter.field===$scope.panel.nodesField){
+                        initModule.filter(decodeURIComponent(filter.value));
+                      }
+                    });
 
-            initModule.build();
+                initModule.build();
 
-            $scope.data.nodes=initModule.filteredNodes();
-            $scope.data.links=initModule.indexedLinks();
-            $scope.render();
-          });
-      });
+                $scope.data.nodes=initModule.filteredNodes();
+                $scope.data.links=initModule.indexedLinks();
+                $scope.render();
+              });
+
+        });
 
       $scope.panelMeta.loading = false;
     };

@@ -14,6 +14,7 @@ define('grid',['dataGraphMapping','d3'],function(dataGraphMapping,d3){
       var step=-1;
       var columnTitles=[];
       var titleHeigth=0;
+      var rowsNumberPar;
 
       var _nodeIndexing=function(nodeList){
 
@@ -45,6 +46,12 @@ define('grid',['dataGraphMapping','d3'],function(dataGraphMapping,d3){
 
       var rowField=function(fieldName){
         rowFieldName=fieldName;
+        return this;
+      };
+
+      var rowsNumber=function(_rowsNumberPar){
+        if(!_rowsNumberPar){return rowsNumberPar;}
+        rowsNumberPar=_rowsNumberPar;
         return this;
       };
 
@@ -130,7 +137,8 @@ define('grid',['dataGraphMapping','d3'],function(dataGraphMapping,d3){
         reset:reset,
         addTitleList:addTitleList,
         getTitleList:getTitleList,
-        addTitleHeight:addTitleHeight
+        addTitleHeight:addTitleHeight,
+        rowsNumber:rowsNumber
       };
 
 
@@ -138,10 +146,17 @@ define('grid',['dataGraphMapping','d3'],function(dataGraphMapping,d3){
       //rifattorizzare questo modulo esteranamente
       function _plainDataProcessor(){
 
+
+
         var getYDomain=function(nodeList){
-          var maxLength=nodeList.reduce(function(domain,d){
-            return Math.max(domain,d.values.length);
-          },0);
+          var maxLength=0;
+          if(rowsNumberPar){
+            maxLength=rowsNumberPar;
+          }else{
+            maxLength=nodeList.reduce(function(domain,d){
+              return Math.max(domain,d.values.length);
+            },0);
+          }
           return  Array.from(new Array(maxLength).keys());
         };
 

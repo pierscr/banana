@@ -139,7 +139,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
       processor.getXDomain=range.getRange;
 
         $scope.myGrid
-          .setDataProcessor(processor);
+          .setDataProcessor(processor)
+          .rowsNumber($scope.panel.max_rows);
 
       dataSource=dataRetrieval($scope,dashboard,$q,filterSrv);
 
@@ -191,10 +192,12 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
           .addRow($scope.panel.max_rows)
           .getGridStep(nodeList,range.getRange(stepNumber+1).split("-")[0])
           .then(function(results){
+              var newNodeList=results.nodes.map(function(item){ item.step=stepNumber+1; item.year=range.getRange(stepNumber+1);return item;});
               $scope.myGrid.addLink(results.links.map(function(item){ item.step=stepNumber+1;return item;}));
-              $scope.myGrid.addNode(results.nodes.map(function(item){ item.step=stepNumber+1; item.year=range.getRange(stepNumber+1);return item;}));
+              $scope.myGrid.addNode(newNodeList);
               $scope.myGrid.stepFn(stepNumber);
               $scope.$emit('render');
+              $scope.$emit('addCiclesSteps',newNodeList,stepNumber+1);
           });
       }
       dashboard.refresh();
@@ -285,7 +288,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
               .attr('class', 'd3-tip')
               .offset([-10, 0])
               .html(function(d) {
-                return "<div><strong>Similarity</strong> <span style='color:red'>" + d.Similarity + "</span></div>";
+                return "<div><strong>Similarity</strong> <span style='color:red'>" + Number(d.Similarity).toFixed(2) + "</span></div>";
               });
 
 
@@ -339,8 +342,14 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
               .attr('y2', function(d) { return d.y2; })
               .attr("stroke-width", function(link){ var r=lineStroke(link.Similarity);return r<10?r:10})
               .attr('transform','scale(0)')
-              .on('mouseover', tipLink.show)
-              .on('mouseout', tipLink.hide)
+              .on('mouseover', function(event){
+                this.setAttribute('class', 'link_highlighted');
+                tipLink.show(event);
+              })
+              .on('mouseout', function(event){
+                this.setAttribute('class', 'link');
+                tipLink.hide(event);
+              })
               .transition().duration(1000)
               .attr('transform','scale(1)');
 
