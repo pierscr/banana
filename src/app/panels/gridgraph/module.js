@@ -66,7 +66,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
       startYear:'2000',
       stepYear:'1',
       yearFieldName:'year',
-      nodeSearch:'cluster_str'
+      nodeSearch:'cluster_str',
+      linkThreshold:0.7
     };
 
     // Set panel's default values
@@ -262,6 +263,15 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
             return self;
           }
 
+          var linkColor=function(data){
+            if(data.Similarity>scope.panel.linkThreshold){
+              return 'strongLink';
+            }else{
+              return 'link';
+            }
+
+          }
+
           var tipNode = d3tip()
               .attr('class', 'd3-tip')
               .offset([-10, 0])
@@ -335,7 +345,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
               .data(scope.myGrid.links())
               .enter().append('line')
 
-              .attr('class', 'link')
+              .attr('class', linkColor)
               .attr('x1', function(d) { return d.x1; })
               .attr('y1', function(d) { return d.y1; })
               .attr('x2', function(d) { return d.x2; })
@@ -346,8 +356,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
                 this.setAttribute('class', 'link_highlighted');
                 tipLink.show(event);
               })
-              .on('mouseout', function(event){
-                this.setAttribute('class', 'link');
+              .on('mouseout', function(data,event){
+                this.setAttribute('class', linkColor(data));
                 tipLink.hide(event);
               })
               .transition().duration(1000)

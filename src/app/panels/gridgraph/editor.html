@@ -34,6 +34,12 @@
     </div>
     <div class="span3">
         <label class="small">
+          Highlighted link threshold <tip>Links with similarity value bigger then this threshold will be Highlighted</tip>
+        </label>
+        <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.linkThreshold" ng-change="set_refresh(true)">
+    </div>
+    <div class="span3">
+        <label class="small">
           Start year <tip>TODO</tip>
         </label>
         <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.startYear" ng-change="set_refresh(true)">
