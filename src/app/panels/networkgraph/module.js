@@ -10,9 +10,13 @@ define([
   'd3',
   'd3tip',
   'dataGraphMapping',
-  'dataRetrieval'
+  'dataRetrieval',
+  'clusterTooltip',
+  'labelTooltip',
+  'patentDescription',
+  'labelText'
 ],
-function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval) {
+function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterTooltip,labelTooltip,patentDescription,labelText) {
   'use strict';
 
   var module = angular.module('kibana.panels.networkgraph', []);
@@ -65,7 +69,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval) {
       nodelimit:'',
       nodeSearch:'cluster_h',
       nodeLink1:'Cluster1',
-      nodeLink2:'Cluster2'
+      nodeLink2:'Cluster2',
+      patent:false
     };
 
     // Set panel's default values
@@ -195,7 +200,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval) {
     };
   });
 
-  module.directive('networkgraphChart', function(filterDialogSrv) {
+  module.directive('networkgraphChart', function(filterDialogSrv,dashboard) {
     return {
       restrict: 'E',
       link: function(scope, element)  {
@@ -245,35 +250,6 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval) {
               .html(function(d) {
                 return "<div><strong>Similarity</strong> <span style='color:red'>" + d.Similarity + "</span></div>";
               });
-
-          var createLabelRow=function(string){
-            var self=this;
-            this.concat=function(attr,value){
-              string=string.concat("<div><strong>"+attr+"</strong> <span style='color:red'>"+ value +"</span></div>")
-              return self;
-            }
-            this.build=function(){
-              return string;
-            }
-            return self;
-          }
-
-          var tipNode = d3tip()
-              .attr('class', 'd3-tip')
-              .offset([-10, 0])
-              .html(function(d) {
-                var cluster_levels=(typeof d.name === 'string' ?  d.name.split("/"): d.value.split("/"));
-                var label = createLabelRow.call({},"")
-                  .concat("Name",(typeof d.name === 'string' ?  cluster_levels.pop(): cluster_levels.pop()) )
-                  .concat("Frequency",d.count)
-                  .concat("Level",(typeof d.name === 'string' ?  d.name.split("/").length-1: d.value.split("/").length-1));
-
-                  cluster_levels.map(function(value,index){
-                    label.concat("Parent"+index,value);
-                  });
-
-                  return label.build();
-                });
 
           // node distance scale
           var distanceScale =   d3.scale.log()
@@ -356,7 +332,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval) {
               })
               .on('click', function(d){
                 tipLink.hide();
-                tipNode.hide();
+                clusterTooltip.hide();
+                labelTooltip.hide();
                 filterDialogSrv.addMode('compare');
                 filterDialogSrv.showDialog(scope.panel.nodeSearch,d.name || d.value);
               })
@@ -370,11 +347,22 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval) {
                   !zoomEnable && zoom.translate(zoomtX);
                   zoomEnable=true;
               })
-              .on('mouseover', tipNode.show)
-              .on('mouseout', function(){
-                tipNode.hide();
-                //filterDialogSrv.hideDialog();
-              });
+              .on('mouseover', function(data,event){
+                  var targetEvent=d3.event.target;
+                  if(d3.event.target.className.baseVal =='bubble'){
+                        clusterTooltip
+                          .setDirectionByTarget(d3.event)
+                          .show(data,targetEvent);
+                    //clusterTooltip.show(data);
+                  }
+
+                  //console.log(data);
+                })
+                .on('mouseout', function(){
+                  clusterTooltip.hide();
+                  labelTooltip.hide();
+                  //filterDialogSrv.hideDialog();
+                });
 
 
 
@@ -385,17 +373,67 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval) {
                 .attr('r', function(d){
                   return nodeSize(d.count);
                 })
+                .attr('class','bubble')
                 .call(force.drag);
 
-              // node
-              //     .append('text')
-              //     .text(function(d){return  d.name || d.value;})
-              //     .attr('x',20)
-              //     .attr('y',-10)
-              //     .style('font-size',scope.panel.fontSize+'px');
+          chart.selectAll('.node')
+              .data(scope.data.nodes)
+              .enter().append('g')
+
+          labelText(patentDescription,node,scope,dashboard);
+
+
+//-->
+          // var textLabel=node
+          //         .append('text')
+          //         .attr('class','clusterText')
+          //         .attr('x',20)
+          //         .attr('y',-10)
+          //         .style('font-size',scope.panel.fontSize+'px')
+          //         .style('pointer-events', 'auto')
+          //
+          // textLabel.selectAll('.label')
+          //     .data(patentDescription.createDataLabel)
+          //     .enter()
+          //     .append('tspan')
+          //     .append('tspan')      //2nd part of label
+          //     .attr("class", "label")
+          //     .text(function(d){
+          //
+          //       return " "+d.firstLevel+" ";
+          //   })
+          //   .on('mouseover', function(data,event){
+          //       var targetEvent=d3.event.target;
+          //       if(d3.event.target.className.baseVal !='bubble'){
+          //         labelTooltip.setDirectionByTarget(d3.event)
+          //         patentDescription.getDescription(data.secondLevel,scope,dashboard)
+          //           .thenRun(function(description){
+          //             labelTooltip
+          //               .show(description,targetEvent);
+          //           });
+          //       }
+          //     })
+          //   .on('mouseout', function(){
+          //     clusterTooltip.hide();
+          //     labelTooltip.hide();
+          //   });
+
+//-->
+
+
+          // text.append('tspan')      //2nd part of label
+          // .attr("class", "sublabel1")
+          // .text('label2')
+          // text.append('tspan')      //3rd part of label
+          // .attr("class", "sublabel2")
+          // .text('label3')
+
+          // <tspan class="sublabel1">label2</tspan>
+
 
             chart.call(tipLink);
-            chart.call(tipNode);
+            chart.call(clusterTooltip);
+            chart.call(labelTooltip);
 
               force.on("tick", function() {
 

@@ -59,7 +59,12 @@ require.config({
       dataFacetRetrieval: 'utils/dataFacetRetrieval',
       rangeDate:          'utils/rangeDate',
       strHandler:         'utils/strHandler',
-      legend:             'utils/legend'
+      legend:             'utils/legend',
+      clusterTooltip:     'utils/clusterTooltip',
+      patentDescription:  'utils/patentDescription',
+      createLabelRow:     'utils/createLabelRow',
+      labelTooltip:       'utils/labelTooltip',
+      labelText:          'utils/labelText'
   },
   shim: {
     underscore: {

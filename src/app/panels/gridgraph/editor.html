@@ -63,3 +63,11 @@
         <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.nodeSearch" ng-change="set_refresh(true)">
     </div>
 </div>
+<div class="row-fluid">
+  <div class="span3">
+      <label class="small">
+        Patent <tip>check if is a patent clustering</tip>
+      </label>
+      <input class="input-small" ng-model="panel.patent" type="checkbox" ng-change="set_refresh(true)"></inpt>
+  </div>
+</div>

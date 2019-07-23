@@ -13,9 +13,12 @@ define([
   'grid',
   'dataRetrieval',
   'rangeDate',
-  'strHandler'
+  'strHandler',
+  'clusterTooltip',
+  'patentDescription',
+  'labelText'
 ],
-function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,rangeDate,strHandler) {
+function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,rangeDate,strHandler,clusterTooltip,patentDescription,labelText) {
   'use strict';
 
   var module = angular.module('kibana.panels.gridgraph', []);
@@ -67,7 +70,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
       stepYear:'1',
       yearFieldName:'year',
       nodeSearch:'cluster_str',
-      linkThreshold:0.7
+      linkThreshold:0.7,
+      patent:false
     };
 
     // Set panel's default values
@@ -227,7 +231,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
 
   });
 
-  module.directive('gridgraphChart', function(filterDialogSrv) {
+  module.directive('gridgraphChart', function(filterDialogSrv,dashboard) {
     return {
       restrict: 'E',
       link: function(scope, element)  {
@@ -251,6 +255,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
           var parent_width = element.parent().width(),
             parentheight = parseInt(scope.row.height);
 
+          var margin_right=50;
+
           var createLabelRow=function(string){
             var self=this;
             this.concat=function(attr,value){
@@ -272,27 +278,27 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
 
           }
 
-          var tipNode = d3tip()
-              .attr('class', 'd3-tip')
-              .offset([-10, 0])
-              .direction(function(d) {
-                var dir;
-                (d.x>(parent_width/2))?dir='w':dir='e';
-                return dir;
-              })
-              .html(function(d) {
-                var cluster_levels=(typeof d.name === 'string' ?  d.name.split("/"): d.value.split("/"));
-                var label = createLabelRow.call({},"")
-                  .concat("Name",(typeof d.name === 'string' ?  cluster_levels.pop(): cluster_levels.pop()) )
-                  .concat("Frequency",d.count)
-                  .concat("Level",(typeof d.name === 'string' ?  d.name.split("/").length-1: d.value.split("/").length-1));
-
-                  cluster_levels.map(function(value,index){
-                    label.concat("Parent"+index,value);
-                  });
-
-                  return label.build();
-              });
+          // var tipNode = d3tip()
+          //     .attr('class', 'd3-tip')
+          //     .offset([-10, 0])
+          //     .direction(function(d) {
+          //       var dir;
+          //       (d.x>(parent_width/2))?dir='w':dir='e';
+          //       return dir;
+          //     })
+          //     .html(function(d) {
+          //       var cluster_levels=(typeof d.name === 'string' ?  d.name.split("/"): d.value.split("/"));
+          //       var label = createLabelRow.call({},"")
+          //         .concat("Name",(typeof d.name === 'string' ?  cluster_levels.pop(): cluster_levels.pop()) )
+          //         .concat("Frequency",d.count)
+          //         .concat("Level",(typeof d.name === 'string' ?  d.name.split("/").length-1: d.value.split("/").length-1));
+          //
+          //         cluster_levels.map(function(value,index){
+          //           label.concat("Parent"+index,value);
+          //         });
+          //
+          //         return label.build();
+          //     });
 
           var tipLink = d3tip()
               .attr('class', 'd3-tip')
@@ -303,7 +309,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
 
 
           scope.myGrid
-            .size([parentheight,parent_width])
+            .size([parentheight,parent_width-margin_right])
             .addTitleHeight(30);
 
           var chart = d3.select(element[0]).append('svg')
@@ -376,7 +382,10 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
             });
 
           node.append('circle')
+            .attr('class','bubble')
             .attr('r',function(d){return nodeSize(d.count)+"px";});
+
+          labelText(patentDescription,node,scope,dashboard);
 
           // node.append('text')
           //   .text(function(d){return "";})
@@ -386,20 +395,29 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
 
         node.on('click', function(d){
           //filterDialogSrv.showDialog2();
-          tipNode.hide();
+          clusterTooltip.hide();
           scope.$emit('addStepFilter',d);
           scope.$emit('addStep',[d]);
 
         })
-        .on('mouseover', tipNode.show)
+        .on('mouseover', function(data,event){
+          if(d3.event.target.className.baseVal =='bubble'){
+          var targetEvent=d3.event.target;
+          clusterTooltip
+            .setDirectionByTarget(d3.event)
+            .show(data,targetEvent);
+          }
+        })
         .on('mouseout', function(){
-          tipNode.hide();
+          clusterTooltip.hide();
           //filterDialogSrv.hideDialog();
         });
 
 
-        chart.call(tipNode);
+        chart.call(clusterTooltip);
         chart.call(tipLink);
+
+
 
     }
 
