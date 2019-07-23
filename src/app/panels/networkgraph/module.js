@@ -252,8 +252,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
               });
 
           // node distance scale
-          var distanceScale =   d3.scale.log()
-                            .base(Math.E)
+          var distanceScale =  d3.scale.linear()  
                             .domain([d3.min(scope.data.links,function(link){
                                         return link.Similarity;
                                     }),d3.max(scope.data.links,function(link){
