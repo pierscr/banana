@@ -271,8 +271,14 @@ body.frame-background{
 .d3-tip {
     background: #fff;
     padding: 5px;
-    border: 1px solid blue;
-    width: 50%;
+    border: 1px solid black;
+    max-width: 50%;
+}
+
+.d3-tip-link {
+    background: #fff;
+    padding: 5px;
+    border: 1px solid black;
 }
 /* Creates a small triangle extender for the tooltip */
 .d3-tip:after {

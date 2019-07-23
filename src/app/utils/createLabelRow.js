@@ -4,7 +4,7 @@ define('createLabelRow',[],function(){
     var self=this;
     this.concat=function(attr,value){
       if(value!="" && value!=undefined){
-        string=string.concat("<div><strong>"+attr+"</strong> <span style='color:red'>"+ value +"</span></div>")
+        string=string.concat("<div><strong>"+attr+"</strong> <span>"+ value +"</span></div>")
       }
       return self;
     }

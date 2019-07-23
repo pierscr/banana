@@ -6,7 +6,7 @@ define('labelTooltip',['d3tip','createLabelRow'],function(d3tip,createLabelRow){
                   .offset([-10, 0])
                   .html(function(d) {
                     var label = createLabelRow.call({},"")
-                        .concat("Desc",d);
+                        .concat("",d);
 
                       return label.build();
                     });

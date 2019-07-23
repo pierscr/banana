@@ -245,10 +245,10 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
             });
 
           var tipLink = d3tip()
-              .attr('class', 'd3-tip')
+              .attr('class', 'd3-tip-link')
               .offset([-10, 0])
               .html(function(d) {
-                return "<div><strong>Similarity</strong> <span style='color:red'>" + d.Similarity + "</span></div>";
+                return "<div><strong>Similarity</strong> <span>" + d.Similarity + "</span></div>";
               });
 
           // node distance scale

@@ -26,7 +26,7 @@ define('patentDescription',[],function(){
         .then(
           function(results){
             var desc=results.response.docs.reduce(function(tot,item){
-              return tot.concat("<div>"+item.id+" -- "+item.title+"</div></br>");
+              return tot.concat("<div><strong>"+item.id+"</strong><span> "+item.title+"</span></div></br>");
             },"");
             callbackFn(desc);
           });
