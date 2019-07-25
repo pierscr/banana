@@ -6,7 +6,7 @@ define('patentDescription',[],function(){
       return tot+" "+item.toUpperCase().replace(/_/g,"/")
     };
 
-    return "&q=*:*&wt=json&fq=id:("+text.reduce(q,"")+")";
+    return "&q=*:*&wt=json&fq=id:("+text.reduce(q,"")+")&sort=id asc";
   }
 
 
@@ -46,7 +46,7 @@ define('patentDescription',[],function(){
       if(index!=-1){
         tot[index].secondLevel.push(elem);
       }else{
-        tot.push({firstLevel:currFirstLevel,secondLevel:[currFirstLevel,elem]});
+        tot.push({firstLevel:currFirstLevel,secondLevel:[currFirstLevel,elem.slice(0,3),elem]});
       }
       return tot;
     },dataLabelArray);

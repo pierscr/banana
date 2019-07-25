@@ -1,12 +1,14 @@
 define('labelTooltip',['d3tip','createLabelRow'],function(d3tip,createLabelRow){
 
               tipNode = d3tip()
-                  .attr('class', 'd3-tip')
+                  .attr('class', 'd3-tip labelTooltip')
                   .style('max-width','400px;')
                   .offset([-10, 0])
                   .html(function(d) {
                     var label = createLabelRow.call({},"")
-                        .concat("",d);
+                        .concat("","Click on the label to hold the popup")
+                        .concat("",d)
+
 
                       return label.build();
                     });

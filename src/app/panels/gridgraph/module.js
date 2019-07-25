@@ -338,7 +338,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
           .rangeRound([1,10]);
 
 
-          var nodeSize =  d3.scale.linear()          
+          var nodeSize =  d3.scale.linear()
             .domain([d3.min(scope.myGrid.nodes(),function(node){
               return node.count;
             }),d3.max(scope.myGrid.nodes(),function(node){
@@ -394,10 +394,11 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
 
         node.on('click', function(d){
           //filterDialogSrv.showDialog2();
-          clusterTooltip.hide();
-          scope.$emit('addStepFilter',d);
-          scope.$emit('addStep',[d]);
-
+            if(d3.event.target.className.baseVal =='bubble'){
+              clusterTooltip.hide();
+              scope.$emit('addStepFilter',d);
+              scope.$emit('addStep',[d]);
+            }
         })
         .on('mouseover', function(data,event){
           if(d3.event.target.className.baseVal =='bubble'){

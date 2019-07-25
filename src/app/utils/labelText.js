@@ -5,6 +5,9 @@ define('labelText',
     'labelTooltip'
   ],function(d3,clusterTooltip,labelTooltip){
     return function(descriptor,node,scope,dashboard){
+      var self=this;
+      self.labelPersistTrigger=false;
+
       if(!scope.panel.patent)
         return;
       var textLabel=node
@@ -37,8 +40,21 @@ define('labelText',
             }
           })
         .on('mouseout', function(){
-          clusterTooltip.hide();
-          labelTooltip.hide();
-        });
+          if(!self.labelPersistTrigger)
+              labelTooltip.hide();
+        })
+        .on('click', function(d){
+          if(d3.event.target.className.baseVal !='bubble'){
+            self.labelPersistTrigger=true;
+          }
+        })
+
+        d3.selectAll('.labelTooltip')
+           .on('mouseleave', function(){
+              clusterTooltip.hide();
+              labelTooltip.hide();
+              self.labelPersistTrigger=false;
+              //filterDialogSrv.hideDialog();
+            });
     }
 });

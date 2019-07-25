@@ -252,7 +252,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
               });
 
           // node distance scale
-          var distanceScale =  d3.scale.linear()  
+          var distanceScale =  d3.scale.linear()
                             .domain([d3.min(scope.data.links,function(link){
                                         return link.Similarity;
                                     }),d3.max(scope.data.links,function(link){
@@ -330,11 +330,12 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
                 return "translate("+d.x+","+d.y+")";
               })
               .on('click', function(d){
-                tipLink.hide();
-                clusterTooltip.hide();
-                labelTooltip.hide();
-                filterDialogSrv.addMode('compare');
-                filterDialogSrv.showDialog(scope.panel.nodeSearch,d.name || d.value);
+                if(d3.event.target.className.baseVal =='bubble'){
+                  tipLink.hide();
+                  clusterTooltip.hide();
+                  filterDialogSrv.addMode('compare');
+                  filterDialogSrv.showDialog(scope.panel.nodeSearch,d.name || d.value);
+                }
               })
               .on('mousedown',function(){
                   zoomScale=zoom.scale();
@@ -359,7 +360,6 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
                 })
                 .on('mouseout', function(){
                   clusterTooltip.hide();
-                  labelTooltip.hide();
                   //filterDialogSrv.hideDialog();
                 });
 
