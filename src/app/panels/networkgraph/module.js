@@ -350,6 +350,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
               .on('mouseover', function(data,event){
                   var targetEvent=d3.event.target;
                   if(d3.event.target.className.baseVal =='bubble'){
+                        labelTooltip.hide();
                         clusterTooltip
                           .setDirectionByTarget(d3.event)
                           .show(data,targetEvent);

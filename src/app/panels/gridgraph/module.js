@@ -15,10 +15,11 @@ define([
   'rangeDate',
   'strHandler',
   'clusterTooltip',
+  'labelTooltip',
   'patentDescription',
   'labelText'
 ],
-function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,rangeDate,strHandler,clusterTooltip,patentDescription,labelText) {
+function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,rangeDate,strHandler,clusterTooltip,labelTooltip,patentDescription,labelText) {
   'use strict';
 
   var module = angular.module('kibana.panels.gridgraph', []);
@@ -402,11 +403,12 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
         })
         .on('mouseover', function(data,event){
           if(d3.event.target.className.baseVal =='bubble'){
-          var targetEvent=d3.event.target;
-          clusterTooltip
-            .setDirectionByTarget(d3.event)
-            .show(data,targetEvent);
-          }
+            labelTooltip.hide();
+            var targetEvent=d3.event.target;
+            clusterTooltip
+              .setDirectionByTarget(d3.event)
+              .show(data,targetEvent);
+            }
         })
         .on('mouseout', function(){
           clusterTooltip.hide();
