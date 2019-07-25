@@ -315,7 +315,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
               .attr("stroke-width", 15);
 
           // Now it's the nodes turn. Each node is drawn as a circle.
-
+          var myPatentLabel={};
 
           var node = chart.selectAll('.node')
               .data(scope.data.nodes)
@@ -349,7 +349,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
               })
               .on('mouseover', function(data,event){
                   var targetEvent=d3.event.target;
-                  if(d3.event.target.className.baseVal =='bubble'){
+                  if(d3.event.target.className.baseVal =='bubble' && !window.labelPersistTrigger){
                         labelTooltip.hide();
                         clusterTooltip
                           .setDirectionByTarget(d3.event)
@@ -380,7 +380,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
               .data(scope.data.nodes)
               .enter().append('g')
 
-          labelText(patentDescription,node,scope,dashboard);
+        labelText(patentDescription,node,scope,dashboard);
 
 
 //-->

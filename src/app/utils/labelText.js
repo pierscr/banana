@@ -1,9 +1,8 @@
 define('labelText',
   [
     'd3',
-    'clusterTooltip',
     'labelTooltip'
-  ],function(d3,clusterTooltip,labelTooltip){
+  ],function(d3,labelTooltip){
     return function(descriptor,node,scope,dashboard){
       var self=this;
       self.labelPersistTrigger=false;
@@ -51,7 +50,6 @@ define('labelText',
 
         d3.selectAll('.labelTooltip')
            .on('mouseleave', function(){
-              clusterTooltip.hide();
               labelTooltip.hide();
               self.labelPersistTrigger=false;
               //filterDialogSrv.hideDialog();

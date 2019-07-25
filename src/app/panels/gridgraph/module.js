@@ -385,7 +385,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
             .attr('class','bubble')
             .attr('r',function(d){return nodeSize(d.count)+"px";});
 
-          labelText(patentDescription,node,scope,dashboard);
+        labelText(patentDescription,node,scope,dashboard);
 
           // node.append('text')
           //   .text(function(d){return "";})
@@ -402,7 +402,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
             }
         })
         .on('mouseover', function(data,event){
-          if(d3.event.target.className.baseVal =='bubble'){
+          if(d3.event.target.className.baseVal =='bubble' && !window.labelPersistTrigger){
             labelTooltip.hide();
             var targetEvent=d3.event.target;
             clusterTooltip

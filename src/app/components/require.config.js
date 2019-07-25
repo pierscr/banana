@@ -115,6 +115,6 @@ require.config({
 
     elasticjs:              ['angular', '../vendor/elasticjs/elastic'],
     solrjs:                 ['angular', '../vendor/solrjs/solr'],
-    app:                    ['d3ZoomExt','dataGraphMapping','grid','crossProduct','dataFacetRetrieval']
+    app:                    ['d3ZoomExt','dataGraphMapping','grid','crossProduct','dataFacetRetrieval','labelText']
   }
 });

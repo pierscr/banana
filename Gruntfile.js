@@ -267,6 +267,10 @@ module.exports = function (grunt) {
       name: 'dataFacetRetrieval'
     });
 
+    requireModules.push({
+      name: 'labelText'
+    });
+
   //exclude the literal config definition from all modules
   requireModules
     .forEach(function (module) {
