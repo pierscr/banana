@@ -30,7 +30,7 @@ define('labelText',
         })
         .on('mouseover', function(data,event){
             var targetEvent=d3.event.target;
-            if(d3.event.target.className.baseVal !='bubble'){
+            if(d3.event.target.className.baseVal !='bubble' && !self.labelPersistTrigger){
               labelTooltip.setDirectionByTarget(d3.event)
               descriptor.getDescription(data.secondLevel,scope,dashboard)
                 .thenRun(function(description){
