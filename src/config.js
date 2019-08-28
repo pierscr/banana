@@ -100,6 +100,7 @@ function (Settings) {
      * @type {Array}
      */
     panel_names: [
+      'sendMessage',
       'bar',
       'histogram',
       'map',

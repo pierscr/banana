@@ -1,0 +1,24 @@
+<h5>Forward parameters</h5>
+<div class="row-fluid">
+    <div class="span4">
+        <form class="input-append">
+            <h6>Add Parameter</h6>
+            <input bs-typeahead="panel.fields.list" type="text" class="input-small" ng-model="newfield" ng-disabled="panel.fields.length >= panel.maxnum_facets">
+            <button class="btn" ng-click="add_facet_field(newfield);newfield=''" ng-disabled="panel.fields.length >= panel.maxnum_facets"><i class="icon-plus"></i>
+            </button>
+        </form>
+    </div>
+    <div class="span8">
+        <h6>Parameters
+            <small>Click to remove</small>
+        </h6>
+        <span style="margin-left:3px" ng-click="remove_facet_field(field)" ng-repeat="panel.field in $parent.panel.fields" class="label pointer remove">{{panel.field}}</span>
+    </div>
+</div>
+<h5>Send data</h5>
+<div class="row-fluid">
+    <div class="span12">
+        <h6> Url </h6>
+        <input type="text" class="input-small" ng-model="panel.url">
+    </div>
+</div>

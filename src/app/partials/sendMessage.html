@@ -1,0 +1,15 @@
+<div class="modal-body">
+  <h1>{{panel.header_title}}</h1>
+  <div>
+    <input type="text" name="title" ng-model="panel.messagetitle"/>
+    <textarea name="description" style="width:95%" ng-model="panel.description">
+  </div>
+  <div>
+    <h2>{{response}}</h2>
+  </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-success" ng-click="sendMessage(panel.messagetitle,panel.description)">Send data</button>
+    <button type="button" class="btn btn-danger" ng-click="dismiss();reset_panel();close_edit()">Close</button>
+
+</div>
