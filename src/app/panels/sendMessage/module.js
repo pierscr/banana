@@ -18,12 +18,13 @@ function (angular, app, _, require) {
 
     var _d={
       titolo:"titolo nello scope",
-      maxnum_facets:10,
+      maxnum_facets:11,
       fields:[],
       url:$location.host()+":"+$location.port(),
       messagetitle:"",
       description:"",
-      resultMessage:""
+      resultMessage:"",
+      button_name:""
     };
     _.defaults($scope.panel, _d);
 
@@ -36,19 +37,22 @@ function (angular, app, _, require) {
       //filterSrv.removeAll();
       $http.post($scope.panel.url, data).then(function successCallback(response) {
           if(response==undefined){
-            $scope.response="error sending data";
+            $scope.panel.response="Send data error ";
           }else{
-            console.log("send message done");
-            $scope.response="data sent";
+            if(response.status=200){
+              console.log("send message done");
+              $scope.panel.response="Data sent";
+            }else{
+              $scope.panel.response="Send data error ";
+            }
           }
         }, function errorCallback(response) {
           console.log("error");
-          $scope.response="error sending data";
+          $scope.response="Send data error ";
         });
-      $scope.response="sending data ...";
+      $scope.response="Send data error ";
       dashboard.refresh();
     }
-  });
 
       $scope.add_facet_field = function(field) {
         if ( _.indexOf($scope.panel.fields, field) === -1 && $scope.panel.fields.length < $scope.panel.maxnum_facets) {
@@ -64,5 +68,8 @@ function (angular, app, _, require) {
 
       $scope.init= function(){
         $scope.panel.response="";
+        $scope.panel.messagetitle="";
+        $scope.panel.description="";        
     };
+  });
 });
