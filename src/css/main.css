@@ -352,6 +352,15 @@ body.frame-background{
   color:black;
 }
 
+body.frame-background.fixed-row-theme{
+  margin-top: 40px;
+
+}
+.fixed-row-theme .navbar.navbar-static-top{
+  top: 0px;
+}
+
+
 /*end of fixed filters and header */
 
 .text-link{
