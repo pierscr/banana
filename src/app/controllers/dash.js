@@ -60,7 +60,7 @@ function (angular, config, _) {
         };
 
         $scope.row_style = function (row) {
-            return {'min-height': row.collapse ? '5px' : row.height};
+            return {'min-height': row.collapse || row.fixed? '5px' : row.height};
         };
 
         $scope.edit_path = function (type) {

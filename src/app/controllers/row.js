@@ -15,7 +15,8 @@ function (angular, app, _) {
             collapse: false,
             collapsable: true,
             editable: true,
-            panels: []
+            panels: [],
+            fixed:false
         };
 
         _.defaults($scope.row, _d);

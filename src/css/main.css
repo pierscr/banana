@@ -251,6 +251,117 @@ body.frame-background{
   outline: none;
 }
 
+
+/* fixed filters and header */
+.row-control.row-fixed{
+  position:fixed;
+  top:0px;
+  left:30%;
+  width:40%;
+  z-index:9999;
+  height:50px;
+}
+
+
+.modal{
+  z-index: 9999 !important;
+}
+
+
+.pseudo-bar{
+  height: 40px;
+}
+
+.navbar.navbar-static-top {
+    position: fixed;
+    width: 100%;
+    z-index: 9999;
+}
+
+.panelCont:hover .filtering-container{
+    display: block;
+}
+
+.row-fixed .panelCont:hover .badge{
+    display: none;
+}
+
+.frame-background .row-fixed a {
+    color: white;
+}
+
+.frame-background .row-fixed .panelCont{
+  background-color: #fff;
+  box-shadow: none;
+  border-radius: none;
+  outline: 0;
+  background:#2c2c2c;
+  color: white;
+  border: none;
+  outline: none;
+  padding: 0px;
+}
+
+.row-fixed .panel div.panel-extra .extra{
+  border:none;
+  display: none;
+}
+
+.frame-background .row-fixed .panel-title {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+  text-overflow: ellipsis;
+}
+
+.fixed-row-theme .navbar-inner {
+  background-image:none;
+  box-shadow: none;
+}
+
+.fixed-row-theme .navbar .brand{
+  width: 20%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.row-fixed .filtering-container{
+  display: none;
+  padding: 10px;
+  min-width: 230px;
+  background:#292929;
+  margin-top: -2px;
+  border: 1px solid black;
+  z-index: 9998;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.row-fixed .panel-extra-container:not(:first-child) {
+  display: none;
+}
+
+.row-fixed .row-config{
+  left: -15px;
+  position: absolute;
+}
+
+.row-fixed .row-config a{
+  color:black;
+}
+
+/*end of fixed filters and header */
+
+.text-link{
+  font-size: 1.1em;
+  padding: 4px;
+}
+
+.text-link i{
+  padding: 10px;
+}
+
 .frame-background a{
   color: #000000;
 }

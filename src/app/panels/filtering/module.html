@@ -45,7 +45,7 @@
       margin-bottom: 5px;
     }
   </style>
-
+  <div class="badge" style="position: absolute;bottom: 12px;left: -17px;" ng-show="row.fixed">{{filterSrv.ids.length}}</div>
   <div class='filtering-container'>
     <span ng-show="filterSrv.ids.length == 0"><h5>No filters available</h5></span>
     <div ng-repeat="id in filterSrv.ids" class="small filter-panel-filter" ng-class="{'filter-deselected': !filterSrv.list[id].active}">
