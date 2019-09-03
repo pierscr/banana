@@ -282,7 +282,8 @@ body.frame-background{
     display: block;
 }
 
-.row-fixed .panelCont:hover .badge{
+.row-fixed .panelCont:hover .badge,
+.row-fixed .panelCont:hover .on-over-remove{
     display: none;
 }
 
@@ -343,7 +344,7 @@ body.frame-background{
 }
 
 .row-fixed .row-config{
-  left: -15px;
+  left: -25px;
   position: absolute;
 }
 
