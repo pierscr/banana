@@ -6,6 +6,7 @@ define('labelText',
     return function(descriptor,node,scope,dashboard){
       var self=this;
       self.labelPersistTrigger=false;
+      self.stillOnOverFlag=true;
 
       if(!scope.panel.patent)
         return;
@@ -29,16 +30,20 @@ define('labelText',
         })
         .on('mouseover', function(data,event){
             var targetEvent=d3.event.target;
+            self.stillOnOverFlag=true;
             if(d3.event.target.className.baseVal !='bubble' && !self.labelPersistTrigger){
               labelTooltip.setDirectionByTarget(d3.event)
               descriptor.getDescription(data.secondLevel,scope,dashboard)
                 .thenRun(function(description){
-                  labelTooltip
-                    .show(description,targetEvent);
+                  if(self.stillOnOverFlag){
+                    labelTooltip
+                      .show(description,targetEvent);
+                  }
                 });
             }
           })
         .on('mouseout', function(){
+          self.stillOnOverFlag=false;
           if(!self.labelPersistTrigger)
               labelTooltip.hide();
         })
