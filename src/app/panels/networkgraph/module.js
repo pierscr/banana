@@ -217,6 +217,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
         function render_panel() {
           // Clear the panel
           element.html('');
+          scope.stopFlag=false;
 
           var animationStep = 400;
 
@@ -349,7 +350,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
               })
               .on('mouseover', function(data,event){
                   var targetEvent=d3.event.target;
-                  if(d3.event.target.className.baseVal =='bubble' && !window.labelPersistTrigger){
+                  if(d3.event.target.className.baseVal.indexOf('bubble') !=-1 && !window.labelPersistTrigger){
                         labelTooltip.hide();
                         clusterTooltip
                           .setDirectionByTarget(d3.event)
@@ -358,15 +359,23 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
                   }
 
                   //console.log(data);
+                  scope.stopFlag=true;
+                  force.stop();
                 })
                 .on('mouseout', function(){
                   clusterTooltip.hide();
-                  //filterDialogSrv.hideDialog();
+                  scope.stopFlag=false;
+                  force.start();
+
                 });
 
 
+                var drag = force.drag()
+                    .on("dragstart", dragstart);
 
-
+            function dragstart(d) {
+              d3.select(this).classed("fixed", d.fixed = true);
+            }
 
 
             node.append('circle')
@@ -374,7 +383,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
                   return nodeSize(d.count);
                 })
                 .attr('class','bubble')
-                .call(force.drag);
+                .call(drag);
 
           chart.selectAll('.node')
               .data(scope.data.nodes)
@@ -436,6 +445,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
             chart.call(labelTooltip);
 
               force.on("tick", function() {
+                if(!scope.stopFlag){
+
 
 
                 node.transition().ease('linear').duration(animationStep)
@@ -484,10 +495,13 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
 
 
               force.stop();
-                  setTimeout(
-                      function() { force.start(); },
-                      200
-                  );
+              setTimeout(
+                  function() { if(!scope.stopFlag){force.start(); }},
+                  200
+              );
+            }else{
+              force.stop();
+            } /*end stop flag*/
           });
 
           force.start();
