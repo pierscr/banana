@@ -241,15 +241,21 @@ body{
 }
 
 body.frame-background{
-  background-color: #5bc0de;
+  background-color: #f6f6f6;
 }
 
 .frame-background .panelCont{
   background-color: white;
-  box-shadow: 10px 10px 30px grey;
-  border-radius: 5px;
   outline: none;
+  box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 30px;
+
 }
+
+.frame-background .row-fixed .panel-title {
+    font-size: 1em;
+}
+
+
 
 
 /* fixed filters and header */
@@ -360,6 +366,14 @@ body.frame-background.fixed-row-theme{
   top: 0px;
 }
 
+.row-fixed .panelCont:hover .row-fluid.panel-extra{
+    color: gold;
+}
+
+.row-fixed .panelCont:hover .filtering-container{
+  border-top: 3px solid gold;
+}
+
 
 /*end of fixed filters and header */
 
@@ -385,7 +399,7 @@ body.frame-background.fixed-row-theme{
 }
 
 .frame-background .panel-title{
-    font-size: 1em;
+    font-size: 1.2em;
     margin-left: 5px;
 }
 
