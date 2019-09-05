@@ -204,6 +204,9 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
     return {
       restrict: 'E',
       link: function(scope, element)  {
+        var justClickFlag=false;
+        var mouseDownFlag=false;
+
         scope.$on('render',function(){
           render_panel();
         });
@@ -245,7 +248,17 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
               // !zoomEnable && zoom.scale(zoomScale);
               // !zoomEnable && zoom.translate(zoomtX);
               // zoomEnable=true;
-            });
+              mouseDownFlag=false;
+              console.log('mouseup')
+            })
+            .on("mousedown", function(d) {
+              justClickFlag=true;
+              mouseDownFlag=true;
+              console.log('mousedown')
+            })
+            .on("mousemove",function(){
+              justClickFlag=false;
+            })
 
           var tipLink = d3tip()
               .attr('class', 'd3-tip-link')
@@ -336,31 +349,25 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
                 return "translate("+d.x+","+d.y+")";
               })
               .on('click', function(d){
-                if(d3.event.target.className.baseVal =='bubble'){
+
+                if(justClickFlag && d3.event.target.className.baseVal =='bubble'){
                   tipLink.hide();
                   clusterTooltip.hide();
                   filterDialogSrv.addMode('compare');
                   filterDialogSrv.showDialog(scope.panel.nodeSearch,d.name || d.value);
                 }
                 d3.event.stopPropagation();
+                d3.event.preventDefault();
               })
-              // .on('mousedown',function(){
-              //     zoomScale=zoom.scale();
-              //     zoomtX=zoom.translate();
-              //     zoomEnable=false;
-              // })
-              // .on('mouseup',function(){
-              //     !zoomEnable && zoom.scale(zoomScale);
-              //     !zoomEnable && zoom.translate(zoomtX);
-              //     zoomEnable=true;
-              // })
+
               .on('mouseover', function(data,event){
                   var targetEvent=d3.event.target;
                   if(d3.event.target.className.baseVal.indexOf('bubble') !=-1 && !window.labelPersistTrigger){
                         labelTooltip.hide();
-                        clusterTooltip
-                          .setDirectionByTarget(d3.event)
-                          .show(data,targetEvent);
+                        console.log('mousedown: '+mouseDownFlag)
+                        !mouseDownFlag && clusterTooltip
+                                            .setDirectionByTarget(d3.event)
+                                            .show(data,targetEvent);
                     //clusterTooltip.show(data);
                   }
 
@@ -374,8 +381,12 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
                   force.start();
 
                 })
-                .on("mousedown", function(d) { d3.event.stopPropagation();})
-
+                .on("mousedown", function(d) {
+                  clusterTooltip.hide();
+                  mouseDownFlag=true;
+                  d3.event.stopPropagation();
+                  d3.event.preventDefault();
+                });
 
             function dragstart(d) {
               d3.select(this).classed("fixed", d.fixed = true);
