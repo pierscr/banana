@@ -233,16 +233,18 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
           var zoomScale;
           var zoomtX;
 
-          var chart = d3.select(element[0]).append('svg')
+          var svg = d3.select(element[0]).append('svg')
             .attr('width', parent_width)
             .attr('height', parentheight)
-            .call(zoom);
+
+
+        var chart = svg.append("g");
 
           chart
             .on('mouseup',function(){
-              !zoomEnable && zoom.scale(zoomScale);
-              !zoomEnable && zoom.translate(zoomtX);
-              zoomEnable=true;
+              // !zoomEnable && zoom.scale(zoomScale);
+              // !zoomEnable && zoom.translate(zoomtX);
+              // zoomEnable=true;
             });
 
           var tipLink = d3tip()
@@ -284,11 +286,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
 
           var force = d3.layout
             .force()
-            .linkDistance(function(link){
-              return distanceScale(link.Similarity);
-            })
-            .charge(scope.panel.charge)
-            .gravity(scope.panel.gravity)
+            .linkDistance(60)
+            .charge(-300)
             .size([width, height]);
 
            force
@@ -318,6 +317,9 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
           // Now it's the nodes turn. Each node is drawn as a circle.
           var myPatentLabel={};
 
+          var drag = force.drag()
+              .on("dragstart", dragstart);
+
           var node = chart.selectAll('.node')
               .data(scope.data.nodes)
               .enter().append('g')
@@ -327,6 +329,9 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
                 }
                 return 'node';
               })
+              .call(drag);
+
+          node
               .attr("transform", function(d){
                 return "translate("+d.x+","+d.y+")";
               })
@@ -337,17 +342,18 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
                   filterDialogSrv.addMode('compare');
                   filterDialogSrv.showDialog(scope.panel.nodeSearch,d.name || d.value);
                 }
+                d3.event.stopPropagation();
               })
-              .on('mousedown',function(){
-                  zoomScale=zoom.scale();
-                  zoomtX=zoom.translate();
-                  zoomEnable=false;
-              })
-              .on('mouseup',function(){
-                  !zoomEnable && zoom.scale(zoomScale);
-                  !zoomEnable && zoom.translate(zoomtX);
-                  zoomEnable=true;
-              })
+              // .on('mousedown',function(){
+              //     zoomScale=zoom.scale();
+              //     zoomtX=zoom.translate();
+              //     zoomEnable=false;
+              // })
+              // .on('mouseup',function(){
+              //     !zoomEnable && zoom.scale(zoomScale);
+              //     !zoomEnable && zoom.translate(zoomtX);
+              //     zoomEnable=true;
+              // })
               .on('mouseover', function(data,event){
                   var targetEvent=d3.event.target;
                   if(d3.event.target.className.baseVal.indexOf('bubble') !=-1 && !window.labelPersistTrigger){
@@ -367,11 +373,9 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
                   scope.stopFlag=false;
                   force.start();
 
-                });
+                })
+                .on("mousedown", function(d) { d3.event.stopPropagation();})
 
-
-                var drag = force.drag()
-                    .on("dragstart", dragstart);
 
             function dragstart(d) {
               d3.select(this).classed("fixed", d.fixed = true);
@@ -383,11 +387,12 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
                   return nodeSize(d.count);
                 })
                 .attr('class','bubble')
-                .call(drag);
 
-          chart.selectAll('.node')
-              .data(scope.data.nodes)
-              .enter().append('g')
+
+          // chart.selectAll('.node')
+          //     .data(scope.data.nodes)
+          //     .enter().append('g')
+
 
         labelText(patentDescription,node,scope,dashboard);
 
@@ -440,35 +445,41 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
           // <tspan class="sublabel1">label2</tspan>
 
 
-            chart.call(tipLink);
-            chart.call(clusterTooltip);
-            chart.call(labelTooltip);
+            svg.call(tipLink);
+            svg.call(clusterTooltip);
+            svg.call(labelTooltip);
+            svg.call(zoom);
+
+            zoom.on("zoom", function() {
+                          chart.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+            });
 
               force.on("tick", function() {
-                if(!scope.stopFlag){
+                // if(!scope.stopFlag){
+
+                node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
 
+                // node.transition().ease('linear').duration(animationStep)
+                //                       .attr("transform",function(d){
+                //                                           if(zoomEnable){
+                //                                             if(isNaN(d.x) || isNaN(d.y)) {return;}
+                //                                             return "translate("+d.x*zoom.scale()+","+d.y*zoom.scale()+")translate("+zoom.translate()[0]+","+zoom.translate()[1]+")";
+                //                                           }else{
+                //                                             return "translate("+d.x*zoomScale+","+d.y*zoomScale+")translate("+zoomtX[0]+","+zoomtX[1]+")";
+                //                                           }
+                //                                         });
 
-                node.transition().ease('linear').duration(animationStep)
-                                      .attr("transform",function(d){
-                                                          if(zoomEnable){
-                                                            if(isNaN(d.x) || isNaN(d.y)) {return;}
-                                                            return "translate("+d.x*zoom.scale()+","+d.y*zoom.scale()+")translate("+zoom.translate()[0]+","+zoom.translate()[1]+")";
-                                                          }else{
-                                                            return "translate("+d.x*zoomScale+","+d.y*zoomScale+")translate("+zoomtX[0]+","+zoomtX[1]+")";
-                                                          }
-                                                        });
+                //
+                // var animationNode=node.selectAll('circle')
+                //     .transition().ease('linear').duration(animationStep);
+
+                // zoomEnable && animationNode.attr('transform','scale('+zoom.scale()+')');
+                // !zoomEnable && animationNode.attr('transform','scale('+zoomScale+')');
 
 
-                var animationNode=node.selectAll('circle')
-                    .transition().ease('linear').duration(animationStep);
-
-                zoomEnable && animationNode.attr('transform','scale('+zoom.scale()+')');
-                !zoomEnable && animationNode.attr('transform','scale('+zoomScale+')');
-
-
-                node.selectAll('text')
-                    .transition().ease('linear').duration(animationStep);
+                // node.selectAll('text')
+                //     .transition().ease('linear').duration(animationStep);
 
 
               // We also need to update positions of the links.
@@ -482,26 +493,32 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
               // one iteration, the indices have been replaced by
               // references to the node objects.
 
-              var animationLink=link.transition().ease('linear').duration(animationStep)
-                  .attr('x1', function(d) { return d.source.x; })
-                  .attr('y1', function(d) { return d.source.y; })
-                  .attr('x2', function(d) { return d.target.x; })
-                  .attr('y2', function(d) { return d.target.y; });
+              // var animationLink=link.transition().ease('linear').duration(animationStep)
+              //     .attr('x1', function(d) { return d.source.x; })
+              //     .attr('y1', function(d) { return d.source.y; })
+              //     .attr('x2', function(d) { return d.target.x; })
+              //     .attr('y2', function(d) { return d.target.y; });
 
 
-              zoomEnable && animationLink.attr('transform','translate('+zoom.translate()+')scale('+zoom.scale()+')');
-              !zoomEnable && animationLink.attr('transform','translate('+zoomtX+')scale('+zoomScale+')');
+              // zoomEnable && animationLink.attr('transform','translate('+zoom.translate()+')scale('+zoom.scale()+')');
+              // !zoomEnable && animationLink.attr('transform','translate('+zoomtX+')scale('+zoomScale+')');
 
+              link.attr("x1", function(d) { return d.source.x; })
+                .attr("y1", function(d) { return d.source.y; })
+                .attr("x2", function(d) { return d.target.x; })
+                .attr("y2", function(d) { return d.target.y; });
 
+              node.attr("cx", function(d) { return d.x; })
+                .attr("cy", function(d) { return d.y; });
 
-              force.stop();
-              setTimeout(
-                  function() { if(!scope.stopFlag){force.start(); }},
-                  200
-              );
-            }else{
-              force.stop();
-            } /*end stop flag*/
+            //   force.stop();
+            //   setTimeout(
+            //       function() { if(!scope.stopFlag){force.start(); }},
+            //       200
+            //   );
+            // }else{
+            //   force.stop();
+            // } /*end stop flag*/
           });
 
           force.start();
