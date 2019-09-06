@@ -204,6 +204,9 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
     return {
       restrict: 'E',
       link: function(scope, element)  {
+        var justClickFlag=false;
+        var mouseDownFlag=false;
+
         scope.$on('render',function(){
           render_panel();
         });
@@ -229,21 +232,32 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
 
 
           var zoom = d3.behavior.zoom();
-          var zoomEnable=true;
-          var zoomScale;
-          var zoomtX;
 
-          var chart = d3.select(element[0]).append('svg')
+          var svg = d3.select(element[0]).append('svg')
             .attr('width', parent_width)
             .attr('height', parentheight)
-            .call(zoom);
+
+
+          var chart = svg.append("g");
 
           chart
             .on('mouseup',function(){
-              !zoomEnable && zoom.scale(zoomScale);
-              !zoomEnable && zoom.translate(zoomtX);
-              zoomEnable=true;
-            });
+              mouseDownFlag=false;
+              console.log('mouseup')
+            })
+            .on("mousedown", function(d) {
+              justClickFlag=true;
+              mouseDownFlag=true;
+              console.log('mousedown')
+            })
+            .on("mousemove",function(){
+              justClickFlag=false;
+              if(mouseDownFlag){
+                console.log("mousemove labelTooltip.hide(); labelPersistTrigger=false")
+                labelTooltip.hide();
+                window.labelPersistTrigger=false;
+                }
+              })
 
           var tipLink = d3tip()
               .attr('class', 'd3-tip-link')
@@ -284,9 +298,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
 
           var force = d3.layout
             .force()
-            .linkDistance(function(link){
-              return distanceScale(link.Similarity);
-            })
+            .linkDistance(scope.panel.linkDistance)
             .charge(scope.panel.charge)
             .gravity(scope.panel.gravity)
             .size([width, height]);
@@ -318,6 +330,9 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
           // Now it's the nodes turn. Each node is drawn as a circle.
           var myPatentLabel={};
 
+          var drag = force.drag()
+              .on("dragstart", dragstart);
+
           var node = chart.selectAll('.node')
               .data(scope.data.nodes)
               .enter().append('g')
@@ -327,35 +342,31 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
                 }
                 return 'node';
               })
+              .call(drag);
+
+          node
               .attr("transform", function(d){
                 return "translate("+d.x+","+d.y+")";
               })
               .on('click', function(d){
-                if(d3.event.target.className.baseVal =='bubble'){
+
+                if(justClickFlag && d3.event.target.className.baseVal =='bubble'){
                   tipLink.hide();
                   clusterTooltip.hide();
                   filterDialogSrv.addMode('compare');
                   filterDialogSrv.showDialog(scope.panel.nodeSearch,d.name || d.value);
                 }
+                d3.event.stopPropagation();
+                d3.event.preventDefault();
               })
-              .on('mousedown',function(){
-                  zoomScale=zoom.scale();
-                  zoomtX=zoom.translate();
-                  zoomEnable=false;
-              })
-              .on('mouseup',function(){
-                  !zoomEnable && zoom.scale(zoomScale);
-                  !zoomEnable && zoom.translate(zoomtX);
-                  zoomEnable=true;
-              })
+
               .on('mouseover', function(data,event){
                   var targetEvent=d3.event.target;
                   if(d3.event.target.className.baseVal.indexOf('bubble') !=-1 && !window.labelPersistTrigger){
                         labelTooltip.hide();
-                        clusterTooltip
-                          .setDirectionByTarget(d3.event)
-                          .show(data,targetEvent);
-                    //clusterTooltip.show(data);
+                        !mouseDownFlag && clusterTooltip
+                                            .setDirectionByTarget(d3.event)
+                                            .show(data,targetEvent);
                   }
 
                   //console.log(data);
@@ -366,12 +377,14 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
                   clusterTooltip.hide();
                   scope.stopFlag=false;
                   force.start();
-
+                })
+                .on("mousedown", function(d) {
+                  clusterTooltip.hide();
+                  mouseDownFlag=true;
+                  justClickFlag=true;
+                  d3.event.stopPropagation();
+                  d3.event.preventDefault();
                 });
-
-
-                var drag = force.drag()
-                    .on("dragstart", dragstart);
 
             function dragstart(d) {
               d3.select(this).classed("fixed", d.fixed = true);
@@ -383,125 +396,33 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
                   return nodeSize(d.count);
                 })
                 .attr('class','bubble')
-                .call(drag);
-
-          chart.selectAll('.node')
-              .data(scope.data.nodes)
-              .enter().append('g')
-
-        labelText(patentDescription,node,scope,dashboard);
 
 
-//-->
-          // var textLabel=node
-          //         .append('text')
-          //         .attr('class','clusterText')
-          //         .attr('x',20)
-          //         .attr('y',-10)
-          //         .style('font-size',scope.panel.fontSize+'px')
-          //         .style('pointer-events', 'auto')
-          //
-          // textLabel.selectAll('.label')
-          //     .data(patentDescription.createDataLabel)
-          //     .enter()
-          //     .append('tspan')
-          //     .append('tspan')      //2nd part of label
-          //     .attr("class", "label")
-          //     .text(function(d){
-          //
-          //       return " "+d.firstLevel+" ";
-          //   })
-          //   .on('mouseover', function(data,event){
-          //       var targetEvent=d3.event.target;
-          //       if(d3.event.target.className.baseVal !='bubble'){
-          //         labelTooltip.setDirectionByTarget(d3.event)
-          //         patentDescription.getDescription(data.secondLevel,scope,dashboard)
-          //           .thenRun(function(description){
-          //             labelTooltip
-          //               .show(description,targetEvent);
-          //           });
-          //       }
-          //     })
-          //   .on('mouseout', function(){
-          //     clusterTooltip.hide();
-          //     labelTooltip.hide();
-          //   });
+            labelText(patentDescription,node,scope,dashboard);
 
-//-->
+            svg.call(tipLink);
+            svg.call(clusterTooltip);
+            svg.call(labelTooltip);
+            svg.call(zoom);
 
-
-          // text.append('tspan')      //2nd part of label
-          // .attr("class", "sublabel1")
-          // .text('label2')
-          // text.append('tspan')      //3rd part of label
-          // .attr("class", "sublabel2")
-          // .text('label3')
-
-          // <tspan class="sublabel1">label2</tspan>
-
-
-            chart.call(tipLink);
-            chart.call(clusterTooltip);
-            chart.call(labelTooltip);
+            zoom.on("zoom", function() {
+                          chart.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+            });
 
               force.on("tick", function() {
-                if(!scope.stopFlag){
+                // if(!scope.stopFlag){
+
+                node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
 
+              link.attr("x1", function(d) { return d.source.x; })
+                .attr("y1", function(d) { return d.source.y; })
+                .attr("x2", function(d) { return d.target.x; })
+                .attr("y2", function(d) { return d.target.y; });
 
-                node.transition().ease('linear').duration(animationStep)
-                                      .attr("transform",function(d){
-                                                          if(zoomEnable){
-                                                            if(isNaN(d.x) || isNaN(d.y)) {return;}
-                                                            return "translate("+d.x*zoom.scale()+","+d.y*zoom.scale()+")translate("+zoom.translate()[0]+","+zoom.translate()[1]+")";
-                                                          }else{
-                                                            return "translate("+d.x*zoomScale+","+d.y*zoomScale+")translate("+zoomtX[0]+","+zoomtX[1]+")";
-                                                          }
-                                                        });
+              node.attr("cx", function(d) { return d.x; })
+                .attr("cy", function(d) { return d.y; });
 
-
-                var animationNode=node.selectAll('circle')
-                    .transition().ease('linear').duration(animationStep);
-
-                zoomEnable && animationNode.attr('transform','scale('+zoom.scale()+')');
-                !zoomEnable && animationNode.attr('transform','scale('+zoomScale+')');
-
-
-                node.selectAll('text')
-                    .transition().ease('linear').duration(animationStep);
-
-
-              // We also need to update positions of the links.
-              // For those elements, the force layout sets the
-              // `source` and `target` properties, specifying
-              // `x` and `y` values in each case.
-
-              // Here's where you can see how the force layout has
-              // changed the `source` and `target` properties of
-              // the links. Now that the layout has executed at least
-              // one iteration, the indices have been replaced by
-              // references to the node objects.
-
-              var animationLink=link.transition().ease('linear').duration(animationStep)
-                  .attr('x1', function(d) { return d.source.x; })
-                  .attr('y1', function(d) { return d.source.y; })
-                  .attr('x2', function(d) { return d.target.x; })
-                  .attr('y2', function(d) { return d.target.y; });
-
-
-              zoomEnable && animationLink.attr('transform','translate('+zoom.translate()+')scale('+zoom.scale()+')');
-              !zoomEnable && animationLink.attr('transform','translate('+zoomtX+')scale('+zoomScale+')');
-
-
-
-              force.stop();
-              setTimeout(
-                  function() { if(!scope.stopFlag){force.start(); }},
-                  200
-              );
-            }else{
-              force.stop();
-            } /*end stop flag*/
           });
 
           force.start();
