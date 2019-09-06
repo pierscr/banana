@@ -258,6 +258,11 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
             })
             .on("mousemove",function(){
               justClickFlag=false;
+              if(mouseDownFlag){
+                console.log("mousemove labelTooltip.hide(); labelPersistTrigger=false")
+                labelTooltip.hide();
+                window.labelPersistTrigger=false;
+              }
             })
 
           var tipLink = d3tip()
@@ -364,7 +369,6 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
                   var targetEvent=d3.event.target;
                   if(d3.event.target.className.baseVal.indexOf('bubble') !=-1 && !window.labelPersistTrigger){
                         labelTooltip.hide();
-                        console.log('mousedown: '+mouseDownFlag)
                         !mouseDownFlag && clusterTooltip
                                             .setDirectionByTarget(d3.event)
                                             .show(data,targetEvent);
@@ -384,6 +388,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
                 .on("mousedown", function(d) {
                   clusterTooltip.hide();
                   mouseDownFlag=true;
+                  justClickFlag=true;
                   d3.event.stopPropagation();
                   d3.event.preventDefault();
                 });

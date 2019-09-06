@@ -6,7 +6,7 @@ define('labelTooltip',['d3tip','createLabelRow'],function(d3tip,createLabelRow){
                   .offset([0, 0])
                   .html(function(d) {
                     var label = createLabelRow.call({},"")
-                        .concat("","Click on the label to hold the popup")
+                        .concat("","<div><i class='icon-info-sign'>Click on the label to hold the popup, go with the mouse over the label and leave it for hiding the label</i></div>")
                         .concat("",d)
 
 

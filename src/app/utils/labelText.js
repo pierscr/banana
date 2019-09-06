@@ -8,6 +8,17 @@ define('labelText',
       self.labelPersistTrigger=false;
       self.stillOnOverFlag=true;
 
+      function openTooltip(data,targetEvent){
+        labelTooltip.setDirectionByTarget(d3.event)
+        descriptor.getDescription(data.secondLevel,scope,dashboard)
+          .thenRun(function(description){
+            if(self.stillOnOverFlag){
+              labelTooltip
+                .show(description,targetEvent);
+            }
+          });
+      }
+
       if(!scope.panel.patent)
         return;
       var textLabel=node
@@ -47,9 +58,11 @@ define('labelText',
           if(!self.labelPersistTrigger)
               labelTooltip.hide();
         })
-        .on('click', function(d){
+        .on('click', function(data,event){
           if(d3.event.target.className.baseVal !='bubble'){
+            console.log("click self.labelPersistTrigger=true")
             self.labelPersistTrigger=true;
+            openTooltip(data,event);
           }
         })
 
