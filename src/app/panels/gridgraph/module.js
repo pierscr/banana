@@ -77,6 +77,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
 
     // Set panel's default values
     _.defaults($scope.panel, _d);
+    $scope.filteredValue=[];
 
     $scope.init = function() {
       $scope.$on('refresh',function(){
@@ -107,31 +108,32 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
 
     var dataSource;
     var range;
-    var hierarchy;
+    $scope.hierarchy={};
 
-    var updateGlobalHirarchy= function(){
-      hierarchy=0;
+    $scope.updateGlobalHirarchy= function(){
+      $scope.hierarchy=0;
+      $scope.filteredValue=[];
       $scope.forEachFilter(function(filter,index){
-        if(filter.field===$scope.panel.nodeSearch){
-          if(filter.mandate!="either"){
-              hierarchy=(decodeURIComponent(filter.value).split("/").length)
-              $scope.filteredValue=filter.value;
+        if(filter.field===$scope.panel.nodesField || filter.field===$scope.panel.nodeSearch){
+          if(filter.mandate!="either" || true){
+              $scope.hierarchy=(decodeURIComponent(filter.value).split("/").length)
+              $scope.filteredValue.push(decodeURIComponent(filter.value));
           }else{
-              hierarchy=-1;
+              $scope.hierarchy=-1;
           }
         }
       });
     }
 
     var hierarchyFilter=function(item){
-      if(hierarchy==-1){
+      if($scope.hierarchy==-1){
         return true;
       }
       var currentLevel=item.value.split("/").length-1;
-      if(hierarchy>0){
-        return (currentLevel==hierarchy || currentLevel==hierarchy-1);
+      if($scope.hierarchy>0){
+        return (currentLevel==$scope.hierarchy || currentLevel==$scope.hierarchy-1);
       }else{
-        return currentLevel==hierarchy;
+        return currentLevel==$scope.hierarchy;
       }
     };
 
@@ -166,7 +168,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
         .addYearsCostraint(range.getRange(index).split("-"))
         .getNodes()
         .then(function(results){
-            updateGlobalHirarchy();
+            $scope.updateGlobalHirarchy();
             var nodeFacet=results.facet_counts.facet_pivot[$scope.panel.nodesField].filter(hierarchyFilter);
             nodeFacet=nodeFacet.slice(0,$scope.panel.max_rows);
             var newIndex=index+1;
@@ -252,6 +254,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
 
           // Clear the panel
           element.html('');
+          scope.updateGlobalHirarchy();
 
           var parent_width = element.parent().width(),
             parentheight = parseInt(scope.row.height);
@@ -376,7 +379,12 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
 
           node
             .transition().duration(1000)
-            .attr('class', 'node')
+            .attr('class', function(d){
+              if(scope.filteredValue.includes(d.value)){
+                return 'node2';
+              }
+              return 'node';
+            })
             .attr("transform", function(d){
               return "translate("+d.x+","+d.y+")";
             });

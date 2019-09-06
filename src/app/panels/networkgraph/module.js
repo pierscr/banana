@@ -109,13 +109,14 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
     // };
     //dashboard.current.services.filter.list[item].mandate
 
-    $scope.filteredValue=[];
+
     var hierarchy;
     var updateGlobalHirarchy= function(){
       hierarchy=0;
+      $scope.filteredValue=[];
       $scope.forEachFilter(function(filter,index){
-        if(filter.field===$scope.panel.nodeSearch){
-          if(filter.mandate!="either"){
+        if(filter.field===$scope.panel.nodesField || filter.field==="cluster_h_str"){
+          if(filter.mandate!="either" && filter.field===$scope.panel.nodesField){
               hierarchy=(decodeURIComponent(filter.value).split("/").length)
 
           }else{
