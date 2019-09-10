@@ -137,6 +137,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
       }
     };
 
+
     $scope.get_data = function() {
 
       range=rangeDate($scope.panel.startYear,$scope.panel.stepYear,2019);
@@ -207,6 +208,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
               $scope.$emit('render');
               $scope.$emit('addCiclesSteps',newNodeList,stepNumber+1);
           });
+      }else{
+        $scope.$emit('render');
       }
       dashboard.refresh();
     });
@@ -403,10 +406,13 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
 
         node.on('click', function(d){
           //filterDialogSrv.showDialog2();
-            if(d3.event.target.className.baseVal =='bubble'){
+            if(d3.event.target.className.baseVal =='bubble' && d3.event.target.parentNode.className.baseVal!="node2"){
               clusterTooltip.hide();
               scope.$emit('addStepFilter',d);
               scope.$emit('addStep',[d]);
+            }else if(d3.event.target.className.baseVal =='bubble' && d3.event.target.parentNode.className.baseVal=="node2"){
+              filterDialogSrv.removeFilterByFieldAndValue(d.field,d.value);
+              dashboard.refresh();
             }
         })
         .on('mouseover', function(data,event){

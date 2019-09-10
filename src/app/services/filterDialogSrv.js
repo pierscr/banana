@@ -141,7 +141,8 @@ define([
       showDialog:showDialog,
       showDialog2:showDialog2,
       hideDialog:hideDialog,
-      addMode:addMode
+      addMode:addMode,
+      removeFilterByFieldAndValue:removeFilterByFieldAndValue
     };
   });
 
