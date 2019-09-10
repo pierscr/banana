@@ -351,11 +351,16 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
               })
               .on('click', function(d){
 
-                if(justClickFlag && d3.event.target.className.baseVal =='bubble'){
+                if(justClickFlag && d3.event.target.className.baseVal =='bubble' && !d3.event.target.parentNode.className.baseVal.includes('node2')){
                   tipLink.hide();
                   clusterTooltip.hide();
                   filterDialogSrv.addMode('compare');
                   filterDialogSrv.showDialog(scope.panel.nodeSearch,d.name || d.value);
+                } else if(d3.event.target.className.baseVal =='bubble' && d3.event.target.parentNode.className.baseVal.includes('node2')){
+                  tipLink.hide();
+                  clusterTooltip.hide();
+                  filterDialogSrv.addMode('compare');
+                  filterDialogSrv.showDialog(d.field,d.name || d.value);
                 }
                 d3.event.stopPropagation();
                 d3.event.preventDefault();

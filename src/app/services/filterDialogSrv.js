@@ -113,7 +113,8 @@ define([
     var equals=function(filter1,filter2){
       switch (filter1.type) {
         case 'terms':
-          return (filter1.field===filter2.field) && (decodeURIComponent(filter1.value)===decodeURIComponent(filter2.value));
+          /*return (filter1.field===filter2.field) && (decodeURIComponent(filter1.value)===decodeURIComponent(filter2.value));*/
+          return (decodeURIComponent(filter1.value)===decodeURIComponent(filter2.value));
         default:
           return false;
 
