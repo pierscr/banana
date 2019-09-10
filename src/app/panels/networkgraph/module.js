@@ -142,7 +142,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
 
     $scope.get_data = function() {
       $scope.filteredValue=[];
-      var dataSource=dataRetrieval($scope,dashboard,$q,filterSrv);
+      var dataSource=dataRetrieval($scope,dashboard,$q,filterSrv,querySrv);
 
       dataSource
         .createRequest()

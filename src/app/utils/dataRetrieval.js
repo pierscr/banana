@@ -1,6 +1,6 @@
 define('dataRetrieval',['angular','d3'],function(angular,d3){
       'use strict';
-      return function($scope,dashboard,$injQ,filterSrv){
+      return function($scope,dashboard,$injQ,filterSrv,querySrv){
         var $injQ;
         // angular.injector(['ng']).invoke(['$q', function($q) {
         //           $injQ=$q;
@@ -33,7 +33,7 @@ define('dataRetrieval',['angular','d3'],function(angular,d3){
               //--contains features-->
               $scope.forEachFilter(function(filter,index){
                 if(filter.field===searchField && filter.value.length>0){
-                  containsConstraint="&facet.contains="+filter.value;
+                  //containsConstraint="&facet.contains="+filter.value;
                 }
               });
               return this;
@@ -51,9 +51,9 @@ define('dataRetrieval',['angular','d3'],function(angular,d3){
 
 
             function getNodes(nodeList,deactiveGlobalFilter,callback){
-              var filters="";
+              var filters="&"+querySrv.getORquery();
               $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.nodesCore);
-              var nodeFilter="&wt=json&facet=true&facet.pivot="+$scope.panel.nodesField+"&q=*:*&rows=0&facet.limit="+ row;
+              var nodeFilter="&wt=json&facet=true&facet.pivot="+$scope.panel.nodesField+"&rows=0&facet.limit="+ row;
               if(nodeList!==undefined){
                 filters+="&fq="+$scope.panel.nodesField+":"+_createNodeFiltersList(nodeList,callback);
               }

@@ -151,7 +151,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
           .setDataProcessor(processor)
           .rowsNumber($scope.panel.max_rows);
 
-      dataSource=dataRetrieval($scope,dashboard,$q,filterSrv);
+      dataSource=dataRetrieval($scope,dashboard,$q,filterSrv,querySrv);
 
 
       $scope.myGrid.reset();

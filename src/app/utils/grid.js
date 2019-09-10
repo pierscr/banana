@@ -82,9 +82,13 @@ define('grid',['dataGraphMapping','d3'],function(dataGraphMapping,d3){
       };
 
       var addNode=function(nodeListPar){
+        if(!nodeListPar.length){
+          return this;
+        }
+
         nodeList=nodeList
         .filter(function(item){
-          return item.step<nodeListPar[0].step;
+            return item.step<nodeListPar[0].step;
         })
         .concat(nodeListPar);
         return this;
