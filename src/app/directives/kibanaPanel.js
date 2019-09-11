@@ -46,7 +46,7 @@ function (angular) {
 
           '<span ng-repeat="task in panelMeta.modals" class="row-button extra" ng-show="panel.spyable">' +
             '<span bs-modal="task.partial"class="pointer">' +
-            '<a title="Click to show info" alt="Click to show info" href="" bs-tooltip="Click to show info" ng-class="task.icon" class="pointer"></a></span>'+
+            '<a title="Click to show info" alt="Click to show info" href="" bs-tooltip="\'Click to show info\'" ng-class="task.icon" class="pointer"></a></span>'+
           '</span>' +
 
           '<span class="row-button extra" ng-show="panel.fitBoundsAuto != undefined && !panel.fitBoundsAuto">' +
