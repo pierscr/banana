@@ -165,6 +165,7 @@ define([
             //     console.log($scope.panel.facet_pivot_strings[i].replace(/ /g, '') + ' - ' + d[i]);
             //
             // }
+             filterDialogSrv.addMode('compare');
             filterDialogSrv.showDialog($scope.panel.facet_pivot_strings[d.length-1].replace(/ /g, ''),d[d.length-1]);
             dashboard.refresh();
         };

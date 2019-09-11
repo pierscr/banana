@@ -328,6 +328,7 @@ function (angular, app, _, $, kbn) {
       //   return;
       // }
       // dashboard.refresh();
+      filterDialogSrv.addMode('compare');      
       filterDialogSrv.showDialog($scope.panel.field,term.label,term.pageY,term.pageX);
     };
 

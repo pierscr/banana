@@ -70,7 +70,9 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
       nodeSearch:'cluster_h',
       nodeLink1:'Cluster1',
       nodeLink2:'Cluster2',
-      patent:false
+      patent:false,
+      label:false,
+      patentDescriptionCollection:"cpc_codes"
     };
 
     // Set panel's default values
@@ -338,10 +340,20 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
               .data(scope.data.nodes)
               .enter().append('g')
               .attr('class', function(d){
+                var nodeClass='node';
+                scope.filteredValue.forEach(function(filter){
+                  var nodeClusters=d.value.split("/");
+                  var nodeClustersFilters=filter.split("/");
+                  if(nodeClusters.length>nodeClustersFilters.length && d.value.includes(filter)){
+                    nodeClass="node3";
+                    return;
+                  }
+                });
+
                 if(scope.filteredValue.includes(d.value)){
-                  return 'node2';
+                  nodeClass='node2';
                 }
-                return 'node';
+                return nodeClass;
               })
               .call(drag);
 
@@ -354,12 +366,12 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
                 if(justClickFlag && d3.event.target.className.baseVal =='bubble' && !d3.event.target.parentNode.className.baseVal.includes('node2')){
                   tipLink.hide();
                   clusterTooltip.hide();
-                  filterDialogSrv.addMode('compare');
+                  filterDialogSrv.addMode('or');
                   filterDialogSrv.showDialog(scope.panel.nodeSearch,d.name || d.value);
-                } else if(d3.event.target.className.baseVal =='bubble' && d3.event.target.parentNode.className.baseVal.includes('node2')){
+                } else if(justClickFlag && d3.event.target.className.baseVal =='bubble' && d3.event.target.parentNode.className.baseVal.includes('node2')){
                   tipLink.hide();
                   clusterTooltip.hide();
-                  filterDialogSrv.addMode('compare');
+                  filterDialogSrv.addMode('or');
                   filterDialogSrv.showDialog(d.field,d.name || d.value);
                 }
                 d3.event.stopPropagation();

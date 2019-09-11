@@ -12,7 +12,7 @@ define([
 
     var callback;
     var showRemoveCallback;
-    var mode;
+    var dialogMode;
 
     var hideDialogCallback;
 
@@ -22,7 +22,7 @@ define([
     };
 
     var addMode=function(modePar){
-      mode=modePar;
+      dialogMode=modePar;
     }
 
     var subscribeShow=function(fn){
@@ -40,7 +40,7 @@ define([
     var build_search = function(field,value,mode) {
       DEBUG && console.log(d3.event);
       var active=true;
-      if(mode==='either'){
+      if(mode==='either' && dialogMode=='orand'){
         active=false;
       }
 
@@ -52,7 +52,7 @@ define([
       } else {
         return;
       }
-      if(mode!=='either'){
+      if(mode!='either' || dialogMode!='orand'){
         dashboard.refresh();
       }
     };
@@ -88,7 +88,7 @@ define([
         pageY=d3.event.pageY;
         pageX=d3.event.pageX;
       }
-      callback(pageY+"px",pageX+10+"px",mode)
+      callback(pageY+"px",pageX+10+"px",dialogMode)
         .then(resolve,reject);
     };
 

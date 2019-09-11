@@ -260,7 +260,7 @@ define([
                   .attr("height", function(d) { return height - y(d.frequency); })
                   .on('mouseover', tip.show)
                   .on('mouseout', tip.hide)
-                  .on('click', function(d){ tip.hide(); filterDialogSrv.showDialog(scope.panel.field,d.letter);});
+                  .on('click', function(d){ tip.hide(); filterDialogSrv.addMode('compare'); filterDialogSrv.showDialog(scope.panel.field,d.letter);});
           }
         }
       };

@@ -72,7 +72,9 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
       yearFieldName:'year',
       nodeSearch:'cluster_str',
       linkThreshold:0.7,
-      patent:false
+      patent:false,
+      label:false,
+      patentDescriptionCollection:"cpc_codes"
     };
 
     // Set panel's default values

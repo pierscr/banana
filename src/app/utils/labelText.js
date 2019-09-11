@@ -19,7 +19,7 @@ define('labelText',
           });
       }
 
-      if(!scope.panel.patent)
+      if(!scope.panel.label)
         return;
       var textLabel=node
               .append('text')
@@ -36,8 +36,12 @@ define('labelText',
           .append('tspan')      //2nd part of label
           .attr("class", "label")
           .text(function(d){
+            if(scope.panel.patent){
+              return " "+d.firstLevel+" ";
+            }else{
+              return d.secondLevel.pop()+" ";
+            }
 
-            return " "+d.firstLevel+" ";
         })
         .on('mouseover', function(data,event){
             var targetEvent=d3.event.target;

@@ -329,6 +329,7 @@ define([
                         })
                         .on("click", function (d) {
                             if (scope.panel.colorField) {
+                               filterDialogSrv.addMode('compare');
                                 filterDialogSrv.showDialog( scope.panel.colorField,d[scope.panel.colorField]);
                                 $tooltip.detach();
                                 dashboard.refresh();

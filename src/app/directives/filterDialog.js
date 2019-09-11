@@ -29,7 +29,7 @@ define(['angular'],function(angular){
               if(mode!==undefined){
                 $scope.dialog=mode;
               }else{
-                $scope.dialog='add';
+                $scope.dialog='orand';
               }
               $scope.style.top=posy;
               $scope.style.left=posx;

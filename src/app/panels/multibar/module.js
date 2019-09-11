@@ -491,7 +491,7 @@ function (angular, app, _, $, d3, d3tip,palette,legend) {
               })
               .on('mouseover', tipField2.show)
               .on('mouseout', tipField2.hide)
-              .on('click', function(d){ tipField2.hide(); filterDialogSrv.showDialog(scope.panel.field2,d.val);});
+              .on('click', function(d){ tipField2.hide();  filterDialogSrv.addMode('compare'); filterDialogSrv.showDialog(scope.panel.field2,d.val);});
 
 
 
@@ -511,7 +511,7 @@ function (angular, app, _, $, d3, d3tip,palette,legend) {
               })
             .on('mouseover', tipField1.show)
             .on('mouseout', tipField1.hide)
-            .on('click', function(d){ tipField1.hide();filterDialogSrv.showDialog(scope.panel.field1,d.val);});
+            .on('click', function(d){ tipField1.hide(); filterDialogSrv.addMode('compare');filterDialogSrv.showDialog(scope.panel.field1,d.val);});
 
           svg.call(legendFn);
           chart.call(tipField1);
