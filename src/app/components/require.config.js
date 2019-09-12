@@ -64,7 +64,8 @@ require.config({
       patentDescription:  'utils/patentDescription',
       createLabelRow:     'utils/createLabelRow',
       labelTooltip:       'utils/labelTooltip',
-      labelText:          'utils/labelText'
+      labelText:          'utils/labelText',
+      pivotToLabel:       'utils/pivotToLabel'
   },
   shim: {
     underscore: {

@@ -1,4 +1,4 @@
-define('clusterTooltip',['d3tip','createLabelRow'],function(d3tip,createLabelRow){
+define('clusterTooltip',['d3tip','pivotToLabel','createLabelRow'],function(d3tip,pivotToLabel,createLabelRow){
 
               tipNode = d3tip()
                   .attr('class', 'd3-tip')
@@ -9,7 +9,8 @@ define('clusterTooltip',['d3tip','createLabelRow'],function(d3tip,createLabelRow
                     var label = createLabelRow.call({},"")
                       .concat("Name",(typeof d.name === 'string' ?  cluster_levels.pop(): cluster_levels.pop()) )
                       .concat("Frequency",d.count)
-                      .concat("Level",(typeof d.name === 'string' ?  d.name.split("/").length-1: d.value.split("/").length-1));
+                      .concat("Level",(typeof d.name === 'string' ?  d.name.split("/").length-1: d.value.split("/").length-1))
+                      .concat("",pivotToLabel(d));
                       //.concat("Desc",d.desc);
 
                       cluster_levels.map(function(value,index){

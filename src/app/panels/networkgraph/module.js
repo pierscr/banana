@@ -117,7 +117,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
       hierarchy=0;
       $scope.filteredValue=[];
       $scope.forEachFilter(function(filter,index){
-        if(filter.field===$scope.panel.nodesField || filter.field==="cluster_h_str"){
+
+        if(filter.field===$scope.panel.nodesField.split(',').reverse().pop() || filter.field==="cluster_h_str"){
           if(filter.mandate!="either" && filter.field===$scope.panel.nodesField){
               hierarchy=(decodeURIComponent(filter.value).split("/").length)
 
