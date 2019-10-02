@@ -105,6 +105,12 @@
         </label>
         <input class="input-small" type="number" ng-model="panel.max_rows" ng-change="set_refresh(true)">
     </div> -->
+    <div class="span3">
+        <label class="small">
+          Patent description collection <tip>TODO</tip>
+        </label>
+        <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.patentDescriptionCollection" ng-change="set_refresh(true)">
+    </div>
 </div>
 <div class="row-fluid">
   <div class="span3">
@@ -119,4 +125,10 @@
       </label>
       <input class="input-small" ng-model="panel.label" type="checkbox" ng-change="set_refresh(true)"></inpt>
   </div>
+  <!-- <div class="span3">
+      <label class="small">
+        Max number of label elemnts <tip>TODO</tip>
+      </label>
+      <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.labelNumberLimit" ng-change="set_refresh(true)">
+  </div> -->
 </div>

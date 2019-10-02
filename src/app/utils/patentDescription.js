@@ -1,4 +1,9 @@
 define('patentDescription',[],function(){
+  var labelLimit=10;
+
+  var setLabelLimit=function(limit){
+    labelLimit=limit;
+  }
 
 
   function queryBuild(text){
@@ -40,6 +45,10 @@ define('patentDescription',[],function(){
     var t=label.name || label.value;
     t=t.split('/').pop()
     var dataArray=t.split(",");
+    if(dataArray.length>labelLimit){
+      dataArray=dataArray.slice(0,labelLimit);
+      dataArray.push("...");
+    }
     var dataLabelArray=[];
 
     dataArray.reduce(function(tot,elem){
@@ -58,6 +67,7 @@ define('patentDescription',[],function(){
 
   return {
     getDescription:getDescription,
-    createDataLabel:createDataLabel
+    createDataLabel:createDataLabel,
+    setLabelLimit:setLabelLimit
   }
 });

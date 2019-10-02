@@ -72,7 +72,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
       nodeLink2:'Cluster2',
       patent:false,
       label:false,
-      patentDescriptionCollection:"cpc_codes"
+      patentDescriptionCollection:"cpc_codes",
+      labelNumberLimit:10
     };
 
     // Set panel's default values

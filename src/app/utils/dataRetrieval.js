@@ -72,7 +72,7 @@ define('dataRetrieval',['angular','d3'],function(angular,d3){
               $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.linksCore);
               //var join="&q={!join from="+$scope.panel.nodesField+" to=Cluster2 fromIndex="+$scope.panel.nodesCore+"}*:*"
               var q="&q=*:*";
-              var nodeFilter="&wt=json&fq=Cluster1_str:"+_createNodeFiltersList(nodeList,callback)+"&rows="+row+"&fq=Cluster2Run_str:*/"+step+"/*&sort=Similarity_f desc";
+              var nodeFilter="&wt=json&fq="+$scope.panel.nodeLink1+":"+_createNodeFiltersList(nodeList,callback)+"&rows="+row+"&fq="+$scope.panel.link2DateString+":*/"+step+"/*&sort=Similarity_f desc";
               var stepResults={stepNodes:[],selfNode:[],links:[],stepNodesResponse:false,selfNodeResponse:false};
               function semaphore(enabled){
                 if((stepResults.stepNodesResponse && stepResults.selfNodeResponse) || !enabled){

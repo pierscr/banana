@@ -74,7 +74,12 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
       linkThreshold:0.7,
       patent:false,
       label:false,
-      patentDescriptionCollection:"cpc_codes"
+      patentDescriptionCollection:"cpc_codes",
+      labelNumberLimit:10,
+      nodeLink1:'Cluster1_str',
+      nodeLink2:'Cluster2_str',
+      link1DateString:'Cluster1Run_str',
+      link2DateString:'Cluster2Run_str'
     };
 
     // Set panel's default values

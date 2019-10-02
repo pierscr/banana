@@ -8,6 +8,8 @@ define('labelText',
       self.labelPersistTrigger=false;
       self.stillOnOverFlag=true;
 
+      descriptor.setLabelLimit(scope.labelNumberLimit);
+
       function openTooltip(data,targetEvent){
         labelTooltip.setDirectionByTarget(d3.event)
         descriptor.getDescription(data.secondLevel,scope,dashboard)
