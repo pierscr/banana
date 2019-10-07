@@ -87,7 +87,7 @@ function (angular, _, config) {
             }
             if(type === 'home') {
                 return (dashboard.current.home || $scope.home);
-            }  
+            }
 
             return false;
         };
@@ -222,7 +222,7 @@ function (angular, _, config) {
 
             // Fusion uses Blob Store API, so Solr query will not work here.
             if (config.USE_FUSION) {
-                query = query || ''; 
+                query = query || '';
             } else {
                 // TODO: getTitleField() + ':' + elasticsearch.query + '*'
                 // query += '&start=' + offset;
@@ -236,7 +236,8 @@ function (angular, _, config) {
                         // Get the list according to pageNum (paging).
                         var startIndex = offset;
                         var endIndex = offset + dashboard.current.loader.load_elasticsearch_size;
-                        $scope.elasticsearch.dashboards = parseDashboardList(result.response.docs).slice(startIndex, endIndex);
+                        //$scope.elasticsearch.dashboards = parseDashboardList(result.response.docs).slice(startIndex, endIndex);                        
+                        $scope.elasticsearch.dashboards = parseDashboardList(result.response.docs);
                     }
                 }
             );
@@ -328,7 +329,7 @@ function (angular, _, config) {
                     doc.server = angular.fromJson(dashboardList[i][self.DASHBOARD_FIELD][0]).solr.server;
                   } else {
                     doc.server = angular.fromJson(dashboardList[i][self.DASHBOARD_FIELD]).solr.server;
-                  }                  
+                  }
                 }
                 docs.push(doc);
             }
