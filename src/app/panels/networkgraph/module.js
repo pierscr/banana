@@ -73,7 +73,10 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
       patent:false,
       label:false,
       patentDescriptionCollection:"cpc_codes",
-      labelNumberLimit:10
+      labelNumberLimit:10,
+      labelTextLength: 30,
+      patentCodeField:"escluster_str_patent_codes_str",
+      maxNumberOfPantetCodes:6
     };
 
     // Set panel's default values
@@ -303,7 +306,9 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
 
           var force = d3.layout
             .force()
-            .linkDistance(scope.panel.linkDistance)
+            .linkDistance(function(link){
+              return distanceScale(link.Similarity);
+            })
             .charge(scope.panel.charge)
             .gravity(scope.panel.gravity)
             .size([width, height]);

@@ -79,7 +79,10 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
       nodeLink1:'Cluster1_str',
       nodeLink2:'Cluster2_str',
       link1DateString:'Cluster1Run_str',
-      link2DateString:'Cluster2Run_str'
+      link2DateString:'Cluster2Run_str',
+      labelTextLength: 30,
+      patentCodeField:"escluster_str_patent_codes_str",
+      maxNumberOfPantetCodes:6
     };
 
     // Set panel's default values
@@ -270,6 +273,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
             parentheight = parseInt(scope.row.height);
 
           var margin_right=50;
+          var padding_left=50;
 
           var createLabelRow=function(string){
             var self=this;
@@ -323,12 +327,13 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
 
 
           scope.myGrid
-            .size([parentheight,parent_width-margin_right])
+            .size([parentheight,parent_width-margin_right-padding_left])
             .addTitleHeight(30);
 
           var chart = d3.select(element[0]).append('svg')
             .attr('width', parent_width)
-            .attr('height', parentheight);
+            .attr('height', parentheight)
+            .style('padding-left',padding_left+'px');
 
           scope.myGrid
             .rowField("name")

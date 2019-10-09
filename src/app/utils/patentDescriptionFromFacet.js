@@ -1,19 +1,10 @@
 define('patentDescription',[],function(){
   var labelLimit=10;
-  var labelTextLength;
-  var patentCodeField;
 
   var setLabelLimit=function(limit){
     labelLimit=limit;
   }
 
-
-  var setLabelTextLength=function(labelTextLengthPar){
-    labelTextLength=labelTextLengthPar;
-  }
-  var setPatentCodeField=function(patentCodeFieldPar){
-    patentCodeField=patentCodeFieldPar;
-  }
 
   function queryBuild(text){
     function q(tot,item){
@@ -50,32 +41,15 @@ define('patentDescription',[],function(){
     };
   }
 
-  var getDataArrayFacet=function(label){
-    if(label.field == patentCodeField){
-      return [label.value];
-    }else if(label.pivot){
-      return label.pivot.reduce(function(tot,cur){
-        return tot.concat(getDataArrayFacet(cur));
-      },Array())
-    }else{
-      return [];
-    }
-  }
-
   var createDataLabel=function(label){
-    // var t=label.name || label.value;
-    // t=t.split('/').pop()
-    // var dataArray=t.split(",");
-    // if(dataArray.length>labelLimit){
-    //   dataArray=dataArray.slice(0,labelLimit);
-    //   dataArray.push("...");
-    // }
+    var t=label.name || label.value;
+    t=t.split('/').pop()
+    var dataArray=t.split(",");
+    if(dataArray.length>labelLimit){
+      dataArray=dataArray.slice(0,labelLimit);
+      dataArray.push("...");
+    }
     var dataLabelArray=[];
-
-    //--->
-    var dataArray = getDataArrayFacet(label).slice(0,100);
-
-    //-->
 
     dataArray.reduce(function(tot,elem){
       var currFirstLevel=elem.slice(0,4)
@@ -94,8 +68,6 @@ define('patentDescription',[],function(){
   return {
     getDescription:getDescription,
     createDataLabel:createDataLabel,
-    setLabelLimit:setLabelLimit,
-    setLabelTextLength:setLabelTextLength,
-    setPatentCodeField:setPatentCodeField
+    setLabelLimit:setLabelLimit
   }
 });

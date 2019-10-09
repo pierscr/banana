@@ -55,7 +55,7 @@ define('dataRetrieval',['angular','d3'],function(angular,d3){
               $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.nodesCore);
               var nodeFilter="&wt=json&facet=true&facet.pivot="+$scope.panel.nodesField+"&rows=0&facet.limit="+ row;
               if(nodeList!==undefined){
-                filters+="&fq="+$scope.panel.nodesField+":"+_createNodeFiltersList(nodeList,callback);
+                filters+="&fq="+$scope.panel.nodesField.split(",")[0]+":"+_createNodeFiltersList(nodeList,callback);
               }
               if(!deactiveGlobalFilter){
                 filters += filterSrv.getSolrFq(false,"cluste_h")!==''?'&' + filterSrv.getSolrFq(false,"cluste_h"):'';

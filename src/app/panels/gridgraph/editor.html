@@ -1,117 +1,144 @@
+<h5>Graph</h5>
+<div class="row-fluid">
+  <div class="span3">
+      <label class="small">
+        Number of rows <tip>The number of rows of nodes in the graph</tip>
+      </label>
+      <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.max_rows" ng-change="set_refresh(true)">
+  </div>
+  <div class="span3">
+      <label class="small">
+        Node font size <tip>Node name font size</tip>
+      </label>
+      <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.fontSize" ng-change="set_refresh(true)">
+  </div>
+  <div class="span3">
+      <label class="small">
+        Highlighted link threshold <tip>Links with similarity value bigger then this threshold will be Highlighted</tip>
+      </label>
+      <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.linkThreshold" ng-change="set_refresh(true)">
+  </div>
+</div>
+<div class="row-fluid">
+  <div class="span3">
+      <label class="small">
+        Start year <tip>TODO</tip>
+      </label>
+      <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.startYear" ng-change="set_refresh(true)">
+  </div>
+  <div class="span3">
+      <label class="small">
+        Step year <tip>TODO</tip>
+      </label>
+      <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.stepYear" ng-change="set_refresh(true)">
+  </div>
+</div>
+<h5>Label</h5>
 <div class="row-fluid">
     <div class="span3">
+        <label class="small">
+          Patent <tip>check if is a patent clustering</tip>
+        </label>
+        <input class="input-small" ng-model="panel.patent" type="checkbox" ng-change="set_refresh(true)"></inpt>
+    </div>
+    <div class="span3">
+        <label class="small">
+          Max number of patent codes <tip>check to show cluster label</tip>
+        </label>
+        <input class="input-small" ng-model="panel.maxNumberOfPantetCodes" type="number" ng-change="set_refresh(true)"></inpt>
+    </div>    
+</div>
+<div class="row-fluid">
+    <div class="span3">
+        <label class="small">
+          Label <tip>check to show cluster label</tip>
+        </label>
+        <input class="input-small" ng-model="panel.label" type="checkbox" ng-change="set_refresh(true)"></inpt>
+    </div>
+    <div class="span3">
+        <label class="small">
+          Label max length <tip>check to show cluster label</tip>
+        </label>
+        <input class="input-small" ng-model="panel.labelTextLength" type="number" ng-change="set_refresh(true)"></inpt>
+    </div>
+  </div>
+<h5>Graph fields configuration</h5>
+<div class="row-fluid">
+    <div class="span6">
         <label class="small">
             nodes core name<tip>Specify a the core name containing the nodes for the graph</tip>
         </label>
-        <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.nodesCore" ng-change="set_refresh(true)">
+        <input type="text" class="input-xlarge" bs-typeahead="fields.list" ng-model="panel.nodesCore" ng-change="set_refresh(true)">
     </div>
-    <div class="span3">
+    <div class="span6">
         <label class="small">
             Node field <tip>Specify a field which contains the nodes name</tip>
         </label>
-        <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.nodesField" ng-change="set_refresh(true)">
+        <input type="text" class="input-xlarge" bs-typeahead="fields.list" ng-model="panel.nodesField" ng-change="set_refresh(true)">
     </div>
-  </br>
-    <div class="span3">
+  </div>
+  <div class="row-fluid">
+    <div class="span6">
         <label class="small">
             links core name<tip>Specify a the core name containing the nodes for the graph</tip>
         </label>
-        <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.linksCore" ng-change="set_refresh(true)">
+        <input type="text" class="input-xlarge" bs-typeahead="fields.list" ng-model="panel.linksCore" ng-change="set_refresh(true)">
     </div>
   </br>
-  <div class="span3">
+  <div class="span6">
         <label class="small">
             Year field name<tip>Specify ...</tip>
         </label>
-        <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.yearFieldName" ng-change="set_refresh(true)">
+        <input type="text" class="input-xlarge" bs-typeahead="fields.list" ng-model="panel.yearFieldName" ng-change="set_refresh(true)">
     </div>
-  </br>
-    <div class="span3">
-        <label class="small">
-          Node font size <tip>Node name font size</tip>
-        </label>
-        <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.fontSize" ng-change="set_refresh(true)">
-    </div>
-    <div class="span3">
-        <label class="small">
-          Highlighted link threshold <tip>Links with similarity value bigger then this threshold will be Highlighted</tip>
-        </label>
-        <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.linkThreshold" ng-change="set_refresh(true)">
-    </div>
-    <div class="span3">
-        <label class="small">
-          Start year <tip>TODO</tip>
-        </label>
-        <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.startYear" ng-change="set_refresh(true)">
-    </div>
-    <div class="span3">
-        <label class="small">
-          Step year <tip>TODO</tip>
-        </label>
-        <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.stepYear" ng-change="set_refresh(true)">
-    </div>
-    <div class="span3">
-        <label class="small">
-          Rows <tip>TODO</tip>
-        </label>
-        <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.max_rows" ng-change="set_refresh(true)">
-    </div>
-    <div class="span3">
+  </div>
+  <div class="row-fluid">
+    <div class="span6">
         <label class="small">
           Node Search <tip>The search field which is search when click on node</tip>
         </label>
-        <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.nodeSearch" ng-change="set_refresh(true)">
+        <input type="text" class="input-xlarge" bs-typeahead="fields.list" ng-model="panel.nodeSearch" ng-change="set_refresh(true)">
     </div>
-    <div class="span3">
+    <div class="span6">
         <label class="small">
           Patent description collection <tip>TODO</tip>
         </label>
-        <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.patentDescriptionCollection" ng-change="set_refresh(true)">
+        <input type="text" class="input-xlarge" bs-typeahead="fields.list" ng-model="panel.patentDescriptionCollection" ng-change="set_refresh(true)">
     </div>
 </div>
 <div class="row-fluid">
-  <div class="span3">
+  <div class="span6">
       <label class="small">
         Node link 1 <tip>the cluster 1 field link to the node field</tip>
       </label>
-      <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.nodeLink1" ng-change="set_refresh(true)">
+      <input type="text" class="input-xlarge" bs-typeahead="fields.list" ng-model="panel.nodeLink1" ng-change="set_refresh(true)">
   </div>
-  <div class="span3">
+  <div class="span6">
       <label class="small">
         Node link 2 <tip>the cluster 2 field link to the node field</tip>
       </label>
-      <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.nodeLink2" ng-change="set_refresh(true)">
-  </div>
-  <div class="span3">
-      <label class="small">
-        Link 1 Date info field <tip>Date field of link 1 </tip>
-      </label>
-      <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.link1DateString" ng-change="set_refresh(true)">
-  </div>
-  <div class="span3">
-      <label class="small">
-        Link 2 Date info field <tip>Date field of link 2 </tip>
-      </label>
-      <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.link2DateString" ng-change="set_refresh(true)">
+      <input type="text" class="input-xlarge" bs-typeahead="fields.list" ng-model="panel.nodeLink2" ng-change="set_refresh(true)">
   </div>
 </div>
 <div class="row-fluid">
-  <div class="span3">
+  <div class="span6">
       <label class="small">
-        Patent <tip>check if is a patent clustering</tip>
+        Link 1 Date info field <tip>Date field of link 1 </tip>
       </label>
-      <input class="input-small" ng-model="panel.patent" type="checkbox" ng-change="set_refresh(true)"></inpt>
+      <input type="text" class="input-xlarge" bs-typeahead="fields.list" ng-model="panel.link1DateString" ng-change="set_refresh(true)">
   </div>
-  <div class="span3">
+  <div class="span6">
       <label class="small">
-        Label <tip>check to show cluster label</tip>
+        Link 2 Date info field <tip>Date field of link 2 </tip>
       </label>
-      <input class="input-small" ng-model="panel.label" type="checkbox" ng-change="set_refresh(true)"></inpt>
+      <input type="text" class="input-xlarge" bs-typeahead="fields.list" ng-model="panel.link2DateString" ng-change="set_refresh(true)">
   </div>
-  <!-- <div class="span3">
+</div>
+<div class="row-fluid">
+  <div class="span6">
       <label class="small">
-        Max number of label elemnts <tip>TODO</tip>
+        Patent code field name<tip>TODO</tip>
       </label>
-      <input type="number" class="input-small" bs-typeahead="fields.list" ng-model="panel.labelNumberLimit" ng-change="set_refresh(true)">
-  </div> -->
+      <input type="text" class="input-xlarge" bs-typeahead="fields.list" ng-model="panel.patentCodeField" ng-change="set_refresh(true)">
+  </div>
 </div>
