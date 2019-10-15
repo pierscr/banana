@@ -51,8 +51,10 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
         custom: ''
       },
       nodesCore: '',
+      linksCore: '',
+      copyNodesCore: '',
+      copyLinksCore: '',
       nodesField: 'cluster_h',
-      linksCore:'',
       max_rows: 10,
       spyable: true,
       show_queries: true,
@@ -148,6 +150,17 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
     };
 
     $scope.get_data = function() {
+      $scope.panel.copyNodesCore=$scope.panel.nodesCore;
+      if($scope.panel.copyNodesCore===''){
+        $scope.panel.copyNodesCore=dashboard.current.solr.core_name;
+      }
+
+      $scope.panel.copyLinksCore=$scope.panel.linksCore;
+      if($scope.panel.copyLinksCore===''){
+        $scope.panel.copyLinksCore=dashboard.current.solr.core_name.replace("clusters","simmatrix");
+      }
+
+
       $scope.filteredValue=[];
       var dataSource=dataRetrieval($scope,dashboard,$q,filterSrv,querySrv);
 
@@ -163,7 +176,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
               nodes:results.facet_counts.facet_pivot[$scope.panel.nodesField].filter(hierarchyFilter),
               links:[]
             };
-            $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.linksCore);
+            $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.copyLinksCore);
             var nodesClouse="";
             if(Array.isArray($scope.data.nodes) && $scope.data.nodes.length>0){
             nodesClouse="(\""+$scope.data.nodes[0].value;

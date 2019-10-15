@@ -52,7 +52,7 @@ define('dataRetrieval',['angular','d3'],function(angular,d3){
 
             function getNodes(nodeList,deactiveGlobalFilter,callback){
               var filters="&"+querySrv.getORquery();
-              $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.nodesCore);
+              $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.copyNodesCore);
               var nodeFilter="&wt=json&facet=true&facet.pivot="+$scope.panel.nodesField+"&rows=0&facet.limit="+ row;
               if(nodeList!==undefined){
                 filters+="&fq="+$scope.panel.nodesField.split(",")[0]+":"+_createNodeFiltersList(nodeList,callback);
@@ -69,7 +69,7 @@ define('dataRetrieval',['angular','d3'],function(angular,d3){
 
             function getGridStep(nodeList,step,callback){
               var deferred = $injQ.defer();
-              $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.linksCore);
+              $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.copyLinksCore);
               //var join="&q={!join from="+$scope.panel.nodesField+" to=Cluster2 fromIndex="+$scope.panel.nodesCore+"}*:*"
               var q="&q=*:*";
               var nodeFilter="&wt=json&fq="+$scope.panel.nodeLink1+":"+_createNodeFiltersList(nodeList,callback)+"&rows="+row+"&fq="+$scope.panel.link2DateString+":*/"+step+"/*&sort=Similarity_f desc";

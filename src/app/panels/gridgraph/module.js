@@ -150,6 +150,16 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
 
     $scope.get_data = function() {
 
+      $scope.panel.copyNodesCore=$scope.panel.nodesCore;
+      if($scope.panel.copyNodesCore===''){
+        $scope.panel.copyNodesCore=dashboard.current.solr.core_name;
+      }
+
+      $scope.panel.copyLinksCore=$scope.panel.linksCore;
+      if($scope.panel.copyLinksCore===''){
+        $scope.panel.copyLinksCore=dashboard.current.solr.core_name.replace("clusters","simmatrix");
+      }
+
       range=rangeDate($scope.panel.startYear,$scope.panel.stepYear,2019);
 
 
