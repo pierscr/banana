@@ -157,7 +157,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
 
       $scope.panel.copyLinksCore=$scope.panel.linksCore;
       if($scope.panel.copyLinksCore===''){
-        $scope.panel.copyLinksCore=dashboard.current.solr.core_name.replace("clusters","simmatrix");
+        $scope.panel.copyLinksCore=dashboard.current.solr.core_name.replace("clusters","sim_matrix");
       }
 
       range=rangeDate($scope.panel.startYear,$scope.panel.stepYear,2019);
