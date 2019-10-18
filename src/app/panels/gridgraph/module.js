@@ -251,6 +251,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
               $scope.$emit('render');
               $scope.$emit('addCiclesSteps',nodes,stepNumber+1);
           });
+      }else{
+        $scope.$emit('render');
       }
       //dashboard.refresh();
     });
