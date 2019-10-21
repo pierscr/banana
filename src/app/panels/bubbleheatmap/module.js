@@ -125,6 +125,12 @@ define([
                   return ob1;
                 }
 
+                var getArrayValue=function(array,field){
+                  return array.find(function(obj){
+                    return obj.val===field.replace(/\"/g,"");
+                  })
+                }
+
                 dataFacetRetrieval(["tech_s","dim_s","macro_s"],$scope,dashboard,filterSrv,querySrv,
                   function(results){
                       console.log(results);
@@ -135,8 +141,13 @@ define([
 
 
                       var technology=elem.val;
-                      var x_values=elem["dim_s"].buckets[0];
-                      var y_values=elem["dim_s"].buckets[1];
+                      // no
+                      // var x_values=elem["dim_s"].buckets[0];
+                      // var y_values=elem["dim_s"].buckets[1];
+                      //get x assis y assis
+                      //result[$scope.panel.xaxis]
+                      var x_values=getArrayValue(elem["dim_s"].buckets,$scope.panel.xaxis);
+                      var y_values=getArrayValue(elem["dim_s"].buckets,$scope.panel.yaxis);
 
                       var addFieldFn=function(obj){
                         return obj.tech_s=technology;
