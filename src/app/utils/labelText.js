@@ -101,17 +101,24 @@ define('labelText',
               console.log("click self.labelPersistTrigger=true")
               self.labelPersistTrigger=true;
               openTooltip(data,event);
+              outEventAppend();
             }
           })
       }
 
 
+      function outEventAppend(){
+        d3.selectAll('.labelTooltip')
+           .on('mouseleave',null);
 
         d3.selectAll('.labelTooltip')
            .on('mouseleave', function(){
               labelTooltip.hide();
               self.labelPersistTrigger=false;
-              //filterDialogSrv.hideDialog();
             });
+      }
+
+
+
     }
 });
