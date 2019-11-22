@@ -45,6 +45,8 @@ define('dataGraphMapping',[],function () {
         var found1=false;
         var found2=false;
         var nodeToRemove=[];
+        if(link.Cluster1 && link.Cluster1[0] && link.Cluster2 && link.Cluster2[0] && link.Cluster1[0]===link.Cluster2[0])
+            return;        
         for(var i=0; i<filteredNodes.length; i++){
           found1=_linkNodeMap(link,'Cluster1','source',filteredNodes[i],found1,i,_getIndexFilteredNode);
           found2=_linkNodeMap(link,'Cluster2','target',filteredNodes[i],found2,i,_getIndexFilteredNode);

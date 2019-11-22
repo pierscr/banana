@@ -56,7 +56,7 @@ function (angular, app, _, require) {
       if(checkResult.length>0){
         console.log('the follow parameters need to be passed with the request');
         console.log(checkResult);
-        $scope.panel.response = 'You need to reopen the visualization link in the collective intelligence';
+        $scope.panel.response = 'you need to reopen the visualization tool by  the collective intelligence link';
         return;
       }
       var data = $scope.panel.fields.reduce(addParameter,{});;
@@ -67,12 +67,13 @@ function (angular, app, _, require) {
       //filterSrv.removeAll();
       $http.post($scope.panel.url, wrappedJson).then(function successCallback(response) {
         if (response == undefined) {
-          $scope.panel.response = 'Send data error ';
+          console.log('the server is not reachable , possible cors problems');
+          $scope.panel.response = 'Send data error - check the connection and console log';
         } else {
           if (response.status == 200) {
             if(response.data.success == true){
               console.log('send message done');
-              $scope.panel.response = 'Data sent';
+              $scope.panel.response = 'Data have been sent to the collective intelligence platform';
             }else{
               console.log('send message error');
             $scope.panel.response = response.data.message!=""?response.data.message:'Send data error ';
