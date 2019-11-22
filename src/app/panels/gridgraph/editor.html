@@ -46,7 +46,7 @@
           Max number of patent codes <tip>check to show cluster label</tip>
         </label>
         <input class="input-small" ng-model="panel.maxNumberOfPantetCodes" type="number" ng-change="set_refresh(true)"></inpt>
-    </div>    
+    </div>
 </div>
 <div class="row-fluid">
     <div class="span3">
@@ -141,4 +141,12 @@
       </label>
       <input type="text" class="input-xlarge" bs-typeahead="fields.list" ng-model="panel.patentCodeField" ng-change="set_refresh(true)">
   </div>
+</div>
+<div class="row-fluid">
+    <div class="span12">
+        <label class="small">
+          Parameters<tip>TODO</tip>
+        </label>
+        <input type="text" class="input-xxlarge" bs-typeahead="fields.list" ng-model="panel.parameters" ng-change="set_refresh(true)">
+    </div>
 </div>

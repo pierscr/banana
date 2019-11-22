@@ -52,8 +52,9 @@ define('dataRetrieval',['angular','d3'],function(angular,d3){
 
             function getNodes(nodeList,deactiveGlobalFilter,callback){
               var filters="&"+querySrv.getORquery();
+              var parameters=$scope.panel.parameters || "";
               $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.copyNodesCore);
-              var nodeFilter="&wt=json&facet=true&facet.pivot="+$scope.panel.nodesField+"&rows=0&facet.limit="+ row;
+              var nodeFilter="&wt=json&facet=true&facet.pivot="+$scope.panel.nodesField+"&rows=0&facet.limit="+ row+parameters;
               if(nodeList!==undefined){
                 filters+="&fq="+$scope.panel.nodesField.split(",")[0]+":"+_createNodeFiltersList(nodeList,callback);
               }

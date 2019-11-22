@@ -82,7 +82,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
       link2DateString:'Cluster2Run_str',
       labelTextLength: 30,
       patentCodeField:"escluster_str_patent_codes_str",
-      maxNumberOfPantetCodes:6
+      maxNumberOfPantetCodes:6,
+      parameters:""
     };
 
     // Set panel's default values
