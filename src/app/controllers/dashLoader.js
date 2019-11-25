@@ -225,7 +225,7 @@ function (angular, _, config) {
                 query = query || '';
             } else {
                 // TODO: getTitleField() + ':' + elasticsearch.query + '*'
-                query += '&start=' + offset;
+                query += '*&start=' + offset;
                 /*query = $scope.getTitleField() + ':' + query + '*&start=' + offset;*/
             }
 
