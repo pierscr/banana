@@ -182,7 +182,7 @@ function (angular, _, config) {
         };
 
         $scope.elasticsearch_dblist = function (query) {
-            dashboard.elasticsearch_list(query, dashboard.current.loader.load_elasticsearch_size).then(
+            dashboard.elasticsearch_list(query, dashboard.current.loader.load_elasticsearch_size,$scope.getTitleField()).then(
                 function (result) {
                     if (!_.isUndefined(result.response.docs)) {
                         $scope.hits = result.response.numFound;
@@ -225,18 +225,18 @@ function (angular, _, config) {
                 query = query || '';
             } else {
                 // TODO: getTitleField() + ':' + elasticsearch.query + '*'
-                // query += '&start=' + offset;
-                query = $scope.getTitleField() + ':' + query + '*&start=' + offset;
+                query += '&start=' + offset;
+                /*query = $scope.getTitleField() + ':' + query + '*&start=' + offset;*/
             }
 
-            dashboard.elasticsearch_list(query, dashboard.current.loader.load_elasticsearch_size).then(
+            dashboard.elasticsearch_list(query, dashboard.current.loader.load_elasticsearch_size, $scope.getTitleField()).then(
                 function (result) {
                     if (!_.isUndefined(result.response.docs)) {
                         $scope.hits = result.response.numFound;
                         // Get the list according to pageNum (paging).
                         var startIndex = offset;
                         var endIndex = offset + dashboard.current.loader.load_elasticsearch_size;
-                        //$scope.elasticsearch.dashboards = parseDashboardList(result.response.docs).slice(startIndex, endIndex);                        
+                        //$scope.elasticsearch.dashboards = parseDashboardList(result.response.docs).slice(startIndex, endIndex);
                         $scope.elasticsearch.dashboards = parseDashboardList(result.response.docs);
                     }
                 }

@@ -199,20 +199,20 @@ define([
             }
           } else if (v.type === 'terms') {
             if (v.mandate === 'must') {
-              filter_fq = filter_fq + '&fq=' + v.field + ':"' + v.value + '"';
+              filter_fq = filter_fq + '&fq=' + v.field + ':"' + v.value.replace(/%22/g,"%5C%22")+ '"';
             } else if (v.mandate === 'mustNot') {
-              filter_fq = filter_fq + '&fq=-' + v.field + ':"' + v.value + '"';
+              filter_fq = filter_fq + '&fq=-' + v.field + ':"' + v.value.replace(/%22/g,"%5C%22") + '"';
             } else if (v.mandate === 'either') {
-              filter_either.push(v.field + ':"' + v.value + '"');
+              filter_either.push(v.field + ':"' + v.value.replace(/%22/g,"%5C%22") + '"');
             }
           } else if (v.type === 'field') {
             // v.query contains double-quote around it.
             if (v.mandate === 'must') {
-              filter_fq = filter_fq + '&fq=' + v.field + ':' + v.query;
+              filter_fq = filter_fq + '&fq=' + v.field + ':' + v.query.replace(/%22/g,"%5C%22");
             } else if (v.mandate === 'mustNot') {
-              filter_fq = filter_fq + '&fq=-' + v.field + ':' + v.query;
+              filter_fq = filter_fq + '&fq=-' + v.field + ':' + v.query.replace(/%22/g,"%5C%22");
             } else if (v.mandate === 'either') {
-              filter_either.push(v.field + ':' + v.query);
+              filter_either.push(v.field + ':' + v.query.replace(/%22/g,"%5C%22"));
             }
           } else if (v.type === 'querystring') {
             if (v.mandate === 'must') {

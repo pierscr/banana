@@ -394,7 +394,7 @@ function (angular, $, kbn, _, config, moment, Modernizr) {
                   source_json = angular.fromJson(response.response.docs[0][self.DASHBOARD_FIELD][0]);
                 } else {
                   source_json = angular.fromJson(response.response.docs[0][self.DASHBOARD_FIELD]);
-                }                
+                }
               }
 
               if (DEBUG) {
@@ -530,11 +530,15 @@ function (angular, $, kbn, _, config, moment, Modernizr) {
         };
 
         // Get a list of saved dashboards from Fusion or Solr
-        this.elasticsearch_list = function (query, count) {
+        this.elasticsearch_list = function (query, count,title) {
             var server = self.current.solr.server + config.banana_index || config.solr + config.banana_index;
             if (config.USE_FUSION) {
                 // Use Blob Store API to list all dashboards
                 return lucidworksSrv.getDashboardList(query);
+            }
+
+            if(title!=undefined && query!=undefined && query!=''){
+              query=title+":"+query;
             }
 
             sjs.client.server(server);
