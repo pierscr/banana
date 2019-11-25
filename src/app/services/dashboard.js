@@ -537,7 +537,8 @@ function (angular, $, kbn, _, config, moment, Modernizr) {
                 return lucidworksSrv.getDashboardList(query);
             }
 
-            if(title!=undefined && query!=undefined && query!=''){
+
+            if(title!=undefined && query!=undefined && query.split("&")[0]!=''){
               query=title+":"+query;
             }
 
