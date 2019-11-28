@@ -81,9 +81,21 @@ define('patentDescription',[],function(){
       var currFirstLevel=elem.slice(0,4)
       var index=tot.findIndex(function(curr){return curr.firstLevel==currFirstLevel})
       if(index!=-1){
+        var twolevelcode=elem.split("/");
+        if(twolevelcode.length>1 && tot[index].secondLevel.indexOf(twolevelcode[0])===-1){
+          tot[index].secondLevel.push(twolevelcode[0]);
+        }
         tot[index].secondLevel.push(elem);
       }else{
-        tot.push({firstLevel:currFirstLevel,secondLevel:[currFirstLevel,elem.slice(0,3),elem]});
+        var obj=[];
+        obj.push(currFirstLevel);
+        obj.push(elem.slice(0,3));
+        var twolevelcode=elem.split("/");
+        if(twolevelcode.length>1){
+          obj.push(twolevelcode[0]);
+        }
+        obj.push(elem);
+        tot.push({firstLevel:currFirstLevel,secondLevel:obj});
       }
       return tot;
     },dataLabelArray);
