@@ -82,7 +82,7 @@
                     <tr ng-repeat="row in elasticsearch.dashboards | orderBy:['id'] | limitTo:dashboard.current.loader.load_elasticsearch_size">
                         <!--<td class="span11" style="vertical-align: middle;"><a href="#/dashboard/solr/{{row.id}}">{{row.id}}</a></td>-->
                       <!-- TODO -->
-                      <td class="span11" style="vertical-align: middle;"><a href="#/dashboard/solr/{{row.id}}?server={{row.server}}">{{row.id}}</a></td>
+                      <td class="span11" style="vertical-align: middle;"><a href="#/dashboard/solr/{{row.id}}?server={{row.server}}" target="_blank">{{row.id}}</a></td>
                         <td class="span1" ng-show="dashboard.current.loader.save_elasticsearch">
                             <a class="btn btn-danger" confirm-click="elasticsearch_delete(row.id)"
                                confirmation="Are you sure you want to delete {{row.id}} dashboard?">
