@@ -328,7 +328,7 @@ function (angular, app, _, $, kbn) {
       //   return;
       // }
       // dashboard.refresh();
-      filterDialogSrv.addMode('compare');      
+      filterDialogSrv.addMode('compare');
       filterDialogSrv.showDialog($scope.panel.field,term.label,term.pageY,term.pageX);
     };
 
@@ -437,7 +437,7 @@ function (angular, app, _, $, kbn) {
                       return v === 0 ? 0 : Math.exp(v); }
                   });
                 }
-
+                elem.text("");
                 plot = $.plot(elem, chartData, {
                   legend: { show: false },
                   series: {
@@ -471,7 +471,7 @@ function (angular, app, _, $, kbn) {
                 //   position = "nw";
                 // else if (scope.panel.counter_pos == "right")
                 //   position = "ne";
-
+                elem.text("")
                 plot = $.plot(elem, chartData, {
                   legend: {
                     show: false
