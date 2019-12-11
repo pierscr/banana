@@ -181,6 +181,10 @@ function (angular, _, config) {
             );
         };
 
+        $scope.myEncodeServerUri= function(input){
+           return window.encodeURIComponent(input);
+        };
+
         $scope.elasticsearch_dblist = function (query) {
             dashboard.elasticsearch_list(query, dashboard.current.loader.load_elasticsearch_size,$scope.getTitleField()).then(
                 function (result) {

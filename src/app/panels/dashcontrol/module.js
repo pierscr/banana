@@ -86,7 +86,7 @@ function(angular, app, _) {
         ($scope.panel.ttl_enable ? ttl : false)
       ).then(
         function(result) {
-          
+
         if (DEBUG) {
           console.log('result = ',result);
         }
@@ -122,6 +122,10 @@ function(angular, app, _) {
         }
       );
     };
+
+    $scope.myEncodeServerUri= function(input){
+       return window.encodeURIComponent(input);
+    }
 
     $scope.elasticsearch_dblist = function(query) {
       dashboard.elasticsearch_list(query,$scope.panel.elasticsearch_size).then(
