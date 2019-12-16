@@ -39,8 +39,9 @@ define('labelText',
               .append('tspan')      //2nd part of label
               .attr("class", "label")
               .text(function(d){
-                var returnText=d.value.substr(0,labelTextLength);
-                if(labelTextLength<d.value.length){
+                var label=d.value.split("/").pop();
+                var returnText=label.substr(0,labelTextLength);
+                if(labelTextLength<label.length){
                   returnText+="...";
                 }
                 return returnText;
