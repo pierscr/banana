@@ -48,7 +48,7 @@ define([
       //mode='either';
 
       if(value) {
-        filterSrv.set({type:'terms',field:field,value:value,mandate:mode,active:active});
+        filterSrv.set({type:'terms',field:field,value:value,mandate:'must',active:active});
       } else {
         return;
       }
