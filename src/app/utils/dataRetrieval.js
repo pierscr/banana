@@ -22,18 +22,24 @@ define('dataRetrieval',['angular','d3'],function(angular,d3){
             var addCointainsConstraint=function(searchField){
               $scope.forEachFilter=function(fn){
                 d3.keys(dashboard.current.services.filter.list)
-                  .forEach(function(item,index){
+                  .forEach(function(item,index,array){
                     if(dashboard.current.services.filter.list[item].active){
                       //fn(dashboard.current.services.filter.list[item].field,dashboard.current.services.filter.list[item].value);
-                      fn(dashboard.current.services.filter.list[item],index);
+                      fn(dashboard.current.services.filter.list[item],index,array);
                     }
                   });
               };
 
               //--contains features-->
-              $scope.forEachFilter(function(filter,index){
+              $scope.forEachFilter(function(filter,index,array){
                 if(filter.field===searchField && filter.value.length>0){
-                  //containsConstraint="&facet.contains="+filter.value;
+                  if(index === array.length - 1){
+                      containsConstraint="&facet.matches=("+filter.value+")|("+filter.value+"/[A-Za-z0-9,_]*)";
+                  }
+                  // else{
+                  //   containsConstraint+="|("+filter.value+")|("+filter.value+"/[A-Za-z0-9,_]*)";
+                  // }
+
                 }
               });
               return this;
