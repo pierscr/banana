@@ -34,7 +34,7 @@ define('dataRetrieval',['angular','d3'],function(angular,d3){
               $scope.forEachFilter(function(filter,index,array){
                 if(filter.field===searchField && filter.value.length>0){
                   if(index === array.length - 1){
-                      containsConstraint="&f."+filter.field+".facet.matches=("+filter.value+")|("+filter.value+"/[A-Za-z0-9,_]*)";
+                      containsConstraint="&f."+filter.field+".facet.matches=("+filter.value+")|("+filter.value+"/[A-Za-z0-9,_-]*)";
                   }
                   // else{
                   //   containsConstraint+="|("+filter.value+")|("+filter.value+"/[A-Za-z0-9,_]*)";

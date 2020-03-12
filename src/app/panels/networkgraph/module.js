@@ -186,12 +186,12 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
               }
             nodesClouse+="\")";
             }
-            var nodePar="&q="+$scope.panel.nodeLink1+":"+nodesClouse+" && "+$scope.panel.nodeLink2+":"+nodesClouse;
+            var nodePar="&q="+$scope.panel.nodeLink1+":"+nodesClouse+" AND "+$scope.panel.nodeLink2+":"+nodesClouse;
             //var nodePar="&q="+$scope.panel.nodeLink1+":"+nodesClouse;
             var linksRequest = $scope.sjs.Request();
                 linksRequest.setQuery(
                   //"wt=json&rows=60000"+"&fq=Similarity:["+$scope.panel.linkValue+" TO *]"+nodePar+"&sort=Similarity_f desc"
-                  "wt=json&rows="+$scope.panel.linkNumber*3+"&fq=Similarity:["+$scope.panel.linkValue+" TO *]"+nodePar+"&sort=Similarity_f desc"
+                  "wt=json&rows="+$scope.panel.linkNumber*3+"&fq=Similarity_f:["+$scope.panel.linkValue+" TO *]"+nodePar+"&sort=Similarity_f desc"
                 );
             linksRequest
               .doSearch()
@@ -200,15 +200,16 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
 
                  var initModule=dataGraphMapping();
                  initModule
+                    .linkName1($scope.panel.nodeLink1)
+                    .linkName2($scope.panel.nodeLink2)
                     .nodes($scope.data.nodes)
-                    .links($scope.data.links.filter(function(link){return link.Similarity>$scope.panel.linkValue;}));
+                    .links($scope.data.links.filter(function(link){link.Similarity=link.Similarity_f; return link.Similarity_f>$scope.panel.linkValue;}));
 
                   $scope.forEachFilter(function(filter,index){
                       if(filter.field===$scope.panel.nodesField){
                         initModule.filter(decodeURIComponent(filter.value));
                       }
                     });
-
                 initModule.build();
 
                 $scope.data.nodes=initModule.filteredNodes();

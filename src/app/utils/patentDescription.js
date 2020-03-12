@@ -35,7 +35,7 @@ define('patentDescription',[],function(){
     };
     if($scope.panel.patent){
       $scope.sjs.Request()
-          .setQuery(queryBuild(data))
+          .setQuery(queryBuild(data.map(x => x.replace(/ /g,''))))
           .doSearch()
           .then(
             function(results){
