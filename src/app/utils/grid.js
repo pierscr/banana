@@ -15,6 +15,8 @@ define('grid',['dataGraphMapping','d3'],function(dataGraphMapping,d3){
       var columnTitles=[];
       var titleHeigth=0;
       var rowsNumberPar;
+      var link1FieldName="Cluster1";
+      var link2FieldName="Cluster2";
 
       var _nodeIndexing=function(nodeList){
 
@@ -46,6 +48,16 @@ define('grid',['dataGraphMapping','d3'],function(dataGraphMapping,d3){
 
       var rowField=function(fieldName){
         rowFieldName=fieldName;
+        return this;
+      };
+
+      var link1Field=function(fieldName){
+        link1FieldName=fieldName;
+        return this;
+      };
+
+      var link2Field=function(fieldName){
+        link2FieldName=fieldName;
         return this;
       };
 
@@ -131,6 +143,8 @@ define('grid',['dataGraphMapping','d3'],function(dataGraphMapping,d3){
         rowField:rowField,
         colField:colField,
         size:size,
+        link1Field:link1Field,
+        link2Field:link2Field,
         setDataProcessor:setDataProcessor,
         plainDataProcessor:_plainDataProcessor,
         build:build,
@@ -261,13 +275,15 @@ define('grid',['dataGraphMapping','d3'],function(dataGraphMapping,d3){
 
           var _linkMap=function(obj,links,step){
             return links.map(function(link){
-                if(link.Cluster1[0]===obj.value && isStep(obj,step)){
+                var link1=Array.isArray(link[link1FieldName])?link[link1FieldName][0]:link[link1FieldName];
+                var link2=Array.isArray(link[link2FieldName])?link[link2FieldName][0]:link[link2FieldName];
+                if(link1===obj.value && isStep(obj,step)){
                   //console.log("step:"+step);
                   //console.log("cluster1---"+"x"+obj.x+" y:"+obj.y);
                   link.x1=obj.x;
                   link.y1=obj.y;
                   return link;
-                }else if(link.Cluster2[0]===obj.value && isStep(obj,step+1)){
+                }else if(link2===obj.value && isStep(obj,step+1)){
                   //console.log("step:"+step+1);
                   //console.log("cluster2--- x"+obj.x+" y:"+obj.y);
                   link.x2=obj.x;

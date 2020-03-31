@@ -49,6 +49,26 @@
     </div>
 </div>
 <div class="row-fluid">
+    <div class="span4">
+        <label class="small">
+          Leaf only<tip>show just the leaf nodes</tip>
+        </label>
+        <input class="input-small" ng-model="panel.leafonly" type="checkbox" ng-change="set_refresh(true)"></inpt>
+    </div>
+    <div class="span4">
+        <label class="small">
+          Cluster description facet<tip>check to show cluster label</tip>
+        </label>
+        <input class="input-small" ng-model="panel.clusterDescriptionCheck" type="checkbox" ng-change="set_refresh(true)"></inpt>
+    </div>
+    <div class="span4">
+        <label class="small">
+            Cluster description facet field<tip>Specify a the core name containing the nodes for the graph</tip>
+        </label>
+        <input type="text" class="input-xlarge" bs-typeahead="fields.list" ng-model="panel.clusterDescriptionField" ng-change="set_refresh(true)">
+    </div>
+</div>
+<div class="row-fluid">
     <div class="span3">
         <label class="small">
           Label <tip>check to show cluster label</tip>

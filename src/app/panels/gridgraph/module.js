@@ -73,6 +73,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
       nodeSearch:'cluster_str',
       linkThreshold:0.7,
       patent:false,
+      leafonly:false,
       label:false,
       patentDescriptionCollection:"cpc_codes",
       labelNumberLimit:10,
@@ -83,7 +84,9 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
       labelTextLength: 30,
       patentCodeField:"escluster_str_patent_codes_str",
       maxNumberOfPantetCodes:6,
-      parameters:""
+      parameters:"",
+      clusterDescriptionField:"title",
+      clusterDescriptionCheck:false
     };
 
     // Set panel's default values
@@ -161,7 +164,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
         $scope.panel.copyLinksCore=dashboard.current.solr.core_name.replace("clusters","sim_matrix");
       }
 
-      range=rangeDate($scope.panel.startYear,$scope.panel.stepYear,2019);
+      range=rangeDate($scope.panel.startYear,$scope.panel.stepYear,2020);
 
 
       $scope.myGrid=grid();
@@ -170,7 +173,9 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
 
         $scope.myGrid
           .setDataProcessor(processor)
-          .rowsNumber($scope.panel.max_rows);
+          .rowsNumber($scope.panel.max_rows)
+          .link1Field($scope.panel.nodeLink1)
+          .link2Field($scope.panel.nodeLink2);
 
       dataSource=dataRetrieval($scope,dashboard,$q,filterSrv,querySrv);
 
@@ -191,7 +196,12 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
         .getNodes()
         .then(function(results){
             $scope.updateGlobalHirarchy();
-            var nodeFacet=results.facet_counts.facet_pivot[$scope.panel.nodesField].filter(hierarchyFilter);
+            var nodeFacet;
+            if($scope.panel.leafonly){
+              nodeFacet=results.facet_counts.facet_pivot[$scope.panel.nodesField];
+            }else{
+              nodeFacet=results.facet_counts.facet_pivot[$scope.panel.nodesField].filter(hierarchyFilter);
+            }
             nodeFacet=nodeFacet.slice(0,$scope.panel.max_rows);
             var newIndex=index+1;
             if(nodeFacet.length>0  || range.getRange(index)==undefined){
@@ -246,11 +256,12 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
           })
           .then(function(results){
               var nodes=results.nodes.map(function(item){ item.step=stepNumber+1; item.year=range.getRange(stepNumber+1);return item;})
-              $scope.myGrid.addLink(results.links.map(function(item){ item.step=stepNumber+1;return item;}));
+              $scope.myGrid.addLink(results.links.map(function(item){item.Similarity=item.Similarity_f; item.step=stepNumber+1;return item;}));
               $scope.myGrid.addNode(nodes);
               $scope.myGrid.stepFn(stepNumber);
               $scope.$emit('render');
-              $scope.$emit('addCiclesSteps',nodes,stepNumber+1);
+              if(range.getRange(stepNumber + 1).split('-').pop()!="2020")
+                $scope.$emit('addCiclesSteps',nodes,stepNumber+1);
           });
       }else{
         $scope.$emit('render');
@@ -260,7 +271,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
 
   });
 
-  module.directive('gridgraphChart', function(filterDialogSrv,dashboard) {
+  module.directive('gridgraphChart', function(filterDialogSrv,dashboard,filterSrv) {
     return {
       restrict: 'E',
       link: function(scope, element)  {
@@ -441,13 +452,32 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
             }
         })
         .on('mouseover', function(data,event){
-          if(d3.event.target.className.baseVal =='bubble' && !window.labelPersistTrigger){
+          var labelDescr=function(data,targetEvent){
             labelTooltip.hide();
-            var targetEvent=d3.event.target;
             clusterTooltip
-              .setDirectionByTarget(d3.event)
-              .show(data,targetEvent);
+              .setDirectionByTarget(targetEvent)
+              .show(data,targetEvent.target);
+          }
+          if(d3.event.target.className.baseVal =='bubble' && !window.labelPersistTrigger){
+            var targetEvent=d3.event;
+            if(scope.panel.clusterDescriptionCheck){
+              scope.sjs.client.server(dashboard.current.solr.server + scope.panel.copyNodesCore);
+              var filters="&wt=json&q=*:*&facet=on&facet.field="+scope.panel.clusterDescriptionField+"&rows=0&facet.limit=20";
+                filters+="&fq="+data.field+":\""+data.value+"\"";
+                filters+="&"+filterSrv.getSolrFq();
+              scope.sjs.Request()
+                  .setQuery(filters)
+                  .doSearch()
+                  .then(function(results){
+                      data.description=results.facet_counts.facet_fields[scope.panel.clusterDescriptionField];
+                      labelDescr(data,targetEvent);
+                });
+              }else{
+                labelDescr(data,targetEvent);
+              }
             }
+
+            /*----*/
         })
         .on('mouseout', function(){
           clusterTooltip.hide();

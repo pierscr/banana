@@ -12,6 +12,17 @@ define('clusterTooltip',['d3tip','pivotToLabel','createLabelRow'],function(d3tip
                       .concat("Level",(typeof d.name === 'string' ?  d.name.split("/").length-1: d.value.split("/").length-1))
                       .concat("",pivotToLabel(d));
                       //.concat("Desc",d.desc);
+                      if(d.description!=undefined){
+                        var description=d.description.reduce(function(tot,curr, index,arr){
+                          if(index % 2 === 0){
+                            tot.push(curr);
+                          }else{
+                            tot[tot.length-1]=tot[tot.length-1]+"("+curr+") ";
+                          }
+                          return tot;
+                        },[]);
+                        label.concat("Desc",description);
+                      }
 
                       cluster_levels.map(function(value,index){
                         label.concat("Parent"+index,value);

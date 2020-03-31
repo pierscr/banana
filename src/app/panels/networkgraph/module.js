@@ -79,7 +79,9 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
       labelTextLength: 30,
       patentCodeField:"escluster_str_patent_codes_str",
       maxNumberOfPantetCodes:6,
-      parameters:""
+      parameters:"",
+      clusterDescriptionField:"title",
+      clusterDescriptionCheck:false
     };
 
     // Set panel's default values
@@ -223,7 +225,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
     };
   });
 
-  module.directive('networkgraphChart', function(filterDialogSrv,dashboard) {
+  module.directive('networkgraphChart', function(filterDialogSrv,dashboard,filterSrv) {
     return {
       restrict: 'E',
       link: function(scope, element)  {
@@ -401,12 +403,31 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
               })
 
               .on('mouseover', function(data,event){
-                  var targetEvent=d3.event.target;
+                  var targetEvent=d3.event;
+
+                  var labelDescr=function(data,targetEvent){
+                    labelTooltip.hide();
+                    !mouseDownFlag && clusterTooltip
+                                        .setDirectionByTarget(targetEvent)
+                                        .show(data,targetEvent.target);
+                  }
+
                   if(d3.event.target.className.baseVal.indexOf('bubble') !=-1 && !window.labelPersistTrigger){
-                        labelTooltip.hide();
-                        !mouseDownFlag && clusterTooltip
-                                            .setDirectionByTarget(d3.event)
-                                            .show(data,targetEvent);
+                    if(scope.panel.clusterDescriptionCheck){
+                      scope.sjs.client.server(dashboard.current.solr.server + scope.panel.copyNodesCore);
+                      var filters="&wt=json&q=*:*&facet=on&facet.field="+scope.panel.clusterDescriptionField+"&rows=0&facet.limit=20";
+                        filters+="&fq="+data.field+":\""+data.value+"\"";
+                        filters+="&"+filterSrv.getSolrFq();
+                      scope.sjs.Request()
+                          .setQuery(filters)
+                          .doSearch()
+                          .then(function(results){
+                              data.description=results.facet_counts.facet_fields[scope.panel.clusterDescriptionField];
+                              labelDescr(data,targetEvent);
+                        });
+                      }else{
+                        labelDescr(data,targetEvent);
+                      }
                   }
 
                   //console.log(data);

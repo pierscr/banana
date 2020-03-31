@@ -79,7 +79,7 @@ define('dataRetrieval',['angular','d3'],function(angular,d3){
               $scope.sjs.client.server(dashboard.current.solr.server + $scope.panel.copyLinksCore);
               //var join="&q={!join from="+$scope.panel.nodesField+" to=Cluster2 fromIndex="+$scope.panel.nodesCore+"}*:*"
               var q="&q=*:*";
-              var nodeFilter="&wt=json&fq="+$scope.panel.nodeLink1+":"+_createNodeFiltersList(nodeList,callback)+"&rows="+row+"&fq="+$scope.panel.link2DateString+":*/"+step+"/*&sort=Similarity_f desc";
+              var nodeFilter="&wt=json&fq="+$scope.panel.nodeLink1+":"+_createNodeFiltersList(nodeList,callback)+"&rows="+row+"&fq="+$scope.panel.link1DateString+":*"+(step-1)+"*&fq="+$scope.panel.link2DateString+":*"+step+"*&sort=Similarity_f desc";
               var stepResults={stepNodes:[],selfNode:[],links:[],stepNodesResponse:false,selfNodeResponse:false};
               function semaphore(enabled){
                 if((stepResults.stepNodesResponse && stepResults.selfNodeResponse) || !enabled){
@@ -91,7 +91,7 @@ define('dataRetrieval',['angular','d3'],function(angular,d3){
               function addSimilarity(nodes,links){
                 return nodes.map(function(item){
                   var linkFound=links.find(function(link){
-                    return link.Cluster2==item.value;
+                    return link[$scope.panel.nodeLink2]==item.value;
                   });
                   if(linkFound)
                     item.Similarity_f=linkFound.Similarity_f;
@@ -108,7 +108,7 @@ define('dataRetrieval',['angular','d3'],function(angular,d3){
                       stepResults.links=results.response.docs;
                       stepResults.selfNode=[];
                       getNodes(stepResults.links,true,function(item){
-                          return item.Cluster2;
+                          return item[$scope.panel.nodeLink2];
                       })
                       .then(function(results){
                           //$scope.myGrid.addNode(results.facet_counts.facet_pivot['"+$scope.panel.nodesField+"'].map(function(item){ item.year=range.getRange(0);return item;}));
