@@ -464,7 +464,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
               scope.sjs.client.server(dashboard.current.solr.server + scope.panel.copyNodesCore);
               var filters="&wt=json&q=*:*&facet=on&facet.field="+scope.panel.clusterDescriptionField+"&rows=0&facet.limit=20";
                 filters+="&fq="+data.field+":\""+data.value+"\"";
-                filters+="&fq="+scope.panel.yearFieldName+":\""+data[scope.panel.yearFieldName]+"\"";
+                filters+="&fq="+scope.panel.yearFieldName+":\""+data.year+"\"";
                 filters+="&"+filterSrv.getSolrFq();
               scope.sjs.Request()
                   .setQuery(filters)
