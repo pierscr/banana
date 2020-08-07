@@ -188,7 +188,7 @@ function (angular, app, _, $, worldmap) {
             terms.push(facet_field, stats_obj[$scope.panel.mode]);
           });
         }
-
+        $scope.reverseCountryMap=[];
         if ($scope.hits > 0) {
           for (var i=0; i < terms.length; i += 2) {
             // Skip states with zero count to make them greyed out in the map.
@@ -198,12 +198,15 @@ function (angular, app, _, $, worldmap) {
               // the data contains both uppercase and lowercase state letters with
               // duplicate states (e.g. CA and ca). By adding the value, the map will
               // show correct counts for states with mixed-case letters.
-              if(($scope.panel.map === 'world' || $scope.panel.map === 'world-antarctica') && $scope.panel.useNames) {
-                if(worldmap.countryCodes[terms[i]]) {
-                  if (!$scope.data[worldmap.countryCodes[terms[i]]]) {
-                    $scope.data[worldmap.countryCodes[terms[i]]] = terms[i+1];
+              if($scope.panel.useNames) {
+                var termLower=terms[i].toLocaleLowerCase();
+                var currTerm=termLower.split(" ").map(function(entry){return entry.charAt(0).toUpperCase() + entry.slice(1);}).join(" ");
+                if(countryCodes[currTerm]) {
+                  if (!$scope.data[countryCodes[currTerm]]) {
+                    $scope.reverseCountryMap[countryCodes[currTerm]]=terms[i];
+                    $scope.data[countryCodes[currTerm]] = terms[i+1];
                   } else {
-                    $scope.data[worldmap.countryCodes[terms[i]]] += terms[i+1];
+                    $scope.data[countryCodes[currTerm]] += terms[i+1];
                   }
               	}
               }
@@ -236,10 +239,9 @@ function (angular, app, _, $, worldmap) {
         filterSrv.set({type:'querystring',mandate:'must',query:field+':"'+value.toUpperCase()+
           '" OR '+field+':"'+value.toLowerCase()+'"'});
       } else {
-        filterSrv.set({type:'querystring',mandate:'must',query:field+':"'+value.toUpperCase()+
-          '" OR '+field+':"'+value.toLowerCase()+'" OR '+field+':"'+value+'"'});
+        filterSrv.set({type:'terms',mandate:'must',field:field,value:$scope.reverseCountryMap[value]});
       }
-      
+
       dashboard.refresh();
     };
 
@@ -289,12 +291,7 @@ function (angular, app, _, $, worldmap) {
               onRegionClick: function(event, code) {
                 var count = _.isUndefined(scope.data[code]) ? 0 : scope.data[code];
                 if (count !== 0) {
-                  if (!scope.panel.useNames) {
                     scope.build_search(scope.panel.field, code);
-                  } else {
-                    var countryNames = _.invert(worldmap.countryCodes);
-                    scope.build_search(scope.panel.field, countryNames[code]);
-                  }
                 }
               }
             });
