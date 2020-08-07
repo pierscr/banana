@@ -41,6 +41,15 @@
       <input type="number" class="input-small" ng-model="panel.linkNumber" ng-change="set_refresh(true)">
   </div>
 </div>
+<h5>Hierarchy</h5>
+<div class="row-fluid">
+  <div class="span3">
+      <label class="small">
+        Enabled <tip>enable hierarchy representation</tip>
+      </label>
+      <input class="input-small" ng-model="panel.hierarchyView" type="checkbox" ng-change="set_refresh(true)"></inpt>
+  </div>
+</div>
 <h5>Graph </h5>
 <div class="row-fluid">
   <div class="span3">

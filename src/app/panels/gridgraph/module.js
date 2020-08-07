@@ -215,12 +215,12 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
 
     $scope.$on('addStepFilter',function(event,node){
       var ids=filterSrv.idsByMandate('must');
-      for(var index in ids){
-          filterSrv.remove(ids[index]);
-      }
+      // for(var index in ids){
+      //     filterSrv.remove(ids[index]);
+      // }
 
       $scope.refreshByGridgraph=true;
-      filterSrv.set({type:'terms',field:node.field,value:node.value,mandate:'either'});
+      filterSrv.set({type:'terms',field:$scope.panel.nodeSearch,value:node.value,mandate:'either'});
     })
 
     $scope.$on('addStep',function(event,nodeList){
@@ -346,7 +346,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
               .attr('class', 'd3-tip')
               .offset([-10, 0])
               .html(function(d) {
-                return "<div><strong>Similarity</strong> <span style='color:red'>" + Number(d.Similarity).toFixed(2) + "</span></div>";
+                return "<div><strong>Similarity</strong> <span style='color:red'>" + Number(d.Similarity || d.Similarity_f).toFixed(2) + "</span></div>";
               });
 
 
@@ -374,9 +374,9 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
 
         var lineStroke =   d3.scale.linear()
           .domain([d3.min(scope.myGrid.links(),function(link){
-            return link.Similarity;
+            return (link.Similarity || link.Similarity_f);
           }),d3.max(scope.myGrid.links(),function(link){
-            return link.Similarity;
+            return (link.Similarity || link.Similarity_f);
           })])
           .rangeRound([1,10]);
 
@@ -398,7 +398,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
               .attr('y1', function(d) { return d.y1; })
               .attr('x2', function(d) { return d.x2; })
               .attr('y2', function(d) { return d.y2; })
-              .attr("stroke-width", function(link){ var r=lineStroke(link.Similarity);return r<10?r:10})
+              .attr("stroke-width", function(link){ var r=lineStroke(link.Similarity || link.Similarity_f);return r<10?r:10})
               .attr('transform','scale(0)')
               .on('mouseover', function(event){
                 this.setAttribute('class', 'link_highlighted');
@@ -447,8 +447,12 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,grid,dataRetrieval,range
               scope.$emit('addStepFilter',d);
               scope.$emit('addStep',[d]);
             }else if(d3.event.target.className.baseVal =='bubble' && d3.event.target.parentNode.className.baseVal=="node2"){
-              filterDialogSrv.removeFilterByFieldAndValue(d.field,d.value);
-              dashboard.refresh();
+              //TODO
+              //filterDialogSrv.removeFilterByFieldAndValue($scope.panel.nodeSearch,d.value);
+              //TODO
+              clusterTooltip.hide();
+              scope.refreshByGridgraph=true;
+              scope.$emit('addStep',[d]);
             }
         })
         .on('mouseover', function(data,event){

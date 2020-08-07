@@ -304,6 +304,7 @@ define('grid',['dataGraphMapping','d3'],function(dataGraphMapping,d3){
 
           linkList=linkList
           .filter(function(item){
+            if(addedLinks[0]==undefined)return true;
             return item.step<addedLinks[0].step;
           })
           .concat(addedLinks.filter(function(link){

@@ -81,7 +81,8 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
       maxNumberOfPantetCodes:6,
       parameters:"",
       clusterDescriptionField:"title",
-      clusterDescriptionCheck:false
+      clusterDescriptionCheck:false,
+      hierarchyView:true
     };
 
     // Set panel's default values
@@ -144,6 +145,9 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
         return true;
       }
       var currentLevel=item.value.split("/").length-1;
+      if(!$scope.panel.hierarchyView){
+        return true;
+      }
       if(hierarchy>0){
         return (currentLevel==hierarchy || currentLevel==hierarchy-1);
       }else{
@@ -418,6 +422,7 @@ function (angular, app, _, $, d3,d3tip,dataGraphMapping,dataRetrieval,clusterToo
                       var filters="&wt=json&q=*:*&facet=on&facet.field="+scope.panel.clusterDescriptionField+"&rows=0&facet.limit=20";
                         filters+="&fq="+data.field+":\""+data.value+"\"";
                         filters+="&"+filterSrv.getSolrFq();
+                        filters+=scope.panel.parameters;
                       scope.sjs.Request()
                           .setQuery(filters)
                           .doSearch()
