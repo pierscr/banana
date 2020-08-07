@@ -35,7 +35,8 @@ function (angular, app, _, $, kbn) {
       ],
       exportfile: true,
       editorTabs : [
-        {title:'Queries', src:'app/partials/querySelect.html'}
+        {title:'Queries', src:'app/partials/querySelect.html'},
+        {title:'Join', src:'app/partials/join.html'}
       ],
       status  : "Stable",
       description : "Displays the results of a Solr facet as a pie chart, bar chart, or a table. Newly added functionality displays min/max/mean/sum of a stats field, faceted by the Solr facet field, again as a pie chart, bar chart or a table."
@@ -117,8 +118,16 @@ function (angular, app, _, $, kbn) {
 
       // Build Solr query
       var fq = '';
+      var joinQuery='';
+      if($scope.panel.joinEnable){
+        joinQuery="{!join from="+$scope.panel.joinCollectionRightParameter+" fromIndex="+dashboard.current.solr.core_name+" to="+$scope.panel.joinCollectionLeftParameter+"}"
+      }
       if (filterSrv.getSolrFq()) {
-        fq = '&' + filterSrv.getSolrFq();
+        fq = '&' + filterSrv.getSolrFq(undefined,undefined,joinQuery);
+      }else{
+        if($scope.panel.joinEnable){
+          fq = '&' + joinQuery + "*:*";
+        }
       }
       var wt_json = '&wt=' + filetype;
       var rows_limit = isForExport ? '&rows=0' : ''; // for terms, we do not need the actual response doc, so set rows=0
@@ -198,7 +207,12 @@ function (angular, app, _, $, kbn) {
       $scope.panelMeta.loading = true;
       var request, results;
 
-      $scope.sjs.client.server(dashboard.current.solr.server + dashboard.current.solr.core_name);
+      var core=dashboard.current.solr.core_name;
+      if($scope.panel.joinEnable){
+        core=$scope.panel.joinCollection;
+      }
+
+      $scope.sjs.client.server(dashboard.current.solr.server + core);
 
       request = $scope.sjs.Request().indices(dashboard.indices);
       $scope.panel.queries.ids = querySrv.idsByMode($scope.panel.queries);
@@ -329,7 +343,11 @@ function (angular, app, _, $, kbn) {
       // }
       // dashboard.refresh();
       filterDialogSrv.addMode('compare');
-      filterDialogSrv.showDialog($scope.panel.field,term.label,term.pageY,term.pageX);
+      if($scope.panel.chart!='table'){
+        filterDialogSrv.showDialog($scope.panel.field, term.label, term.pageY, term.pageX);
+      }else{
+        filterDialogSrv.showDialog($scope.panel.field, term.label, event.pageY, event.pageX);
+      }
     };
 
     $scope.set_refresh = function (state) {

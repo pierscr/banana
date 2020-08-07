@@ -169,10 +169,11 @@ define([
     // Return fq string for constructing a query to send to Solr.
     // noTime param use only in ticker panel so the filter query will return without
     // time filter query
-    this.getSolrFq = function(noTime,excludedField) {
+    this.getSolrFq = function(noTime,excludedField,prefilter) {
       var start_time, end_time, time_field;
       var filter_fq = '';
       var filter_either = [];
+      prefilter=prefilter===undefined?'':prefilter;
 
       // Loop through the list to find the time field, usually it should be in self.list[0]
       _.each(self.list, function(v, k) {
@@ -199,7 +200,7 @@ define([
             }
           } else if (v.type === 'terms') {
             if (v.mandate === 'must') {
-              filter_fq = filter_fq + '&fq=' + v.field + ':"' + v.value.replace(/%22/g,"%5C%22")+ '"';
+              filter_fq = filter_fq + '&fq='+prefilter + v.field + ':"' + v.value.replace(/%22/g,"%5C%22")+ '"';
             } else if (v.mandate === 'mustNot') {
               filter_fq = filter_fq + '&fq=-' + v.field + ':"' + v.value.replace(/%22/g,"%5C%22") + '"';
             } else if (v.mandate === 'either') {
