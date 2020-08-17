@@ -265,7 +265,7 @@ function (angular, app, _, $, worldmap) {
           require(['./panels/map/lib/map.'+scope.panel.map], function () {
             elem.vectorMap({
               map: scope.panel.map,
-              regionStyle: {initial: {fill: '#8c8c8c'}},
+              regionStyle: {initial: {fill: '#f5f5f5'}},
               zoomOnScroll: false,
               backgroundColor: null,
               series: {
