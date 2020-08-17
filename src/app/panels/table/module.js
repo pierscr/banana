@@ -248,7 +248,10 @@ function (angular, app, _, kbn, moment) {
                 query = angular.toJson(value);
             }
             // TODO: Need to take a look here, not sure if need change.
-            filterSrv.set({type: 'field', field: field, query: query, mandate: (negate ? 'mustNot' : 'must')});
+            filterSrv.set({type:'terms',field:field,value:value,mandate:'must'});
+
+            // pierscr changed the type of filter in 'terms'
+            //filterSrv.set({type: 'field', field: field, query: query, mandate: (negate ? 'mustNot' : 'must')});
 
             $scope.panel.offset = 0;
             dashboard.refresh();
