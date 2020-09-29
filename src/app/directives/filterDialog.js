@@ -25,11 +25,14 @@ define(['angular'],function(angular){
               filterDialogSrv.subscribeRemoveCallback(showRemoveDialog);
             };
 
-            var showAddDialog=function(posy,posx,mode){
+            var showAddDialog=function(posy,posx,mode,selections){
               if(mode!==undefined){
                 $scope.dialog=mode;
               }else{
                 $scope.dialog='orand';
+              }
+              if(selections!==undefined){
+                $scope.selections=selections;
               }
               $scope.style.top=posy;
               $scope.style.left=posx;
@@ -38,7 +41,10 @@ define(['angular'],function(angular){
               return showAddDeferred.promise;
             };
 
-            var showRemoveDialog=function(posy,posx){
+            var showRemoveDialog=function(posy,posx,selections){
+              if(selections!==undefined){
+                $scope.selections=selections;
+              }
               $scope.dialog='remove';
               $scope.style.top=posy;
               $scope.style.left=posx;
@@ -61,9 +67,11 @@ define(['angular'],function(angular){
               $scope.dialog=false;
             };
 
-
-
-            $scope.andSelection=function(){
+            $scope.andSelection=function(selection){
+              if(selection!==undefined){
+                console.log("ah ca ti ncucciavu:"+selection);
+                showAddDeferred.resolve({mode:'selection',value:selection});
+              }
               showAddDeferred.resolve('must');
               $scope.close();
               initAddPromise();

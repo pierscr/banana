@@ -46,11 +46,15 @@ function (angular, _, config) {
         };
 
         // This function is for getting the list of fields from a collection.
-        this.map = function () {
+        this.map = function (dashboadParam) {
             // Check USE_ADMIN_LUKE flag in config.js
-            // And also check USE_FUSION flag, if true, use Fusion Collection API instead of Solr.
+            // And also check UsSE_FUSION flag, if true, use Fusion Collection API instead of Solr.
             var fieldApi = '';
             var request;
+            var targetDashboard=dashboadParam;
+            if(dashboadParam==undefined || dashboadParam=="_all"){
+              targetDashboard=dashboard.current.solr.core_name;
+            }
 
             if (config.USE_FUSION) {
                 request = lucidworksSrv.getFields(dashboard.current.solr.core_name);
@@ -59,11 +63,11 @@ function (angular, _, config) {
             } else {
                 fieldApi = '/schema/fields';
             }
-            
+
             if (!config.USE_FUSION) {
                 request = $http({
                     // Get all fields in Solr core
-                    url: dashboard.current.solr.server + dashboard.current.solr.core_name + fieldApi,
+                    url: dashboard.current.solr.server + targetDashboard + fieldApi,
                     method: "GET"
                 }).error(function (data, status) {
                     if (status === 0) {
@@ -83,7 +87,7 @@ function (angular, _, config) {
                 var logs = 'logs';
                 mapping[log_index] = {};
                 mapping[log_index][logs] = {};
-                
+
                 if (config.USE_FUSION) {
                     _.each(p, function(v) {
                         mapping[log_index][logs][v.name] = {'type': v.type, 'schema': ''};

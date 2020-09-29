@@ -8,7 +8,7 @@ define([
 
   var module = angular.module('kibana.services');
 
-  module.service('filterDialogSrv',function($q,dashboard, filterSrv){
+  module.service('filterDialogSrv',function($q,dashboard, filterSrv,relatedDashboardSrv){
 
     var callback;
     var showRemoveCallback;
@@ -78,7 +78,13 @@ define([
 
     var callAddDialog=function(field,value,pageY,pageX){
       var resolve=function(mode){
-        build_search(field,value,mode);
+        //if the directive resolve the promise passing an object type it means that a dashboard has beeen selected
+        if(typeof mode=='object'){
+          console.log("callAddDialog resolved with selection:"+mode.value);
+          relatedDashboardSrv.goToDashboard(mode.value,field,value);
+        }else{
+          build_search(field,value,mode);
+        }
       };
 
       var reject=function(){
@@ -88,7 +94,8 @@ define([
         pageY=d3.event.pageY;
         pageX=d3.event.pageX;
       }
-      callback(pageY+"px",pageX+10+"px",dialogMode)
+      //here the function call the related dashboard services to get the dashboard regarding the field and value selected
+      callback(pageY+"px",pageX+10+"px",dialogMode,relatedDashboardSrv.getRelatedDashboardByField(field,value))
         .then(resolve,reject);
     };
 

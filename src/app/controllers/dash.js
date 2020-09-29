@@ -21,6 +21,7 @@ function (angular, config, _) {
         $scope.panelMoveStop = panelMove.onStop;
         $scope.panelMoveOver = panelMove.onOver;
         $scope.panelMoveOut = panelMove.onOut;
+        $scope.relatedDashboardfields= [];
 
         $scope.init = function () {
             $scope.config = config;
@@ -34,6 +35,7 @@ function (angular, config, _) {
             $scope.fields = fields;
             $scope.reset_row();
 
+            $scope.reset_related_dashboard();
             // Solr
             $scope.ejs = ejsResource(config.elasticsearch);
             $scope.sjs = sjsResource(config.solr + config.solr_core);
@@ -58,6 +60,32 @@ function (angular, config, _) {
                 editable: true,
             };
         };
+
+        $scope.add_relatedDashboard = function (related_dashboard, new_dashboard) {
+            related_dashboard.push(new_dashboard);
+        };
+
+        $scope.reset_related_dashboard= function () {
+            $scope.relatedDashboard = {
+                label: '',
+                dashboard:'',
+                fieldin: '',
+                fieldout:''
+            };
+        };
+
+        $scope.getRelatedFields=function(){
+          dashboard.elasticsearch_load('nochange', $scope.relatedDashboard.dashboard,"nochange").success(function(data){
+            fields.map(data.solr.core_name).then(function (result) {
+              var obj=result["logstash-2999.12.31"]["logs"]
+              $scope.relatedDashboardfields= Object.keys(obj);
+            });
+          })
+
+        }
+
+
+        // $scope.dashboards=dashboard.dashboard_list.map(x=>x.id);
 
         $scope.row_style = function (row) {
             return {'min-height': row.collapse || row.fixed? '5px' : row.height};

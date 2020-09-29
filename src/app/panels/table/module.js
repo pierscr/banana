@@ -531,4 +531,10 @@ function (angular, app, _, kbn, moment) {
             return data;
         };
     });
+    // This filter will check the input field to see if it should be displayed as <img src="data">
+    module.filter('addActionIcon', function () {
+        return function (text) {
+          return text+"<i class='icon-search pointer' ng-click='build_search(key,value)'></i><i class='icon-ban-circle pointer' ng-click='build_search(key,value,true)'></i>";
+        };
+    });
 });

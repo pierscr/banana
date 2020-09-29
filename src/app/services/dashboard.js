@@ -28,6 +28,8 @@ function (angular, $, kbn, _, config, moment, Modernizr) {
             home: true,
             failover: false,
             panel_hints: true,
+            related_dashboard:[],
+            dashboardList:[],
             rows: [],
             services: {},
             loader: {
@@ -86,6 +88,8 @@ function (angular, $, kbn, _, config, moment, Modernizr) {
 
         this.current = _.clone(_dash);
         this.last = {};
+        this.dashboard_list=[];
+        this.dashboard_list_objects=[];
 
         $rootScope.$on('$routeChangeSuccess', function () {
             // Clear the current dashboard to prevent reloading
@@ -210,7 +214,7 @@ function (angular, $, kbn, _, config, moment, Modernizr) {
             return dashboard;
         };
 
-        this.dash_load = function (dashboard) {
+        this.dash_load = function (dashboard,mode) {
             // Cancel all timers
             timer.cancel_all();
 
@@ -228,12 +232,16 @@ function (angular, $, kbn, _, config, moment, Modernizr) {
             self.current = _.clone(dashboard);
 
             // Ok, now that we've setup the current dashboard, we can inject our services
-            querySrv = $injector.get('querySrv');
-            filterSrv = $injector.get('filterSrv');
+              querySrv = $injector.get('querySrv');
+              filterSrv = $injector.get('filterSrv');
+          
+
 
             // Make sure these re-init
-            querySrv.init();
-            filterSrv.init();
+            if(mode!="nofilters"){
+              querySrv.init();
+              filterSrv.init();
+            }
 
             // If there's an index interval set and no existing time filter, send a refresh to set one
             if (dashboard.index.interval !== 'none' && filterSrv.idsByType('time').length === 0) {
@@ -369,7 +377,7 @@ function (angular, $, kbn, _, config, moment, Modernizr) {
         // };
 
         // Load a saved dashboard from Solr
-        this.elasticsearch_load = function (type, id) {
+        this.elasticsearch_load = function (type,id) {
           // For dashboard field, Fusion uses 'banana_dashboard_s', but Solr uses 'dashboard'
           var server = $routeParams.server + config.banana_index || config.solr + config.banana_index;
           var url = server + '/select?wt=json&q=' + self.TITLE_FIELD + ':"' + id + '"';
@@ -414,7 +422,14 @@ function (angular, $, kbn, _, config, moment, Modernizr) {
             }
             return false;
           }).success(function (data) {
-            self.dash_load(data);
+            switch (type) {
+              case "dashboard":
+                self.dash_load(data);
+                break;
+              case "nofilters":
+                self.dash_load(data,type);
+                break;
+            }
           });
         };
 

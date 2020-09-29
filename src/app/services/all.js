@@ -9,6 +9,7 @@ define([
   './panelMove',
   './solrSrv',
   './lucidworksSrv',
-  './filterDialogSrv'
+  './filterDialogSrv',
+  './relatedDashboardSrv'
 ],
 function () {});

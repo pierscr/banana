@@ -57,6 +57,8 @@ function (angular, _, config) {
             };
 
             $scope.elasticsearch.query = '';  // query for filtering the dashboard list
+            window.name=dashboard.current.title;
+            $scope.elasticsearch_dblist("");
         };
 
         // This function should be replaced by one-way binding feature of AngularJS 1.3
@@ -186,11 +188,14 @@ function (angular, _, config) {
         };
 
         $scope.elasticsearch_dblist = function (query) {
+          console.log("elasticsearch_dblist");
             dashboard.elasticsearch_list(query, dashboard.current.loader.load_elasticsearch_size,$scope.getTitleField()).then(
                 function (result) {
                     if (!_.isUndefined(result.response.docs)) {
                         $scope.hits = result.response.numFound;
                         $scope.elasticsearch.dashboards = parseDashboardList(result.response.docs);
+                        dashboard.dashboard_list=$scope.elasticsearch.dashboards.map(x=>x.id);
+                        dashboard.dashboard_list_objects=$scope.elasticsearch.dashboards;
 
                         // Handle pagination
                         $scope.loadMenu.totalPages = Math.ceil($scope.hits / dashboard.current.loader.load_elasticsearch_size);
