@@ -52,8 +52,13 @@ define(['angular'],function(angular){
               return showRemoveDeferred.promise;
             };
 
-            $scope.removeFilterSelection=function(){
-              showRemoveDeferred.resolve();
+            $scope.removeFilterSelection=function(selection){
+              if(selection!==undefined){
+                console.log("ah ca ti ncucciavu:"+selection);
+                showRemoveDeferred.resolve({mode:'selection',value:selection});
+              }else{
+                showRemoveDeferred.resolve();
+              }
               $scope.close();
               initRemovePromise();
             };
@@ -71,8 +76,10 @@ define(['angular'],function(angular){
               if(selection!==undefined){
                 console.log("ah ca ti ncucciavu:"+selection);
                 showAddDeferred.resolve({mode:'selection',value:selection});
+              }else{
+                showAddDeferred.resolve('must');
               }
-              showAddDeferred.resolve('must');
+
               $scope.close();
               initAddPromise();
             };

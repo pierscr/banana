@@ -31,7 +31,7 @@ function (angular, app, _, kbn, moment) {
 
     var module = angular.module('kibana.panels.table', []);
     app.useModule(module);
-    module.controller('table', function ($rootScope, $scope, $timeout, timer, fields, querySrv, dashboard, filterSrv, solrSrv) {
+    module.controller('table', function ($rootScope, $scope, $timeout, timer, fields, querySrv, dashboard, filterSrv, solrSrv,filterDialogSrv) {
         $scope.panelMeta = {
             modals: [
                 {
@@ -255,6 +255,11 @@ function (angular, app, _, kbn, moment) {
 
             $scope.panel.offset = 0;
             dashboard.refresh();
+        };
+
+          $scope.build_search_popup = function (field, value, event) {
+            filterDialogSrv.addMode('compare');
+            filterDialogSrv.showDialog(field, value,event.pageY,event.pageX);
         };
 
         $scope.fieldExists = function (field, mandate) {

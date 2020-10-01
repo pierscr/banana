@@ -101,9 +101,14 @@ define([
 
     var callRemoveDialog=function(field,value,pageY,pageX){
 
-      var resolve=function(){
+      var resolve=function(mode){
+        if(typeof mode=='object'){
+          console.log("callAddDialog resolved with selection:"+mode.value);
+          relatedDashboardSrv.goToDashboard(mode.value,field,value);
+        }else{
           removeFilterByFieldAndValue(field,value);
           dashboard.refresh();
+        }
       };
 
       var reject=function(){
@@ -113,7 +118,7 @@ define([
         pageY=d3.event.pageY;
         pageX=d3.event.pageX;
       }
-      showRemoveCallback(pageY+"px",pageX+10+"px")
+      showRemoveCallback(pageY+"px",pageX+10+"px",relatedDashboardSrv.getRelatedDashboardByField(field,value))
         .then(resolve,reject);
     };
 

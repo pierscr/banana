@@ -38,6 +38,7 @@
 
       <table class="table-hover table table-condensed" ng-style="panel.style">
         <thead ng-show="panel.header">
+          <th ></th>
           <th ng-show="panel.fields.length<1">message (select columns from the list to the left)</th>
           <th style="white-space:nowrap" ng-repeat="field in panel.fields">
             <i ng-show="!$first" class="pointer link icon-caret-left" ng-click="_.move(panel.fields,$index,$index-1)"></i>
@@ -53,11 +54,12 @@
         </thead>
 
         <tbody ng-repeat="event in data | slice:panel.offset:panel.offset+panel.size" ng-class-odd="'odd'">
-          <tr ng-click="toggle_details(event)" class="pointer">
-            <td ng-show="panel.fields.length<1">{{event.kibana._source|stringify|tableTruncate:panel.trimFactor:1}}</td>
+          <tr >
+            <td> <i class='icon-collapse  pointer' ng-click="toggle_details(event)" ></i></td>
+            <td ng-show="panel.fields.length<1" >{{event.kibana._source|stringify|tableTruncate:panel.trimFactor:1}}</td>
 
             <!-- Table columns -->
-            <td ng-show="panel.fields.length>0" ng-repeat="field in panel.fields" ng-bind-html-unsafe="(event.kibana.highlight[field]||event.kibana._source[field]) |tableHighlight |tableTruncate:panel.trimFactor:panel.fields.length:field:panel.imageFields |tableDisplayImageField:field:panel.imageFields:panel.imgFieldWidth:panel.imgFieldHeight|addActionIcon"></td>
+            <td ng-show="panel.fields.length>0" ng-repeat="field in panel.fields" class="pointer"  ng-click='build_search_popup(field,event.kibana._source[field],$event)' ng-bind-html-unsafe="(event.kibana.highlight[field]||event.kibana._source[field]) |tableHighlight |tableTruncate:panel.trimFactor:panel.fields.length:field:panel.imageFields |tableDisplayImageField:field:panel.imageFields:panel.imgFieldWidth:panel.imgFieldHeight"></td>
 
             <!-- Hyperlink column -->
             <td ng-click="" ng-show="panel.enableHyperlink && panel.displayLinkIcon" ng-bind-html-unsafe="event.kibana._source[panel.hyperlinkColumnForURI] |urlLinkAsIcon"></td>

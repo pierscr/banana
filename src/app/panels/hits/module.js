@@ -162,7 +162,7 @@ define([
             var stats = '&stats=true';
             _.each($scope.panel.metrics, function(metric) {
                 if (metric.field) {
-                    stats += '&stats.field=' + metric.field;
+                    stats += '&stats.field={!'+metric.type+'=true}' + metric.field;
                 }
             });
 

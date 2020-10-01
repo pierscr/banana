@@ -15,7 +15,7 @@
     <li ng-click="abort()">Abort</li>
   </ul>
   <ul ng-show="dialog=='remove'">
-    <li ng-repeat="selection in selections">{selection}</li>
+    <li ng-repeat="selection in selections" ng-click="removeFilterSelection(selection)" ng-bind-html-unsafe="selection">{selection}</li>
     <li ng-click="removeFilterSelection()">Remove filter</li>
     <li ng-click="abort()">Abort</li>
   </ul>

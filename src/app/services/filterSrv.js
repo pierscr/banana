@@ -27,17 +27,28 @@ define([
 
     var _f = dashboard.current.services.filter;
 
+    var onRemoveCallback=[];
+
     // Save a reference to this
     var self = this;
 
     // Call this whenever we need to reload the important stuff
-    this.init = function() {
+    this.init = function(list,ids) {
       // Populate defaults
       _.defaults(dashboard.current.services.filter,_d);
 
+      var list_t = dashboard.current.services.filter.list;
+      var ids_t = dashboard.current.services.filter.ids;
+
+      if(list!==undefined && ids !== undefined){
+        list_t = list;
+        ids_t = ids;
+      }
+
+
       // Accessors
-      self.list = dashboard.current.services.filter.list;
-      self.ids = dashboard.current.services.filter.ids;
+      self.list = list_t;
+      self.ids = ids_t;
       _f = dashboard.current.services.filter;
 
       _.each(self.getByType('time',true),function(time) {
@@ -48,6 +59,10 @@ define([
       });
 
     };
+
+    this.addOnRemoveCallback=function(callback){
+      onRemoveCallback.push(callback);
+    }
 
     // This is used both for adding filters and modifying them.
     // If an id is passed, the filter at that id is updated.
@@ -368,10 +383,10 @@ define([
       return ids;
     };
 
-    this.removeAll = function(){
+    this.removeAll = function(disableCallback){
       var ids = _.pluck(self.list,'id');
       _.each(ids,function(id) {
-        self.remove(id);
+        self.remove(id,disableCallback);
       });
     }
 
@@ -429,13 +444,18 @@ define([
       };
     };
 
-    this.remove = function(id) {
+    this.remove = function(id,disableCallback) {
       if(!_.isUndefined(self.list[id])) {
         delete self.list[id];
         // This must happen on the full path also since _.without returns a copy
         self.ids = dashboard.current.services.filter.ids = _.without(self.ids,id);
         _f.idQueue.unshift(id);
         _f.idQueue.sort(function(v,k){return v-k;});
+        if(onRemoveCallback.length>0 && !disableCallback){
+          onRemoveCallback.forEach(function(elem){
+            elem();
+          });
+        }
         return true;
       } else {
         return false;
@@ -457,6 +477,10 @@ define([
         return self.ids.length;
       }
     };
+
+    this.getFilters=function(){
+      return {list:self.list,ids:self.ids};
+    }
 
     // Now init
     self.init();

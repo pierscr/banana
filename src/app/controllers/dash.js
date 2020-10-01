@@ -9,7 +9,7 @@ function (angular, config, _) {
 
     var module = angular.module('kibana.controllers');
 
-    module.controller('DashCtrl', function ($scope, $route, ejsResource, sjsResource, fields, dashboard, alertSrv, panelMove) {
+    module.controller('DashCtrl', function ($scope, $route, ejsResource, sjsResource, fields, dashboard, alertSrv, panelMove,relatedDashboardSrv) {
         $scope.editor = {
             index: 0
         };
@@ -40,6 +40,10 @@ function (angular, config, _) {
             $scope.ejs = ejsResource(config.elasticsearch);
             $scope.sjs = sjsResource(config.solr + config.solr_core);
         };
+
+        $scope.backToDashboard=function(idx){
+          relatedDashboardSrv.backToDashboard(idx);
+        }
 
         $scope.isPanel = function (obj) {
             if (!_.isNull(obj) && !_.isUndefined(obj) && !_.isUndefined(obj.type)) {

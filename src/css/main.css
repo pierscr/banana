@@ -336,13 +336,15 @@ body.frame-background{
 .row-fixed .filtering-container{
   display: none;
   padding: 10px;
-  min-width: 230px;
+  min-width: 780px;
   background:#292929;
   margin-top: -2px;
   border: 1px solid black;
   z-index: 9998;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
+  overflow-y: auto;
+  max-height: 500px;
 }
 
 .row-fixed .panel-extra-container:not(:first-child) {
@@ -362,6 +364,11 @@ body.frame-background.fixed-row-theme{
   margin-top: 40px;
 
 }
+
+body.frame-background.fixed-row-theme.breadcrumbsActive{
+  margin-top: 90px;
+}
+
 .fixed-row-theme .navbar.navbar-static-top{
   top: 0px;
 }
@@ -469,4 +476,55 @@ body.frame-background.fixed-row-theme{
 
 .clusterPatentCodesRef{
   color: blue;
+}
+
+.banana-breadcrumb{
+  margin: 0;
+  padding-right: 20px;
+  padding-left: 20px;
+  padding-bottom: 5px;
+}
+
+.breadcrumbsActive .banana-breadcrumb{
+  margin: 0;
+  padding-right: 20px;
+  padding-left: 20px;
+  padding-bottom: 5px;
+  padding-top: 11px;
+  background: grey;
+}
+
+.breadcrumbsActive .banana-breadcrumb{
+  margin: 0;
+  padding-right: 20px;
+  padding-left: 20px;
+  padding-bottom: 5px;
+}
+
+
+
+.banana-breadcrumb>li{
+  display: inline-block;
+    color: white;
+}
+
+.banana-breadcrumb>li>a,.banana-breadcrumb>li>span{
+  display: inline-block;
+  color: #fff;
+  padding: 0 3px 0 1px;
+  font-weight: 700;
+  margin-bottom: 3px;
+  padding-bottom: 3px;
+}
+
+.banana-breadcrumb span {
+    font-weight: normal;
+}
+.banana-breadcrumb>li>a.active{
+    border-bottom: 3px solid #3a87ad;
+}
+
+.banana-breadcrumb .badge{
+  margin-right: 10px;
+  border: 1px solid white;
 }

@@ -20,7 +20,7 @@
             <tr ng-repeat="metric in panel.metrics" data-drag="false" jqyoui-draggable="{animate:true}">
                 <td>
                     <select class="input-small" ng-change="set_refresh(true)" ng-model="metric.type"
-                            ng-options="f for f in ['count','min','mean','max','sum','stddev','sumOfSquares','missing']"></select>
+                            ng-options="f for f in ['count','min','mean','max','sum','stddev','sumOfSquares','missing','countDistinct','cardinality']"></select>
                 </td>
                 <td>
                     <input type="text" class="input-large" placeholder="Field name" bs-typeahead="fields.list"

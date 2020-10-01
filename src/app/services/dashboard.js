@@ -90,6 +90,7 @@ function (angular, $, kbn, _, config, moment, Modernizr) {
         this.last = {};
         this.dashboard_list=[];
         this.dashboard_list_objects=[];
+        this.breadcrumbs=[];
 
         $rootScope.$on('$routeChangeSuccess', function () {
             // Clear the current dashboard to prevent reloading
@@ -234,7 +235,7 @@ function (angular, $, kbn, _, config, moment, Modernizr) {
             // Ok, now that we've setup the current dashboard, we can inject our services
               querySrv = $injector.get('querySrv');
               filterSrv = $injector.get('filterSrv');
-          
+
 
 
             // Make sure these re-init

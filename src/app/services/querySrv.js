@@ -43,10 +43,21 @@ function (angular, _, config) {
     // Save a reference to this
     var self = this;
 
-    this.init = function() {
+    this.init = function(list,ids) {
+      // Populate defaults
       _q = dashboard.current.services.query;
-      self.list = dashboard.current.services.query.list;
-      self.ids = dashboard.current.services.query.ids;
+
+      var list_t = dashboard.current.services.query.list;
+      var ids_t = dashboard.current.services.query.ids;
+
+      if(list!==undefined && ids !== undefined){
+        list_t = list;
+        ids_t = ids;
+      }
+
+      // Accessors
+      self.list = list_t;
+      self.ids = ids_t;
 
       // Check each query object, populate its defaults
       _.each(self.list,function(query,id) {
@@ -137,6 +148,10 @@ function (angular, _, config) {
     this.findQuery = function(queryString) {
       return _.findWhere(self.list,{query:queryString});
     };
+
+    this.getQueries=function(){
+      return {list:self.list,ids:self.ids};
+    }
 
     this.idsByMode = function(config) {
       switch(config.mode)
