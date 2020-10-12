@@ -1,4 +1,4 @@
-<div class="context" ng-show="dialog=='orand' || dialog=='remove' || dialog=='send' || dialog=='compare' || dialog=='or'" ng-style="style">
+<div class="context" ng-show="dialog=='orand' || dialog=='remove' || dialog=='send' || dialog=='compare' || dialog=='or' || dialog=='selections'" ng-style="style">
   <ul ng-show="dialog=='orand'">
     <li ng-click="andSelection()">Select only this</li>
     <li ng-click="orSelection()">Select to compare</li>
@@ -12,6 +12,10 @@
   <ul ng-show="dialog=='compare'">
     <li ng-repeat="selection in selections" ng-click="andSelection(selection)" ng-bind-html-unsafe="selection">{selection}</li>
     <li ng-click="andSelection()">Select only this</li>
+    <li ng-click="abort()">Abort</li>
+  </ul>
+  <ul ng-show="dialog=='selections'">
+    <li ng-repeat="selection in selections" ng-click="andSelection(selection)" ng-bind-html-unsafe="selection">{selection}</li>
     <li ng-click="abort()">Abort</li>
   </ul>
   <ul ng-show="dialog=='remove'">

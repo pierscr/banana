@@ -285,10 +285,10 @@ define([
                         var data = jQuery.extend(true, [], scope.data); // jshint ignore:line
 
                         var labels_columns = [];
-                        var intensity_domain = d3.scale.linear().domain(scope.domain).range([0,10]);
+                        var intensity_domain = d3.scale.linear().domain(scope.domain).range([0,100]);
 
                         _.each(scope.internal_domain, function(d){
-                            var d_range = d3.scale.linear().domain(d).range([0,10]);
+                            var d_range = d3.scale.linear().domain(d).range([0,100]);
                             labels_columns.push(d_range);
                         });
 
@@ -311,7 +311,7 @@ define([
                             colSortOrder = false;
 
                         var brightrange = d3.scale.linear().domain([0,300]).range([0,3]),
-                            colr_domain = d3.range(11),
+                            colr_domain = d3.range(101),
                             otherRange  = d3.scale.linear().domain([0,10]).range([-255,255]); // we have 255 intensities for a color range
 
                         var cell_color = scope.panel.color;
@@ -341,7 +341,7 @@ define([
                             colors.push(color(otherRange(n)).toString());
                         });
 
-                        var colorScale   = d3.scale.quantile().domain([0, 10]).range(colors);
+                        var colorScale   = d3.scale.quantile().domain([0, 100]).range(colors);
 
                         var $tooltip = $('<div>');
 

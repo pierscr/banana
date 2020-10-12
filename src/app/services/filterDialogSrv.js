@@ -68,18 +68,18 @@ define([
       }
     };
 
-    var showDialog=function(field,value,pageY,pageX) {
+    var showDialog=function(field,value,pageY,pageX,values) {
       if(hasFilter('terms',field,value)){
-          callRemoveDialog(field,value,pageY,pageX);
+          callRemoveDialog(field,value,pageY,pageX,values);
         }else{
-          callAddDialog(field,value,pageY,pageX);
+          callAddDialog(field,value,pageY,pageX,values);
       }
     };
 
-    var callAddDialog=function(field,value,pageY,pageX){
+    var callAddDialog=function(field,value,pageY,pageX,values){
       var resolve=function(mode){
         //if the directive resolve the promise passing an object type it means that a dashboard has beeen selected
-        if(typeof mode=='object'){
+        if(typeof mode=='object' && values==undefined){
           console.log("callAddDialog resolved with selection:"+mode.value);
           relatedDashboardSrv.goToDashboard(mode.value,field,value);
         }else{
@@ -94,8 +94,9 @@ define([
         pageY=d3.event.pageY;
         pageX=d3.event.pageX;
       }
+      var relatedDashboards = values || relatedDashboardSrv.getRelatedDashboardByField(field,value);
       //here the function call the related dashboard services to get the dashboard regarding the field and value selected
-      callback(pageY+"px",pageX+10+"px",dialogMode,relatedDashboardSrv.getRelatedDashboardByField(field,value))
+      callback(pageY+"px",pageX+10+"px",dialogMode,relatedDashboards)
         .then(resolve,reject);
     };
 

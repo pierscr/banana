@@ -1,0 +1,12 @@
+<div ng-controller='upload' ng-init="init()">
+  <div class="input-group">
+    <div class="custom-file">
+      <input type="file" class="custom-file-input" id="file" file-model="fileUpload">
+      <label class="custom-file-label" for="inputGroupFile04">Choose file</label>
+    </div>
+    <div class="input-group-append">
+      <button class="btn btn-outline-secondary" type="button" ng-click="add()">Button</button>
+    </div>
+  </div>
+  <div>{{response}}</div>
+</div>

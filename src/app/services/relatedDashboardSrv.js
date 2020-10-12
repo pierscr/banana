@@ -128,6 +128,9 @@ define([
         filterSrv.set({type:'terms',field:field,value:value,mandate:'must'});
         solrSrv.getFacet(getFieldIn(targetDashboardId),100,function(fields){
           filterSrv.removeAll(true);
+          if(fields[getFieldIn(targetDashboardId)].length==0){
+            filterSrv.set({type:'terms',field:getRelatedDashboardField(targetDashboardId,field),"no-match":elem,mandate:'must'});
+          }
           fields[getFieldIn(targetDashboardId)].forEach(function(elem,index){
             index % 2 !== 0 || filterSrv.set({type:'terms',field:getRelatedDashboardField(targetDashboardId,field),value:elem,mandate:'either'});
           });

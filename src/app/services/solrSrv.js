@@ -139,4 +139,26 @@ function (angular, _) {
     };
 
   });
+
+  module.service('FileUpload', function ($http) {
+      this.upload = function(params, file, success, error){
+          var url = params.url+"" + params.core + "/" + params.handler + "?";
+          var raw = params.raw;
+          delete params.core;
+          delete params.handler;
+          delete params.raw;
+          delete params.url;
+          url += $.param(params);
+          if (raw && raw.length>0) {
+              if (raw[0] != "&") raw = "&" + raw;
+              url += raw;
+          }
+          var fd = new FormData();
+          fd.append('file', file);
+          $http.post(url, fd, {
+              transformRequest: angular.identity,
+              headers: {'Content-Type': undefined}
+          }).success(success).error(error);
+      }
+  });
 });

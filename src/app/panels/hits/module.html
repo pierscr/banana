@@ -8,7 +8,7 @@
             font-size: 10pt;
         }
     </style>
-    
+
     <div ng-show="panel.counter_pos == 'above' && (panel.chart == 'bar' || panel.chart == 'pie')" id='{{$id}}-legend'>
         <!-- vertical legend -->
         <table class="small" ng-show="panel.arrangement == 'vertical'">
@@ -57,7 +57,7 @@
     </div>
 
     <!-- TODO -->
-    <div ng-show="panel.chart == 'total'">
+    <div class="text-right" ng-show="panel.chart == 'total'">
         <!--<div ng-style="panel.style" class="hits-panel-metric">-->
             <!--<div>{{dashboard.numberWithCommas(hits)}}</div>-->
             <!--<div class="hits-panel-metric-label">{{panel.stats_fieldLabel}}</div>-->

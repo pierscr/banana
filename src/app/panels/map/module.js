@@ -247,7 +247,7 @@ function (angular, app, _, $, worldmap) {
 
   });
 
-  module.directive('map', function() {
+  module.directive('map', function(filterDialogSrv) {
     return {
       restrict: 'A',
       link: function(scope, elem) {
@@ -291,7 +291,9 @@ function (angular, app, _, $, worldmap) {
               onRegionClick: function(event, code) {
                 var count = _.isUndefined(scope.data[code]) ? 0 : scope.data[code];
                 if (count !== 0) {
-                    scope.build_search(scope.panel.field, code);
+                  var index=Object.values(countryCodes).findIndex(function(el){return el==code})
+                  filterDialogSrv.addMode('selections');
+                  filterDialogSrv.showDialog(scope.panel.field,scope.reverseCountryMap[code], event.currentTarget.clientHeight, event.currentTarget.clientWidth,["Select "+Object.keys(countryCodes)[index]]);
                 }
               }
             });

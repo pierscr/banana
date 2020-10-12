@@ -129,7 +129,8 @@ function (Settings) {
       'sunburst',
       'docviewer',
       'sankey',
-      'gridgraph'
+      'gridgraph',
+      'upload'
     ]
   });
 });
