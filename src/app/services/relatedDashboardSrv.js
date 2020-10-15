@@ -24,6 +24,7 @@ define([
         // reset
         querySrv.init();
         filterSrv.init();
+        filterSrv.removeAll(true);
         var targetDashboardId=getRelatedDashboardId(targetDashboardLabel)
         setFiltersFromFiedlAndValue(targetDashboardId,field,value);
         //  TODO ADD breadcrumb and davigation stack of current dashboard
