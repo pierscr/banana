@@ -43,14 +43,16 @@ define([
       if(mode==='either' && dialogMode=='orand'){
         active=false;
       }
-
-      //---->
-      //mode='either';
-
-      if(value) {
-        filterSrv.set({type:'terms',field:field,value:value,mandate:'must',active:active});
-      } else {
-        return;
+      if (Array.isArray(value)) {
+        value.forEach(function(element){
+          filterSrv.set({type:'terms',field:field,value:element,mandate:'must',active:active});
+        })
+      }else{
+        if(value) {
+          filterSrv.set({type:'terms',field:field,value:value,mandate:'must',active:active});
+        } else {
+          return;
+        }
       }
       if(mode!='either' || dialogMode!='orand'){
         dashboard.refresh();

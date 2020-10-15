@@ -31,7 +31,7 @@ function (angular, app, _, kbn, moment) {
 
     var module = angular.module('kibana.panels.table', []);
     app.useModule(module);
-    module.controller('table', function ($rootScope, $scope, $timeout, timer, fields, querySrv, dashboard, filterSrv, solrSrv,filterDialogSrv) {
+    module.controller('table', function ($rootScope, $scope, $timeout, timer, fields, querySrv, dashboard, filterSrv, solrSrv,filterDialogSrv,relatedDashboardSrv) {
         $scope.panelMeta = {
             modals: [
                 {
@@ -105,7 +105,12 @@ function (angular, app, _, kbn, moment) {
         };
         _.defaults($scope.panel, _d);
 
+        $scope.$watch('panel.fields', function (newValue, oldValue, scope) {
+            relatedDashboardSrv.setDashboardIcon($scope.panel,newValue);
+        }, true);
+
         $scope.init = function () {
+            relatedDashboardSrv.setDashboardIcon($scope.panel,$scope.panel.fields);
             $scope.Math = Math;
             // Solr
             $scope.sjs = $scope.sjs || sjsResource(dashboard.current.solr.server + dashboard.current.solr.core_name); // jshint ignore: line

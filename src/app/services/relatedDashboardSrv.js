@@ -218,6 +218,30 @@ define([
       }
     }
 
+    var setDashboardIcon=function(panel,value){
+      var check=function(value){
+        var elem=dashboard.current.related_dashboard
+          .find(function(elem){
+
+            return (elem.fieldin && value) && (elem.fieldin.indexOf(value)!=-1 || elem.pivotfield.indexOf(value)!=-1)
+          });
+          if(elem!=undefined){
+            panel.dashboardIcon=true;
+            return true;
+          }
+          panel.dashboardIcon=false;
+          return false;
+      }
+      if(Array.isArray(value)){
+        value.find(function(elem){
+          return check(elem);
+        });
+      }else{
+        check(value);
+      }
+
+    }
+
     filterSrv.addOnRemoveCallback(removeBreadcrumbBadge);
 
     return {
@@ -229,7 +253,8 @@ define([
       getFieldIn:getFieldIn,
       setFiltersFromFiedlAndValue:setFiltersFromFiedlAndValue,
       getPivotField:getPivotField,
-      removeBreadcrumbBadge:removeBreadcrumbBadge
+      removeBreadcrumbBadge:removeBreadcrumbBadge,
+      setDashboardIcon:setDashboardIcon
     };
   });
 

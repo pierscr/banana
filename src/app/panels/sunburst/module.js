@@ -15,7 +15,7 @@ define([
     var module = angular.module('kibana.panels.sunburst', []);
     app.useModule(module);
 
-    module.controller('sunburst', function ($scope, dashboard, querySrv, filterSrv,filterDialogSrv) {
+    module.controller('sunburst', function ($scope, dashboard, querySrv, filterSrv,filterDialogSrv,relatedDashboardSrv) {
         $scope.panelMeta = {
             modals: [{
                 description: "Inspect",
@@ -46,7 +46,13 @@ define([
         _.defaults($scope.panel, _d);
         var DEBUG = true;
 
+        $scope.$watch('panel.facet_pivot_strings', function (newValue, oldValue, scope) {
+            relatedDashboardSrv.setDashboardIcon($scope.panel,newValue);
+        }, true);
+
+
         $scope.init = function () {
+            relatedDashboardSrv.setDashboardIcon($scope.panel,$scope.panel.facet_pivot_strings);
             $scope.$on('refresh', function () {
                 $scope.get_data();
 

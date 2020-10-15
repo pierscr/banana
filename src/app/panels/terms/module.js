@@ -23,7 +23,7 @@ function (angular, app, _, $, kbn) {
   var module = angular.module('kibana.panels.terms', []);
   app.useModule(module);
 
-  module.controller('terms', function($scope, $timeout, timer, querySrv, dashboard, filterSrv,filterDialogSrv) {
+  module.controller('terms', function($scope, $timeout, timer, querySrv, dashboard, filterSrv,filterDialogSrv,relatedDashboardSrv) {
     $scope.panelMeta = {
       modals : [
         {
@@ -81,7 +81,12 @@ function (angular, app, _, $, kbn) {
     };
     _.defaults($scope.panel,_d);
 
+    $scope.$watch('panel.field', function (newValue, oldValue, scope) {
+        relatedDashboardSrv.setDashboardIcon($scope.panel,newValue);
+    }, true);
+
     $scope.init = function () {
+      relatedDashboardSrv.setDashboardIcon($scope.panel,$scope.panel.field);
       $scope.hits = 0;
       //$scope.testMultivalued();
 

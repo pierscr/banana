@@ -84,7 +84,7 @@ function (angular) {
 
           '<span class="row-button row-text panel-title" ng-show="panel.title">' +
             '{{panel.title}}' +
-          '</span>'+
+          '</span><i class="icon-th" ng-show="panel.dashboardIcon"></i>'+
 
         '</div></div>';
       return {
