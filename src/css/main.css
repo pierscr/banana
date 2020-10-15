@@ -528,3 +528,7 @@ body.frame-background.fixed-row-theme.breadcrumbsActive{
   margin-right: 10px;
   border: 1px solid white;
 }
+
+.font-weight-bold{
+font-weight: bold !important;;
+}

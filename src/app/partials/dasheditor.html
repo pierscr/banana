@@ -39,7 +39,7 @@
                                                           ng-options="f for f in ['dark','light']"></select>
             </div>
             <div class="span2">
-                <label class="small">Version</label>Banana v1.6.17
+                <label class="small">Version</label>Banana v1.9.0
             </div>
         </div>
     </div>
@@ -247,6 +247,7 @@
                     <th>Field current dashboard</th>
                     <th>Field related dashboard</th>
                     <th>Pivot field</th>
+                    <th>Field label</th>
                     </thead>
                     <tr ng-repeat="row in dashboard.current.related_dashboard">
                         <td>{{row.label}}</td>
@@ -254,6 +255,7 @@
                         <td>{{row.fieldin}}></td>
                         <td>{{row.fieldout}}</td>
                         <td>{{row.pivotfield}}</td>
+                        <td>{{row.fieldlabel}}</td>
                         <td><i ng-click="dashboard.current.related_dashboard = _.without(dashboard.current.related_dashboard,row)" class="pointer icon-remove"></i></td>
                     </tr>
                 </table>
@@ -283,7 +285,12 @@
                     <label class="small">Pivot field</label>
                     <input id="newRowPivotField" type="text" class="input-medium" ng-model='relatedDashboard.pivotfield' placeholder="Pivot field" bs-typeahead="fields.list" />
                 </div>
+                <div class="span3">
+                    <label class="small">Field Label</label>
+                    <input id="newRowLabelInput" type="text" class="input-medium" ng-model='relatedDashboard.fieldlabel' placeholder="field label" >
+                </div>
             </div>
+
             <div class="row-fluid">
               <button id="createRelatedDashboard" ng-click="add_relatedDashboard(dashboard.current.related_dashboard,relatedDashboard); reset_related_dashboard();" class="btn btn-success" ng-show="editor.index == 4">
                   Create Relation

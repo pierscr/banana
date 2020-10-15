@@ -92,13 +92,13 @@
   <table ng-style="panel.style" class="table tableSection table-striped table-condensed" ng-show="panel.chart == 'table'">
     <thead>
       <th>Term</th>
-      <th>{{panel.mode | capitalize}}</th>
+      <th ng-show="panel.mode!='none'">{{panel.mode | capitalize}}</th>
       <th>Action</th>
     </thead>
     <tbody ng-style="{height: row.height}">
     <tr ng-repeat="term in data" ng-show="showMeta(term)">
       <td>{{term.label}}</td>
-      <td>{{term.data[0][1].toFixed(panel.decimal_points)}}</td>
+      <td ng-show="panel.mode!='none'">{{term.data[0][1].toFixed(panel.decimal_points)}}</td>
       <td>
         <span ng-hide="term.meta == 'other'">
           <i class='icon-search pointer' ng-click="build_search(term)"></i>

@@ -74,7 +74,8 @@ function (angular, config, _) {
                 label: '',
                 dashboard:'',
                 fieldin: '',
-                fieldout:''
+                fieldout:'',
+                fieldlabel:''
             };
         };
 

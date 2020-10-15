@@ -3,28 +3,28 @@
     <li ng-click="andSelection()">Select only this</li>
     <li ng-click="orSelection()">Select to compare</li>
     <li ng-show="showCompare" ng-click="applyCompare()">Apply compare</li>
-    <li ng-click="abort()">Abort</li>
+    <li ng-click="abort()">Close</li>
   </ul>
   <ul ng-show="dialog=='or'">
     <li ng-click="orSelection()">Select</li>
-    <li ng-click="abort()">Abort</li>
+    <li ng-click="abort()">Close</li>
   </ul>
   <ul ng-show="dialog=='compare'">
     <li ng-repeat="selection in selections" ng-click="andSelection(selection)" ng-bind-html-unsafe="selection">{selection}</li>
     <li ng-click="andSelection()">Select only this</li>
-    <li ng-click="abort()">Abort</li>
+    <li ng-click="abort()">Close</li>
   </ul>
   <ul ng-show="dialog=='selections'">
     <li ng-repeat="selection in selections" ng-click="andSelection(selection)" ng-bind-html-unsafe="selection">{selection}</li>
-    <li ng-click="abort()">Abort</li>
+    <li ng-click="abort()">Close</li>
   </ul>
   <ul ng-show="dialog=='remove'">
     <li ng-repeat="selection in selections" ng-click="removeFilterSelection(selection)" ng-bind-html-unsafe="selection">{selection}</li>
     <li ng-click="removeFilterSelection()">Remove filter</li>
-    <li ng-click="abort()">Abort</li>
+    <li ng-click="abort()">Close</li>
   </ul>
   <ul ng-show="dialog=='send'">
     <li ng-click="abort()">Send as relevant</li>
-    <li ng-click="abort()">Abort</li>
+    <li ng-click="abort()">Close</li>
   </ul>
 </div>

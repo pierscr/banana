@@ -133,7 +133,7 @@ function (angular, app, _, $, kbn) {
       var rows_limit = isForExport ? '&rows=0' : ''; // for terms, we do not need the actual response doc, so set rows=0
       var facet = '';
 
-      if ($scope.panel.mode === 'count') {
+      if ($scope.panel.mode === 'count' || $scope.panel.mode === 'none') {
         facet = '&facet=true&facet.field=' + $scope.panel.field + '&facet.limit=' + $scope.panel.size + '&facet.missing=true';
       } else {
         // if mode != 'count' then we need to use stats query
@@ -270,7 +270,7 @@ function (angular, app, _, $, kbn) {
         $scope.hits = results.response.numFound;
         $scope.data = [];
 
-        if ($scope.panel.mode === 'count') {
+        if ($scope.panel.mode === 'count' || $scope.panel.mode === 'none') {
           // In count mode, the y-axis min should be zero because count value cannot be negative.
           $scope.yaxis_min = 0;
           _.each(results.facet_counts.facet_fields, function(v) {
@@ -353,7 +353,7 @@ function (angular, app, _, $, kbn) {
     $scope.set_refresh = function (state) {
       $scope.refresh = state;
       // if 'count' mode is selected, set decimal_points to zero automatically.
-      if ($scope.panel.mode === 'count') {
+      if ($scope.panel.mode === 'count' || $scope.panel.mode === 'none') {
         $scope.panel.decimal_points = 0;
       }
     };

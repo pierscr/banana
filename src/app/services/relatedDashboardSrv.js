@@ -110,6 +110,18 @@ define([
       }
     }
 
+    var getRelatedDashboardFieldLabel=function(targetDashboardLabel){
+      var elem=dashboard.current.related_dashboard
+        .find(function(elem){
+          return elem.label==targetDashboardLabel;
+        });
+      if(elem!=undefined && elem.fieldlabel!=undefined ){
+        return elem.fieldlabel;
+      }else{
+          return "";
+      }
+    }
+
     var getRelatedDashboardByField=function(field,value){
       var dashboards=dashboard.current.related_dashboard.filter(function(elem){
         return field==elem.fieldin || field==elem.pivotfield;
@@ -167,7 +179,8 @@ define([
         if(dashboard.breadcrumbs.length===0){
           dashboard.breadcrumbs.push({title:dashboard.current.title,param:"Home"});
         }
-        dashboard.breadcrumbs.push({title:label,param:value});
+        var fieldlabel=getRelatedDashboardFieldLabel(label);
+        dashboard.breadcrumbs.push({title:label,label:fieldlabel,param:value,});
         //var filters=_.clone(filterSrv.getFilters());
         var filters = $.extend(true, {}, filterSrv.getFilters());
         // filters.list=Array.from(filterSrv.getFilters().list);
@@ -201,6 +214,7 @@ define([
       var lastIndex=dashboard.breadcrumbs.length;
       if(lastIndex>0){
           dashboard.breadcrumbs[lastIndex-1].param="";
+          dashboard.breadcrumbs[lastIndex-1].label="";
       }
     }
 
