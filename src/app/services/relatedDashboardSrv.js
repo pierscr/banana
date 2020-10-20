@@ -10,12 +10,31 @@ define([
 
   var module = angular.module('kibana.services');
 
-  module.service('relatedDashboardSrv',function($q,dashboard, filterSrv,querySrv,solrSrv){
+  module.service('relatedDashboardSrv',function($q,dashboard, filterSrv,querySrv,solrSrv,filterDialogSrv){
 
     var callback;
     var changeMode="this_tab";//"new_tab"
     var navigationMode="incremental";//static
     var navStacks=[];
+
+    filterDialogSrv.subscribeDialogList(function(field,value,selections){
+
+        getRelatedDashboardByField(field,value)
+        .forEach(function(elem){
+            var badge='';
+            var labelObject={
+                  value:elem,
+                  badge:"",
+                  callback:function(){
+                      goToDashboard(elem,field,value);
+                    }
+                  }
+            getNumberOfResult(elem,field,value).then(function(result){
+              labelObject.badge=result;
+            })
+            selections.push(labelObject)
+          })
+    });
 
     var goToDashboard=function(targetDashboardLabel,field,value){
         console.log("go to this target dashboad: "+targetDashboardLabel );
@@ -110,6 +129,16 @@ define([
       }
     }
 
+    var getRelatedDashboardCountField=function(targetDashboardId){
+      var elem=dashboard.current.related_dashboard
+        .find(function(elem){
+          return elem.dashboard==targetDashboardId;
+        });
+      if(elem!=undefined){
+        return elem.countfield;
+      }
+    }
+
     var getRelatedDashboardFieldLabel=function(targetDashboardLabel){
       var elem=dashboard.current.related_dashboard
         .find(function(elem){
@@ -139,7 +168,7 @@ define([
       var pivotField=getPivotField(targetDashboardId)
       if(pivotField!=undefined){
         filterSrv.set({type:'terms',field:field,value:value,mandate:'must'});
-        solrSrv.getFacet(getFieldIn(targetDashboardId),100,function(fields){
+        solrSrv.getFacet(getFieldIn(targetDashboardId),100,"&"+filterSrv.getSolrFq(),function(fields){
           filterSrv.removeAll(true);
           if(fields[getFieldIn(targetDashboardId)].length==0){
             filterSrv.set({type:'terms',field:getRelatedDashboardField(targetDashboardId,field),"no-match":elem,mandate:'must'});
@@ -149,6 +178,36 @@ define([
           });
         });
       }
+    }
+
+    var getNumberOfResult=function(targetDashboard,field,value){
+      var deferred=$q.defer();
+      var targetDashboardId=getRelatedDashboardId(targetDashboard);
+      var filters=[];
+      var pivotField=getPivotField(targetDashboardId)
+      if(getFieldIn(targetDashboardId)==field){
+        filters.push({type:'terms',field:getRelatedDashboardField(targetDashboardId,field),value:value,mandate:'must'});
+        var countField=getRelatedDashboardCountField(targetDashboardId) || "id";
+        solrSrv.count(countField,1000,filters,getCore(targetDashboardId),function(count){
+          deferred.resolve(count);
+        });
+      }else if(pivotField!=undefined){
+        filters.push({type:'terms',field:field,value:value,mandate:'must'});
+        solrSrv.getFacet(getFieldIn(targetDashboardId),100,filterSrv.filtersQueryString(filters),function(fields){
+          filters=[];
+          if(fields[getFieldIn(targetDashboardId)].length==0){
+            filters.push({type:'terms',field:getRelatedDashboardField(targetDashboardId,field),"no-match":elem,mandate:'must'});
+          }
+          fields[getFieldIn(targetDashboardId)].forEach(function(elem,index){
+            index % 2 !== 0 || filters.push({type:'terms',field:getRelatedDashboardField(targetDashboardId,field),value:elem,mandate:'either'});
+          });
+
+          solrSrv.count(getFieldOut(targetDashboardId),1000,filters,getCore(targetDashboardId),function(count){
+            deferred.resolve(count);
+          });
+        });
+      }
+      return deferred.promise;
     }
 
     var getPivotField=function(targetDashboardId){
@@ -171,6 +230,16 @@ define([
         });
       if(elem!=undefined){
         return elem.fieldin;
+      }
+    }
+
+    var getFieldOut=function(targetDashboardId){
+      var elem=dashboard.current.related_dashboard
+        .find(function(elem){
+          return elem.dashboard==targetDashboardId;
+        });
+      if(elem!=undefined){
+        return elem.fieldout;
       }
     }
 
@@ -223,7 +292,7 @@ define([
         var elem=dashboard.current.related_dashboard
           .find(function(elem){
 
-            return (elem.fieldin && value) && (elem.fieldin.indexOf(value)!=-1 || elem.pivotfield.indexOf(value)!=-1)
+            return (elem.fieldin && value) && (elem.fieldin.indexOf(value)!=-1 || (elem.pivotfield && elem.pivotfield.indexOf(value)!=-1))
           });
           if(elem!=undefined){
             panel.dashboardIcon=true;
@@ -240,6 +309,12 @@ define([
         check(value);
       }
 
+    }
+
+    var getCore=function(dashboardId){
+      return dashboard.dashboard_list_objects.find(function(elem){
+        return elem.id==dashboardId;
+      }).core_name;
     }
 
     filterSrv.addOnRemoveCallback(removeBreadcrumbBadge);

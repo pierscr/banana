@@ -181,6 +181,74 @@ define([
       }
     };
 
+    this.filtersQueryString=function(filters){
+      // Loop through the list to find the time field, usually it should be in self.list[0]
+      var filter_fq='';
+      var filter_either = [];
+      _.each(filters, function(v, k) {
+        var test="";
+        if (DEBUG) {
+          console.debug('filterSrv: v=', v, ' k=', k);
+        }
+
+        if (v.type === 'time') {
+          time_field = v.field;
+          // Check for type of timestamps
+          // In case of relative timestamps, they will be string, not Date obj.
+          if (v.from instanceof Date) {
+            start_time = new Date(v.from).toISOString();
+          } else {
+            start_time = v.from;
+          }
+
+          if (v.to instanceof Date) {
+            end_time = new Date(v.to).toISOString();
+          } else {
+            end_time = v.to;
+          }
+        } else if (v.type === 'terms') {
+          if (v.mandate === 'must') {
+            filter_fq = filter_fq + '&fq='+ v.field + ':"' + v.value.replace(/%22/g,"%5C%22")+ '"';
+          } else if (v.mandate === 'mustNot') {
+            filter_fq = filter_fq + '&fq=-' + v.field + ':"' + v.value.replace(/%22/g,"%5C%22") + '"';
+          } else if (v.mandate === 'either') {
+            filter_either.push(v.field + ':"' + v.value.replace(/%22/g,"%5C%22") + '"');
+          }
+        } else if (v.type === 'field') {
+          // v.query contains double-quote around it.
+          if (v.mandate === 'must') {
+            filter_fq = filter_fq + '&fq=' + v.field + ':' + v.query.replace(/%22/g,"%5C%22");
+          } else if (v.mandate === 'mustNot') {
+            filter_fq = filter_fq + '&fq=-' + v.field + ':' + v.query.replace(/%22/g,"%5C%22");
+          } else if (v.mandate === 'either') {
+            filter_either.push(v.field + ':' + v.query.replace(/%22/g,"%5C%22"));
+          }
+        } else if (v.type === 'querystring') {
+          if (v.mandate === 'must') {
+            filter_fq = filter_fq + '&fq=' + v.query;
+          } else if (v.mandate === 'mustNot') {
+            filter_fq = filter_fq + '&fq=-' + v.query;
+          } else if (v.mandate === 'either') {
+            filter_either.push(v.query);
+          }
+        } else if (v.type === 'range') {
+          if (v.mandate === 'must') {
+            filter_fq = filter_fq + '&fq=' + v.field + ':[' + v.from + ' TO ' + v.to + ']';
+          } else if (v.mandate === 'mustNot') {
+            filter_fq = filter_fq + '&fq=-' + v.field + ':[' + v.from + ' TO ' + v.to + ']';
+          } else if (v.mandate === 'either') {
+            filter_either.push(v.field + ':[' + v.from + ' TO ' + v.to + ']');
+          }
+        } else {
+          // Unsupport filter type
+          return false;
+        }
+      })
+      if (filter_either.length > 0) {
+        filter_fq = filter_fq + '&fq=(' + filter_either.join(' OR ') + ')';
+      }
+      return filter_fq;
+    }
     // Return fq string for constructing a query to send to Solr.
     // noTime param use only in ticker panel so the filter query will return without
     // time filter query

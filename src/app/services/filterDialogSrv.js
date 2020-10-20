@@ -8,13 +8,17 @@ define([
 
   var module = angular.module('kibana.services');
 
-  module.service('filterDialogSrv',function($q,dashboard, filterSrv,relatedDashboardSrv){
+  module.service('filterDialogSrv',function($q,dashboard, filterSrv){
 
     var callback;
     var showRemoveCallback;
     var dialogMode;
-
+    var subscribedDialogFns=[];
     var hideDialogCallback;
+
+    var subscribeDialogList=function(fn){
+      subscribedDialogFns.push(fn);
+    }
 
     var hideDialog=function() {
       hideDialogCallback();
@@ -81,10 +85,7 @@ define([
     var callAddDialog=function(field,value,pageY,pageX,values){
       var resolve=function(mode){
         //if the directive resolve the promise passing an object type it means that a dashboard has beeen selected
-        if(typeof mode=='object' && values==undefined){
-          console.log("callAddDialog resolved with selection:"+mode.value);
-          relatedDashboardSrv.goToDashboard(mode.value,field,value);
-        }else{
+        if(typeof mode!='object'){
           build_search(field,value,mode);
         }
       };
@@ -96,19 +97,31 @@ define([
         pageY=d3.event.pageY;
         pageX=d3.event.pageX;
       }
-      var relatedDashboards = values || relatedDashboardSrv.getRelatedDashboardByField(field,value);
+      //var relatedDashboards = values || relatedDashboardSrv.getRelatedDashboardByField(field,value);
       //here the function call the related dashboard services to get the dashboard regarding the field and value selected
-      callback(pageY+"px",pageX+10+"px",dialogMode,relatedDashboards)
+      //callback(pageY+"px",pageX+10+"px",dialogMode,relatedDashboards)
+      var callSubcribedDialogFn=function(selections){
+        subscribedDialogFns.forEach(function(fn){
+          fn(field,value,selections)
+        });
+        if(values!=undefined){
+          values.forEach(function(elem){
+            selections.push({value:elem});
+          });
+        }
+
+      }
+
+      callback(pageY+"px",pageX+10+"px",dialogMode,callSubcribedDialogFn,values)
         .then(resolve,reject);
+
     };
 
     var callRemoveDialog=function(field,value,pageY,pageX){
 
       var resolve=function(mode){
-        if(typeof mode=='object'){
-          console.log("callAddDialog resolved with selection:"+mode.value);
-          relatedDashboardSrv.goToDashboard(mode.value,field,value);
-        }else{
+        //if the directive resolve the promise passing an object type it means that a dashboard has beeen selected
+        if(typeof mode!='object'){
           removeFilterByFieldAndValue(field,value);
           dashboard.refresh();
         }
@@ -121,7 +134,14 @@ define([
         pageY=d3.event.pageY;
         pageX=d3.event.pageX;
       }
-      showRemoveCallback(pageY+"px",pageX+10+"px",relatedDashboardSrv.getRelatedDashboardByField(field,value))
+      //showRemoveCallback(pageY+"px",pageX+10+"px",relatedDashboardSrv.getRelatedDashboardByField(field,value))
+      var callSubcribedDialogFn=function(selections){
+        subscribedDialogFns.forEach(function(fn){
+          fn(field,value,selections)
+        });
+      }
+
+      showRemoveCallback(pageY+"px",pageX+10+"px",callSubcribedDialogFn)
         .then(resolve,reject);
     };
 
@@ -158,7 +178,8 @@ define([
       showDialog2:showDialog2,
       hideDialog:hideDialog,
       addMode:addMode,
-      removeFilterByFieldAndValue:removeFilterByFieldAndValue
+      removeFilterByFieldAndValue:removeFilterByFieldAndValue,
+      subscribeDialogList:subscribeDialogList
     };
   });
 

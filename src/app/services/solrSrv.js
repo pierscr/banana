@@ -87,14 +87,10 @@ function (angular, _) {
     };
 
 
-    this.getFacet = function(field,limit,callback) {
+    this.getFacet = function(field,limit,fq,callback) {
       // Check if we are calculating too many fields and show warning
       // Construct Solr query
       limit=limit || 10;
-      var fq = '';
-      if (filterSrv.getSolrFq()) {
-        fq = '&' + filterSrv.getSolrFq();
-      }
       var wt = '&wt=json';
       var facet = '&rows=0&facet=true&facet.mincount=1&facet.limit='+limit+'&facet.field=' +field;
       var query = '/select?' + querySrv.getORquery() + fq + wt + facet;
@@ -137,6 +133,49 @@ function (angular, _) {
         });
       // }); // each loop
     };
+
+    this.count = function(field,limit,filters,dashboardParam,callback) {
+
+ //http://localhost:8983/solr/techproducts/select?q=*:*&wt=json&stats=true&stats.field=price&rows=0&indent=true
+
+      // Check if we are calculating too many fields and show warning
+      // Construct Solr query
+      limit=limit || 10;
+      var fq = '';
+      if (filters!=undefined || (Array.isArray(filters) && filters.length>0)) {
+        fq = filterSrv.filtersQueryString(filters);
+      }
+      var wt = '&wt=json';
+      //var facet = '&rows=0&facet=true&facet.mincount=1&facet.limit='+limit+'&facet.field=' +field;
+      var query = '/select?q=*:*&rows=0&stats=true&stats.field={!cardinality=true}'+ field  + fq + wt ;
+
+      // loop through each field to send facet query to Solr
+      // _.each(fields, function(field) {
+        // var newquery = query + field;
+        if(dashboardParam==undefined){
+          dashboardParam=dashboard.current.solr.core_name;
+        }
+        var request = $http({
+          method: 'GET',
+          url: dashboard.current.solr.server + dashboardParam + query,
+        }).error(function(data, status) {
+          if(status === 0) {
+            alertSrv.set('Error', 'Could not contact Solr at '+dashboard.current.solr.server+
+              '. Please ensure that Solr is reachable from your system.' ,'error');
+          } else {
+            alertSrv.set('Error','Could not retrieve facet data from Solr (Error status = '+status+')','error');
+          }
+        });
+
+        request.then(function(results) {
+
+          callback(results.data.stats.stats_fields[field].cardinality);
+
+        });
+      // }); // each loop
+    };
+
+
 
   });
 

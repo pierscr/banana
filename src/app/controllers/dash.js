@@ -75,7 +75,8 @@ function (angular, config, _) {
                 dashboard:'',
                 fieldin: '',
                 fieldout:'',
-                fieldlabel:''
+                fieldlabel:'',
+                countfield:'id'
             };
         };
 

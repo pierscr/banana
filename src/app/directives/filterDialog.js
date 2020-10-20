@@ -13,6 +13,7 @@ define(['angular'],function(angular){
             $scope.dialog='';
             $scope.style={position:"absolute",top:"100px",left:"50px"};
             $scope.prova='vuoto';
+            $scope.selections=[];
             var showAddDeferred;
             var showRemoveDeferred;
             var initAddPromise=function(){
@@ -25,15 +26,15 @@ define(['angular'],function(angular){
               filterDialogSrv.subscribeRemoveCallback(showRemoveDialog);
             };
 
-            var showAddDialog=function(posy,posx,mode,selections){
+            var showAddDialog=function(posy,posx,mode,selectionsFn,values){
+              $scope.selections=[];
               if(mode!==undefined){
                 $scope.dialog=mode;
               }else{
                 $scope.dialog='orand';
               }
-              if(selections!==undefined){
-                $scope.selections=selections;
-              }
+              selectionsFn($scope.selections);
+
               $scope.style.top=posy;
               $scope.style.left=posx;
               $scope.showCompare= filterSrv.idsByMandate('either').length>0?true:false;
@@ -41,10 +42,9 @@ define(['angular'],function(angular){
               return showAddDeferred.promise;
             };
 
-            var showRemoveDialog=function(posy,posx,selections){
-              if(selections!==undefined){
-                $scope.selections=selections;
-              }
+            var showRemoveDialog=function(posy,posx,selectionsFn){
+              $scope.selections=[];
+              selectionsFn($scope.selections);
               $scope.dialog='remove';
               $scope.style.top=posy;
               $scope.style.left=posx;
@@ -55,7 +55,8 @@ define(['angular'],function(angular){
             $scope.removeFilterSelection=function(selection){
               if(selection!==undefined){
                 console.log("ah ca ti ncucciavu:"+selection);
-                showRemoveDeferred.resolve({mode:'selection',value:selection});
+                selection.callback()
+                showRemoveDeferred.resolve({mode:'selection',value:selection.value});
               }else{
                 showRemoveDeferred.resolve();
               }
@@ -74,10 +75,14 @@ define(['angular'],function(angular){
 
             $scope.andSelection=function(selection){
               if(selection!==undefined){
-                console.log("ah ca ti ncucciavu:"+selection);
-                showAddDeferred.resolve({mode:'selection',value:selection});
+                if(selection.callback!=undefined){
+                  selection.callback();
+                  showAddDeferred.resolve({mode:'selection',value:selection.value});
+                }else{
+                  showAddDeferred.resolve();
+                }
               }else{
-                showAddDeferred.resolve('must');
+                showAddDeferred.resolve();
               }
 
               $scope.close();

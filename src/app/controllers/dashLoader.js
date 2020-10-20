@@ -193,7 +193,7 @@ function (angular, _, config) {
                 function (result) {
                     if (!_.isUndefined(result.response.docs)) {
                         $scope.hits = result.response.numFound;
-                        $scope.elasticsearch.dashboards = parseDashboardList(result.response.docs);
+                          $scope.elasticsearch.dashboards = parseDashboardList(result.response.docs);
                         dashboard.dashboard_list=$scope.elasticsearch.dashboards.map(x=>x.id);
                         dashboard.dashboard_list_objects=$scope.elasticsearch.dashboards;
 
@@ -333,12 +333,15 @@ function (angular, _, config) {
                   doc.server = '';
                 } else {
                   doc.id = dashboardList[i].id;
+                  var solrData={};
                   // Handle a case where the dashboard field is a multi-valued field (array).
                   if (dashboardList[i][self.DASHBOARD_FIELD] instanceof Array) {
-                    doc.server = angular.fromJson(dashboardList[i][self.DASHBOARD_FIELD][0]).solr.server;
+                    solrData=angular.fromJson(dashboardList[i][self.DASHBOARD_FIELD][0]).solr;
                   } else {
-                    doc.server = angular.fromJson(dashboardList[i][self.DASHBOARD_FIELD]).solr.server;
+                    solrData=angular.fromJson(dashboardList[i][self.DASHBOARD_FIELD]).solr
                   }
+                  doc.server = solrData.server;
+                  doc.core_name = solrData.core_name;
                 }
                 docs.push(doc);
             }

@@ -256,6 +256,7 @@
                         <td>{{row.fieldout}}</td>
                         <td>{{row.pivotfield}}</td>
                         <td>{{row.fieldlabel}}</td>
+                        <td>{{row.countfield}}</td>
                         <td><i ng-click="dashboard.current.related_dashboard = _.without(dashboard.current.related_dashboard,row)" class="pointer icon-remove"></i></td>
                     </tr>
                 </table>
@@ -288,6 +289,10 @@
                 <div class="span3">
                     <label class="small">Field Label</label>
                     <input id="newRowLabelInput" type="text" class="input-medium" ng-model='relatedDashboard.fieldlabel' placeholder="field label" >
+                </div>
+                <div class="span3">
+                    <label class="small">Count field</label>
+                    <input id="newRowCountField" type="text" class="input-medium" ng-focus="getRelatedFields();" ng-model='relatedDashboard.countfield' placeholder="Count field" bs-typeahead="relatedDashboardfields" ng-focus="getRelatedFields()">
                 </div>
             </div>
 
