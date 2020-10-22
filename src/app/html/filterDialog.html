@@ -10,7 +10,7 @@
     <li ng-click="abort()">Close</li>
   </ul>
   <ul ng-show="dialog=='compare'">
-    <li ng-repeat="selection in selections" ng-click="andSelection(selection)" >{{selection.value}}  {{selection.badge}}</li>
+    <li ng-repeat="selection in selections" ng-click="andSelection(selection)" >{{selection.value}}  <span class="badge badge-pill badge-info ng-binding" ng-show="elem.param!=''"><span class="badge badge-pill badge-info ng-binding">{{selection.badge}}</span></li>
     <li ng-click="andSelection()">Select only this</li>
     <li ng-click="abort()">Close</li>
   </ul>

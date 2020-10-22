@@ -42,6 +42,7 @@
           <th ng-show="panel.fields.length<1">message (select columns from the list to the left)</th>
           <th style="white-space:nowrap" ng-repeat="field in panel.fields">
             <i ng-show="!$first" class="pointer link icon-caret-left" ng-click="_.move(panel.fields,$index,$index-1)"></i>
+            <i class="icon-th dashboard-icon" ng-show="checkDashboard(field)" bs-tooltip="'Dashboard Available'"></i>
             <span  class="pointer" ng-click="set_sort(field)" ng-show='panel.sortable'>
               {{facet_label(field)}}
               <i ng-show='field == panel.sort[0]' class="pointer link" ng-class="{'icon-chevron-up': panel.sort[1] == 'asc','icon-chevron-down': panel.sort[1] == 'desc'}"></i>

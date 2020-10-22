@@ -533,7 +533,8 @@ body.frame-background.fixed-row-theme.breadcrumbsActive{
 font-weight: bold !important;;
 }
 
-.panel-title i{
+.panel-title i,
+.dashboard-icon{
   padding: 0px 8px 0px 5px;
   color: #0006ff;
 }

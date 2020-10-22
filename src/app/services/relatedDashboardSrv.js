@@ -311,6 +311,18 @@ define([
 
     }
 
+    var checkDashboard=function(field){
+      var elem=dashboard.current.related_dashboard
+        .find(function(elem){
+          return (elem.fieldin && field) && (elem.fieldin.indexOf(field)!=-1 || (elem.pivotfield && elem.pivotfield.indexOf(field)!=-1))
+        });
+        if(elem!=undefined){
+          panel.dashboardIcon=true;
+          return true;
+        }
+      return false
+    }
+
     var getCore=function(dashboardId){
       return dashboard.dashboard_list_objects.find(function(elem){
         return elem.id==dashboardId;
@@ -329,7 +341,8 @@ define([
       setFiltersFromFiedlAndValue:setFiltersFromFiedlAndValue,
       getPivotField:getPivotField,
       removeBreadcrumbBadge:removeBreadcrumbBadge,
-      setDashboardIcon:setDashboardIcon
+      setDashboardIcon:setDashboardIcon,
+      checkDashboard:checkDashboard
     };
   });
 

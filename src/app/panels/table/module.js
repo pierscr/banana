@@ -200,6 +200,10 @@ function (angular, app, _, kbn, moment) {
             $scope.get_data();
         };
 
+        $scope.checkDashboard = function (field) {
+          return relatedDashboardSrv.checkDashboard(field);
+        };
+
         $scope.toggle_field = function (field) {
             if (_.indexOf($scope.panel.fields, field) > -1) {
                 $scope.panel.fields = _.without($scope.panel.fields, field);
