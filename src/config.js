@@ -32,7 +32,7 @@ function (Settings) {
      * @type {String}
      */
     // Specify Solr server and core to store the data.
-    solr: "/solr/",
+    solr: "/solr-solomon/",
     solr_core: "logs",
     timefield: "timestamp_tdt",
 
