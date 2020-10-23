@@ -8,7 +8,7 @@ function (angular, _, config) {
 
     var module = angular.module('kibana.controllers');
 
-    module.controller('dashLoader', function ($scope, $http, timer, dashboard, alertSrv) {
+    module.controller('dashLoader', function ($scope, $http, timer, dashboard, alertSrv,$rootScope,$routeParams) {
         var self = this;
         // Solr and Fusion uses different field names for their schema.
         // Solr uses banana-int collection, and Fusion uses system_banana collection.
@@ -58,8 +58,11 @@ function (angular, _, config) {
 
             $scope.elasticsearch.query = '';  // query for filtering the dashboard list
             window.name=dashboard.current.title;
-            $scope.elasticsearch_dblist("");
+
         };
+        $rootScope.$on('$routeChangeSuccess', function () {
+          $scope.elasticsearch_dblist("");
+        });
 
         // This function should be replaced by one-way binding feature of AngularJS 1.3
         $scope.resetNewDefaults = function () {
@@ -188,8 +191,10 @@ function (angular, _, config) {
         };
 
         $scope.elasticsearch_dblist = function (query) {
+          var test=$routeParams;
           console.log("elasticsearch_dblist");
-            dashboard.elasticsearch_list(query, dashboard.current.loader.load_elasticsearch_size,$scope.getTitleField()).then(
+          var sizeList=(dashboard.current.loader && dashboard.current.loader.load_elasticsearch_size) || 100;
+            dashboard.elasticsearch_list(query, sizeList,$scope.getTitleField()).then(
                 function (result) {
                     if (!_.isUndefined(result.response.docs)) {
                         $scope.hits = result.response.numFound;
@@ -198,7 +203,7 @@ function (angular, _, config) {
                         dashboard.dashboard_list_objects=$scope.elasticsearch.dashboards;
 
                         // Handle pagination
-                        $scope.loadMenu.totalPages = Math.ceil($scope.hits / dashboard.current.loader.load_elasticsearch_size);
+                        $scope.loadMenu.totalPages = Math.ceil($scope.hits / sizeList);
                         var pages = [];
                         for (var j = 0; j < $scope.loadMenu.totalPages; j++) {
                             pages.push({

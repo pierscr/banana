@@ -15,11 +15,11 @@
     <li ng-click="abort()">Close</li>
   </ul>
   <ul ng-show="dialog=='selections'">
-    <li ng-repeat="selection in selections" ng-click="andSelection(selection)" >{{selection.value}}  {{selection.badge}}</li>
+    <li ng-repeat="selection in selections" ng-click="andSelection(selection)" >{{selection.value}}</li>
     <li ng-click="abort()">Close</li>
   </ul>
   <ul ng-show="dialog=='remove'">
-    <li ng-repeat="selection in selections" ng-click="removeFilterSelection(selection)" >{{selection.value}} {{selection.badge}}</li>
+    <li ng-repeat="selection in selections" ng-click="removeFilterSelection(selection)" >{{selection.value}} <span class="badge badge-pill badge-info ng-binding" ng-show="elem.param!=''"><span class="badge badge-pill badge-info ng-binding">{{selection.badge}}</span></li>
     <li ng-click="removeFilterSelection()">Remove filter</li>
     <li ng-click="abort()">Close</li>
   </ul>

@@ -317,7 +317,7 @@ define([
           return (elem.fieldin && field) && (elem.fieldin.indexOf(field)!=-1 || (elem.pivotfield && elem.pivotfield.indexOf(field)!=-1))
         });
         if(elem!=undefined){
-          panel.dashboardIcon=true;
+          //panel.dashboardIcon=true;
           return true;
         }
       return false

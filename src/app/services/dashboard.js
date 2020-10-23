@@ -379,8 +379,7 @@ function (angular, $, kbn, _, config, moment, Modernizr) {
 
         // Load a saved dashboard from Solr
         this.elasticsearch_load = function (type,id) {
-          // For dashboard field, Fusion uses 'banana_dashboard_s', but Solr uses 'dashboard'
-          var server = $routeParams.server + config.banana_index || config.solr + config.banana_index;
+          var server = ($routeParams.server || config.solr) + config.banana_index;
           var url = server + '/select?wt=json&q=' + self.TITLE_FIELD + ':"' + id + '"';
           var method = 'GET';
 
@@ -477,7 +476,7 @@ function (angular, $, kbn, _, config, moment, Modernizr) {
             request = type === 'temp' && ttl ? request.ttl(ttl) : request;
 
             // For Fusion, set sjs.client.server to use Index Pipeline for saving the dashboard.
-            var server = self.current.solr.server + config.banana_index || config.solr + config.banana_index;
+            var server = (self.current.solr.server || config.solr) + config.banana_index;
             var dashboardUrl = '/dashboard/solr/' + title + '?server=' + self.current.solr.server;
             if (config.USE_FUSION) {
                 // The index pipeline uses /index endpoint, which is different from Solr /update and accepts different params.
@@ -513,7 +512,7 @@ function (angular, $, kbn, _, config, moment, Modernizr) {
         };
 
         this.elasticsearch_delete = function (id) {
-            var server = self.current.solr.server + config.banana_index || config.solr + config.banana_index;
+            var server = (self.current.solr.server || config.solr) + config.banana_index;
             // The index pipeline use /index endpoint, which is different from Solr (/update) and accepts different params.
             if (config.USE_FUSION) {
                 // Fusion uses Blob Store API to manage saved dashboards.
@@ -547,7 +546,7 @@ function (angular, $, kbn, _, config, moment, Modernizr) {
 
         // Get a list of saved dashboards from Fusion or Solr
         this.elasticsearch_list = function (query, count,title) {
-            var server = self.current.solr.server + config.banana_index || config.solr + config.banana_index;
+            var server = ($routeParams.server || elf.current.solr.server || config.solr) + config.banana_index;
             if (config.USE_FUSION) {
                 // Use Blob Store API to list all dashboards
                 return lucidworksSrv.getDashboardList(query);

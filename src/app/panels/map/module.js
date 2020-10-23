@@ -293,7 +293,8 @@ function (angular, app, _, $, worldmap) {
                 if (count !== 0) {
                   var index=Object.values(countryCodes).findIndex(function(el){return el==code})
                   filterDialogSrv.addMode('selections');
-                  filterDialogSrv.showDialog(scope.panel.field,scope.reverseCountryMap[code], (this.getBoundingClientRect().y+(this.getBoundingClientRect().height/2))+window.scrollY, event.currentTarget.clientWidth-(this.getBoundingClientRect().width/2),["Select "+Object.keys(countryCodes)[index]]);
+                  var width= event.currentTarget.clientWidth-(this.getBoundingClientRect().width/2)+this.getBoundingClientRect().x
+                  filterDialogSrv.showDialog(scope.panel.field,scope.reverseCountryMap[code], (this.getBoundingClientRect().y+(this.getBoundingClientRect().height/2))+window.scrollY,width,["Select "+Object.keys(countryCodes)[index]]);
                 }
               }
             });
